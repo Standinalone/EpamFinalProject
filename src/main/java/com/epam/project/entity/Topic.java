@@ -1,6 +1,12 @@
 package com.epam.project.entity;
 
-public class Topic {
+import java.io.Serializable;
+
+public class Topic implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -3934376450445831710L;
 	private int id;
 	private String name;
 

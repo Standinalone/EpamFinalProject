@@ -41,7 +41,7 @@
 						</form>
 					</div>
 					<div id="login-box" class="col-md-12">
-						<c:forEach items="${ sessionScope.get(\"errors\") }" var="error">
+						<c:forEach items="${ requestScope.get(\"errors\") }" var="error">
 							<div class="alert alert-danger">
 								<c:out value="${ error }" />
 							</div>
@@ -54,7 +54,7 @@
 			<p class="font-italic">admin - admin</p>
 			<p class="font-italic">user - user</p>
 			<p class="font-italic">lecturer - lecturer</p>
-			<p class="font-italic">BlockedUser - blockeduser</p>
+			<p class="font-italic">blocked_user - blocked_user</p>
 			
 		</div>
 	</div>

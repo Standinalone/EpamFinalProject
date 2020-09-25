@@ -10,7 +10,9 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
+import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
+import com.epam.project.dao.ICourseHomePageDAO;
 import com.epam.project.dto.CourseHomePageDto;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
@@ -23,9 +25,13 @@ public class HomePageCommand implements ICommand {
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
 	private static ServiceFactory serviceFactory;
 	private static ICourseService courseService;
+	private static DaoFactory daoFactory;
+	private static ICourseHomePageDAO courseHomePageDAO;
 
 	static {
 		try {
+			daoFactory = DaoFactory.getDaoFactory(db);
+			courseHomePageDAO = daoFactory.getCourseHomePageDAO();
 			serviceFactory = ServiceFactory.getServiceFactory(db);
 			courseService = serviceFactory.getCourseService();
 		} catch (DatabaseNotSupportedException e) {
@@ -42,7 +48,7 @@ public class HomePageCommand implements ICommand {
 			pageNum = Integer.parseInt(request.getParameter("pagenum")) - 1;
 		}
 		
-		List<CourseHomePageDto> courses = courseService.getCoursesInfoDTOFromTo(Constants.PAGE_SIZE, pageNum * Constants.PAGE_SIZE);
+		List<CourseHomePageDto> courses = courseHomePageDAO.findAllCoursesHomePageFromTo(Constants.PAGE_SIZE, pageNum * Constants.PAGE_SIZE);
 		request.setAttribute("courses", courses);
 		request.setAttribute("startIndex", pageNum * Constants.PAGE_SIZE + 1);
 		try {

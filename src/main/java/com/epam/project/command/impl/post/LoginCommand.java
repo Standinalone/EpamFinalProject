@@ -9,6 +9,9 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 import com.epam.project.dao.DaoFactory;
@@ -19,7 +22,7 @@ import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.l10n.Localization;
 
 public class LoginCommand implements ICommand {
-
+	private static final Logger log = LoggerFactory.getLogger(LoginCommand.class);
 	public static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
 	public static DaoFactory daoFactory;
 	public static IUserDAO userDao;
@@ -52,6 +55,10 @@ public class LoginCommand implements ICommand {
 			errors.add(localization.getMessagesParam("login.blocked"));
 			return errors;
 		}
+		if (!user.isEnabled()) {
+			errors.add(localization.getMessagesParam("login.enabled"));
+			return errors;
+		}
 		request.getSession().setAttribute("user", user);
 		return errors;
 	}
@@ -60,19 +67,23 @@ public class LoginCommand implements ICommand {
 	public void execute(HttpServletRequest request, HttpServletResponse response) {
 		List<String> errors = validate(request);
 		if (errors.isEmpty()) {
-			request.getSession().setAttribute("errors", null);
+			request.setAttribute("errors", null);
 			try {
 				response.sendRedirect(Constants.PAGE_PROFILE);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 		} else {
+			log.error("Data is not valid for a user");
+			log.debug("debug error");
+			
 			try {
-				request.getSession().setAttribute("errors", errors);
+				request.setAttribute("errors", errors);
 				request.getRequestDispatcher(Constants.PATH_LOGIN_PAGE).forward(request, response);
 			} catch (ServletException | IOException e) {
 				e.printStackTrace();
 			}
+			
 		}
 	}
 }

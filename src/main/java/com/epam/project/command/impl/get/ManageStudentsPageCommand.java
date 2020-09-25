@@ -21,17 +21,13 @@ import com.epam.project.service.ServiceFactory;
 
 public class ManageStudentsPageCommand implements ICommand {
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
-	private static ServiceFactory serviceFactory;
 	private static DaoFactory daoFactory;
-	private static IUserService userService;
 	private static IUserDAO userDao;
 
 	static {
 		try {
 			daoFactory = DaoFactory.getDaoFactory(db);
 			userDao = daoFactory.getUserDAO();
-			serviceFactory = ServiceFactory.getServiceFactory(db);
-			userService = serviceFactory.getUserService();
 		} catch (DatabaseNotSupportedException e) {
 			e.printStackTrace();
 		}
@@ -49,7 +45,7 @@ public class ManageStudentsPageCommand implements ICommand {
 			}
 		}
 //		List<UserDto> users = userService.getUsersWithRoles();
-		List<User> users = userDao.findAll();
+		List<User> users = userDao.findAllUsers();
 		request.setAttribute("users",  users);
 		try {
 			request.getRequestDispatcher(Constants.PATH_MANAGE_STUDENTS_PAGE).forward(request, response);

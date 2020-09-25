@@ -49,12 +49,13 @@ public class LocaleFilter implements Filter {
 
 		Cookie[] cookies = ((HttpServletRequest) request).getCookies();
 		Cookie langaugeCookie = null;
-		for (Cookie cookie : cookies) {
-			if ("language".equals(cookie.getName())) {
-				langaugeCookie = cookie;
-				break;
+		if (cookies != null)
+			for (Cookie cookie : cookies) {
+				if ("language".equals(cookie.getName())) {
+					langaugeCookie = cookie;
+					break;
+				}
 			}
-		}
 
 		if (langaugeCookie == null) {
 			Enumeration<Locale> locales = request.getLocales();

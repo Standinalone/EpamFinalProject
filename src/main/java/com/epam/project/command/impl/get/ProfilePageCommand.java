@@ -9,7 +9,10 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
+import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
+import com.epam.project.dao.ICourseHomePageDAO;
+import com.epam.project.dao.ICourseProfilePageDAO;
 import com.epam.project.dto.CourseProfilePageDto;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
@@ -21,9 +24,13 @@ public class ProfilePageCommand implements ICommand {
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
 	private static ServiceFactory serviceFactory;
 	private static IUserService userService;
+	private static DaoFactory daoFactory;
+	private static ICourseProfilePageDAO courseProfilePageDAO;
 
 	static {
 		try {
+			daoFactory = DaoFactory.getDaoFactory(db);
+			courseProfilePageDAO = daoFactory.getCourseProfilePageDAO();
 			serviceFactory = ServiceFactory.getServiceFactory(db);
 			userService = serviceFactory.getUserService();
 		} catch (DatabaseNotSupportedException e) {
@@ -57,14 +64,13 @@ public class ProfilePageCommand implements ICommand {
 		if (request.getParameter("pagenumnotenrolled") != null && !request.getParameter("pagenumnotenrolled").isEmpty()) {
 			pageNumNotEnrolled = Integer.parseInt(request.getParameter("pagenumnotenrolled")) - 1;
 		}
-		
-		List<CourseProfilePageDto> coursesEnrolled = userService.getEnrolledCoursesDTOFromTo(user, Constants.PAGE_SIZE, pageNum * Constants.PAGE_SIZE);
+		List<CourseProfilePageDto> coursesEnrolled = courseProfilePageDAO.findAllCoursesProfilePageFromTo(Constants.PAGE_SIZE, pageNum * Constants.PAGE_SIZE, user, true);
+		List<CourseProfilePageDto> coursesNotEnrolled = courseProfilePageDAO.findAllCoursesProfilePageFromTo(Constants.PAGE_SIZE, pageNumNotEnrolled * Constants.PAGE_SIZE, user, false);
 		
 		request.setAttribute("coursesEnrolled", coursesEnrolled);
-		request.setAttribute("startIndex", pageNum * Constants.PAGE_SIZE + 1);
-		
-		List<CourseProfilePageDto> coursesNotEnrolled = userService.getNotEnrolledCoursesDTOFromTo(user, Constants.PAGE_SIZE, pageNumNotEnrolled * Constants.PAGE_SIZE);
 		request.setAttribute("coursesNotEnrolled", coursesNotEnrolled);
+		
+		request.setAttribute("startIndex", pageNum * Constants.PAGE_SIZE + 1);
 		
 		try {
 			request.getRequestDispatcher(Constants.PATH_PROFILE_PAGE).forward(request, response);

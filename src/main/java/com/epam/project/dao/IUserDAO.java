@@ -15,6 +15,12 @@ public interface IUserDAO {
 
 	boolean addUser(User user);
 
-	List<User> findAll();
+	List<User> findAllUsers();
+
+	boolean updateUser(User user);
+
+	User findUserByEmail(String email);
+
+	List<User> findAllByRole(int role_id);
 
 }

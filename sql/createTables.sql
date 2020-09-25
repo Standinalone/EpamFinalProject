@@ -16,8 +16,10 @@ USE `epam` ;
 
 DROP TABLE IF EXISTS Users; 
 DROP TABLE IF EXISTS Roles; 
+DROP TABLE IF EXISTS Statuses; 
 DROP TABLE IF EXISTS Courses; 
 DROP TABLE IF EXISTS Topics; 
+DROP TABLE IF EXISTS Tokens; 
 DROP TABLE IF EXISTS Courses_has_Users;
 -- -----------------------------------------------------
 -- Table `epam`.`Roles`
@@ -27,6 +29,17 @@ CREATE TABLE IF NOT EXISTS `epam`.`Roles` (
   `name` VARCHAR(45) NOT NULL,
   PRIMARY KEY (`id`))
 ENGINE = InnoDB;
+
+-- -----------------------------------------------------
+-- Table `epam`.`Statuses`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `epam`.`Statuses` (
+  `id` INT NOT NULL,
+  `name` VARCHAR(45) NOT NULL,
+  PRIMARY KEY (`id`))
+ENGINE = InnoDB;
+
+
 
 
 -- -----------------------------------------------------
@@ -42,6 +55,7 @@ CREATE TABLE IF NOT EXISTS `epam`.`Users` (
   `surname` VARCHAR(45) NOT NULL DEFAULT '',
   `patronym` VARCHAR(45) NOT NULL DEFAULT '',
   `email` VARCHAR(45) NOT NULL DEFAULT '',
+  `enabled` TINYINT DEFAULT false,
   PRIMARY KEY (`id`),
   INDEX `fk_Users_Roles1_idx` (`role_id` ASC) VISIBLE,
   CONSTRAINT `fk_Users_Roles1`
@@ -71,15 +85,21 @@ CREATE TABLE IF NOT EXISTS `epam`.`Courses` (
   `name` VARCHAR(45) NOT NULL,
   `start_date` DATETIME NULL,
   `end_date` DATETIME NULL,
-  `status` TINYINT NOT NULL,
+  `status_id` INT NOT NULL,
   `topic_id` INT NOT NULL,
   `lecturer_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_Courses_Topic1_idx` (`topic_id` ASC) VISIBLE,
   INDEX `fk_Courses_Users1_idx` (`lecturer_id` ASC) VISIBLE,
+  INDEX `fk_Courses_Status1_idx` (`status_id` ASC) VISIBLE,
   CONSTRAINT `fk_Courses_Topic1`
     FOREIGN KEY (`topic_id`)
     REFERENCES `epam`.`Topics` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION,
+  CONSTRAINT `fk_Courses_Status1`
+    FOREIGN KEY (`status_id`)
+    REFERENCES `epam`.`Statuses` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_Courses_Users1`
@@ -89,6 +109,22 @@ CREATE TABLE IF NOT EXISTS `epam`.`Courses` (
     ON UPDATE NO ACTION)
 ENGINE = InnoDB;
 
+-- -----------------------------------------------------
+-- Table `epam`.`Tokens`
+-- -----------------------------------------------------
+CREATE TABLE IF NOT EXISTS `epam`.`Tokens` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `user_id` INT UNSIGNED NOT NULL,
+  `token` VARCHAR(64) NOT NULL,
+  `expiry_date` DATETIME NOT NULL,
+  PRIMARY KEY (`id`),
+  INDEX `fk_Tokens_users1_idx` (`user_id` ASC) VISIBLE,
+  CONSTRAINT `fk_Tokens_users1`
+    FOREIGN KEY (`user_id`)
+    REFERENCES `epam`.`users` (`id`)
+    ON DELETE NO ACTION
+    ON UPDATE NO ACTION)
+ENGINE = InnoDB;
 
 -- -----------------------------------------------------
 -- Table `epam`.`Courses_has_Users`

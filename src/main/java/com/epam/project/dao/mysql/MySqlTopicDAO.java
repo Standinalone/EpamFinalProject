@@ -1,21 +1,24 @@
 package com.epam.project.dao.mysql;
 
-import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
+import com.epam.project.dao.GenericDAO;
 import com.epam.project.dao.ITopicDAO;
-import com.epam.project.dao.IUserDAO;
 import com.epam.project.entity.Topic;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 
-public class MySqlTopicDAO implements ITopicDAO {
+public class MySqlTopicDAO extends GenericDAO<Topic> implements ITopicDAO {
 	private static final String SQL_FIND_TOPIC_BY_ID = "SELECT * FROM Topics WHERE id = ?";
 	private static final String FIELD_NAME = "name";
+	private static final String FIELD_ID = "id";
+	private static final String SQL_FIND_ALL = "SELECT * FROM Topics";
 	private static DaoFactory daoFactory;
 	private static MySqlTopicDAO instance;
 
@@ -39,24 +42,48 @@ public class MySqlTopicDAO implements ITopicDAO {
 
 	@Override
 	public Topic findById(int id) {
-		daoFactory.open();
 		Topic topic = null;
+		daoFactory.open();
 		try {
-			Connection connection = daoFactory.getConnection();
-			PreparedStatement ps = connection.prepareStatement(SQL_FIND_TOPIC_BY_ID);
-			ps.setInt(1, id);
-			ResultSet rs = ps.executeQuery();
-			if (rs.next()) {
-				topic = new Topic();
-				topic.setId(id);
-				topic.setName(rs.getString(FIELD_NAME));
+			List<Topic> list = findByField(daoFactory.getConnection(), SQL_FIND_TOPIC_BY_ID, 1, id);
+			if (!list.isEmpty()) {
+				topic = list.get(0);
 			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
-
 		daoFactory.close();
 		return topic;
+	}
+
+	@Override
+	protected Topic mapToEntity(ResultSet rs) {
+		Topic topic = new Topic();
+		try {
+			topic.setId(rs.getInt(FIELD_ID));
+			topic.setName(rs.getString(FIELD_NAME));
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return topic;
+	}
+
+	@Override
+	protected boolean mapFromEntity(PreparedStatement ps, Topic topic) {
+		return false;
+	}
+
+	@Override
+	public List<Topic> findAll() {
+		List<Topic> topics = new ArrayList<>();
+		daoFactory.open();
+		try {
+			topics = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		daoFactory.close();
+		return topics;
 	}
 
 }

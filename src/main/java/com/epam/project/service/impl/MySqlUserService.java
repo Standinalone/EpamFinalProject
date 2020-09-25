@@ -98,73 +98,73 @@ public class MySqlUserService implements IUserService {
 	@Override
 	public List<CourseProfilePageDto> getCoursesDTO(User user) {
 		List<CourseProfilePageDto> coursesDTO = new ArrayList<>();
-		daoFactory.open();
-		try {
-			Connection connection = daoFactory.getConnection();
-			PreparedStatement ps = connection.prepareStatement(SQL_GET_COURSES_FOR_USER);
-			ps.setInt(1, user.getId());
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				coursesDTO.add(mapToCourseDTO(rs));
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		daoFactory.close();
+//		daoFactory.open();
+//		try {
+//			Connection connection = daoFactory.getConnection();
+//			PreparedStatement ps = connection.prepareStatement(SQL_GET_COURSES_FOR_USER);
+//			ps.setInt(1, user.getId());
+//			ResultSet rs = ps.executeQuery();
+//			while (rs.next()) {
+//				coursesDTO.add(mapToCourseDTO(rs));
+//			}
+//
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
 		return coursesDTO;
 	}
 
 	@Override
 	public List<CourseProfilePageDto> getNotEnrolledCoursesDTOFromTo(User user, int limit, int offset) {
 		List<CourseProfilePageDto> coursesDTO = new ArrayList<>();
-		daoFactory.open();
-		try {
-			Connection connection = daoFactory.getConnection();
-			PreparedStatement ps = connection.prepareStatement(SQL_GET_NOT_ENROLLED_COURSES_FOR_USER_FROM_TO);
-			ps.setInt(1, user.getId());
-			ps.setInt(2, limit);
-			ps.setInt(3, offset);
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				coursesDTO.add(mapToCourseDTO(rs));
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		daoFactory.close();
+//		daoFactory.open();
+//		try {
+//			Connection connection = daoFactory.getConnection();
+//			PreparedStatement ps = connection.prepareStatement(SQL_GET_NOT_ENROLLED_COURSES_FOR_USER_FROM_TO);
+//			ps.setInt(1, user.getId());
+//			ps.setInt(2, limit);
+//			ps.setInt(3, offset);
+//			ResultSet rs = ps.executeQuery();
+//			while (rs.next()) {
+//				coursesDTO.add(mapToCourseDTO(rs));
+//			}
+//
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
 		return coursesDTO;
 	}
 
-	private CourseProfilePageDto mapToCourseDTO(ResultSet rs) {
-		CourseProfilePageDto courseDTO = new CourseProfilePageDto();
-		try {
-			courseDTO.setStartDate(rs.getDate(FIELD_STARTDATE).toLocalDate());
-			LocalDate endDate = rs.getDate(FIELD_ENDDATE).toLocalDate();
-			courseDTO.setEndDate(endDate);
-			courseDTO.setCourseName(rs.getString(FIELD_NAME));
-			courseDTO.setGrade(rs.getInt(FIELD_GRADE));
-			CourseStatusEnum se;
-			if (rs.getBoolean(FIELD_STATUS) && LocalDate.now().isAfter(endDate)) {
-				se = CourseStatusEnum.FINISHED;
-			} else {
-				se = rs.getBoolean(FIELD_STATUS) ? CourseStatusEnum.IN_PROGRESS : CourseStatusEnum.NOT_STARTED;
-			}
-			courseDTO.setStatus(se);
-			Topic topic = topicDao.findById(rs.getInt(FIELD_TOPIC_ID));
-			if (topic != null) {
-				courseDTO.setTopic(topic.getName());
-			}
-			User lecturer = userDao.findUserById(rs.getInt(FIELD_LECTURER_ID));
-			if (lecturer != null) {
-				courseDTO.setLecturer(lecturer.getSurname() + " " + lecturer.getName());
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return courseDTO;
-	}
+//	private CourseProfilePageDto mapToCourseDTO(ResultSet rs) {
+//		CourseProfilePageDto courseDTO = new CourseProfilePageDto();
+//		try {
+//			courseDTO.setStartDate(rs.getDate(FIELD_STARTDATE).toLocalDate());
+//			LocalDate endDate = rs.getDate(FIELD_ENDDATE).toLocalDate();
+//			courseDTO.setEndDate(endDate);
+//			courseDTO.setCourseName(rs.getString(FIELD_NAME));
+//			courseDTO.setGrade(rs.getInt(FIELD_GRADE));
+//			CourseStatusEnum se;
+//			if (rs.getBoolean(FIELD_STATUS) && LocalDate.now().isAfter(endDate)) {
+//				se = CourseStatusEnum.FINISHED;
+//			} else {
+//				se = rs.getBoolean(FIELD_STATUS) ? CourseStatusEnum.IN_PROGRESS : CourseStatusEnum.NOT_STARTED;
+//			}
+//			courseDTO.setStatus(se);
+//			Topic topic = topicDao.findById(rs.getInt(FIELD_TOPIC_ID));
+//			if (topic != null) {
+//				courseDTO.setTopic(topic.getName());
+//			}
+//			User lecturer = userDao.findUserById(rs.getInt(FIELD_LECTURER_ID));
+//			if (lecturer != null) {
+//				courseDTO.setLecturer(lecturer.getSurname() + " " + lecturer.getName());
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		return courseDTO;
+//	}
 
 	@Override
 	public void blockUser(int id) {
@@ -215,22 +215,22 @@ public class MySqlUserService implements IUserService {
 	@Override
 	public List<CourseProfilePageDto> getEnrolledCoursesDTOFromTo(User user, int limit, int offset) {
 		List<CourseProfilePageDto> coursesDTO = new ArrayList<>();
-		daoFactory.open();
-		try {
-			Connection connection = daoFactory.getConnection();
-			PreparedStatement ps = connection.prepareStatement(SQL_GET_ENROLLED_COURSES_FOR_USER_FROM_TO);
-			ps.setInt(1, user.getId());
-			ps.setInt(2, limit);
-			ps.setInt(3, offset);
-			ResultSet rs = ps.executeQuery();
-			while (rs.next()) {
-				coursesDTO.add(mapToCourseDTO(rs));
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		daoFactory.close();
+//		daoFactory.open();
+//		try {
+//			Connection connection = daoFactory.getConnection();
+//			PreparedStatement ps = connection.prepareStatement(SQL_GET_ENROLLED_COURSES_FOR_USER_FROM_TO);
+//			ps.setInt(1, user.getId());
+//			ps.setInt(2, limit);
+//			ps.setInt(3, offset);
+//			ResultSet rs = ps.executeQuery();
+//			while (rs.next()) {
+//				coursesDTO.add(mapToCourseDTO(rs));
+//			}
+//
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
 		return coursesDTO;
 	}
 

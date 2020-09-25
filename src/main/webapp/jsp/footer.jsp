@@ -1,5 +1,5 @@
 			</div>
-			<div class="col-sm-4">
+			<div class="col-sm-3 nopadding">
 				<fmt:bundle basename="menu" >
 				<div class="list-group list-group-flush">
 					<a href="?command=HOME_PAGE" class="list-group-item"><fmt:message key="menu.home" /></a>
@@ -22,7 +22,7 @@
 					<c:choose>
 						<c:when test = "${ user.role == 'ADMIN' }">
 							<a href="?command=MANAGE_STUDENTS_PAGE" class="list-group-item"><fmt:message key="menu.manageStudents" /></a>
-							<a href="?command=MANAGE_COURSES_PAGE" class="list-group-item disabled"><fmt:message key="menu.manageCourses" /></a>
+							<a href="?command=MANAGE_COURSES_PAGE" class="list-group-item"><fmt:message key="menu.manageCourses" /></a>
 						</c:when>
 						<c:otherwise>
 							<li class="list-group-item disabled"><fmt:message key="menu.manageStudents" /></li>

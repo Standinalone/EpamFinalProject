@@ -1,9 +1,25 @@
 package com.epam.project.entity;
 
-public class User {
+import java.io.Serializable;
+
+public class User implements Serializable {
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -936646206474544157L;
 	private int id;
 	private String login;
 	private String password;
+	private boolean enabled;
+	
+	public boolean isEnabled() {
+		return enabled;
+	}
+
+	public void setEnabled(boolean enabled) {
+		this.enabled = enabled;
+	}
+
 	public String getEmail() {
 		return email;
 	}
