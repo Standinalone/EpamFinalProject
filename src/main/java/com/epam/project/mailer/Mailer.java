@@ -20,14 +20,10 @@ import javax.naming.NamingException;
 import com.epam.project.constants.Constants;
 
 public class Mailer {
-//	private static String host = "smtp.gmail.com";
-//	private static String username = "surveyseveryone";
-//	private static String password = "fie20Djd1d";
 	private static String username ;
 	private static String password;
 	private static String host;
 	private static Properties props = new Properties();
-//	private static Session session;
 
 	private Mailer() {
 	}
@@ -73,16 +69,4 @@ public class Mailer {
 //		Transport.send(msg);
 	}
 
-//	public static void sendFeedback(String user, String text) throws MessagingException  {
-//
-//		String subject = "Фидбек";
-//		Address[] recipients = new Address[] {new InternetAddress("surveyseveryone@gmail.com")};
-//
-//		msg.setRecipients(Message.RecipientType.TO, recipients);
-//		msg.setText(text + " от " + user);
-//		msg.setSubject(subject);
-//		msg.setSentDate(new Date());
-//		
-//	    Transport.send(msg, username, password);
-//	}
 }
