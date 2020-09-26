@@ -4,7 +4,6 @@ import com.epam.project.command.impl.post.*;
 
 public enum CommandEnum {
 	HOME_PAGE(new HomePageCommand()),
-	COURSES_PAGE(new CoursesPageCommand()),
 	PROFILE_PAGE(new ProfilePageCommand()),
 	LOGIN_PAGE(new LoginPageCommand()),
 	REGISTER_PAGE(new RegisterPageCommand()),
@@ -22,6 +21,7 @@ public enum CommandEnum {
 	CHANGE_USERS_STATUS(new ChangeUsersStatusCommand()),
 	REGISTRATION_CONFIRM(new RegistrationConfirmCommand()),
 	ADD_EDIT_COURSE(new AddEditCourseCommand()),
+	DELETE_COURSE(new DeleteCourseCommand()),
 	JOIN_COURSES(new JoinCoursesCommand());
 			
 	private ICommand command;

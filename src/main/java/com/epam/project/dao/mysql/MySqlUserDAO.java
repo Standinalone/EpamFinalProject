@@ -3,7 +3,6 @@ package com.epam.project.dao.mysql;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.epam.project.dao.DaoFactory;
@@ -34,9 +33,13 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	private static final String SQL_FIND_ALL = "SELECT * FROM Users, Roles WHERE Users.role_id = Roles.id";
 	private static final String SQL_FIND_USER_BY_EMAIL = "SELECT * FROM Users, Roles WHERE Users.role_id = Roles.id AND users.email = ?";
 	private static final String SQL_FIND_USER_BY_ROLE = "SELECT * FROM Users, Roles WHERE Users.role_id = Roles.id AND users.role_id = ?";
-
-
-
+	private static final String SQL_ENROLL_USER_TO_COURSE = "INSERT INTO Courses_has_users VALUES (?, ?, 0, false)";
+	private static final String SQL_DELETE_USER_BY_ID = "DELETE FROM Users WHERE id = ?";
+//	private static final String SQL_GET_COURSES_WITH_USER_COUNT = "SELECT COUNT(*) FROM (" + SQL_GET_COURSES_FOR_USER
+//			+ " and registered = ?) as t";
+	
+	private static final String SQL_GET_COURSES_WITH_USER_COUNT = "SELECT COUNT(*) FROM Courses_has_users WHERE user_id = ?";
+	
 	private static DaoFactory daoFactory;
 	private static MySqlUserDAO instance;
 
@@ -59,82 +62,137 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	}
 
 	@Override
-	public User findUserByLogin(String login) {
-		User user = null;
-		daoFactory.open();
-		try {
-			List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_LOGIN, 1, login);
-			if (!list.isEmpty()) {
-				user = list.get(0);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		daoFactory.close();
-		return user;
+	public User findByLogin(String login) throws SQLException {
+		List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_LOGIN, 1, login);
+		if (!list.isEmpty())
+			return list.get(0);
+		return null;
+//		User user = null;
+//		daoFactory.open();
+//		try {
+//			List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_LOGIN, 1, login);
+//			if (!list.isEmpty()) {
+//				user = list.get(0);
+//			}
+//
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
+//		return user;
 	}
 
 	@Override
-	public boolean addUser(User user) {
-		boolean result = false;
-		daoFactory.open();
-		try {
-			int id = addToDb(daoFactory.getConnection(), SQL_ADD_USER, user);
-			if (id > 0) {
-				user.setId(id);
-				result = true;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+	public boolean add(User user) throws SQLException {
+		int id = addToDb(daoFactory.getConnection(), SQL_ADD_USER, user);
+		if (id > 0) {
+			user.setId(id);
+			return true;
 		}
-		daoFactory.close();
-		return result;
+		return false;
 	}
 
 	@Override
-	public User findUserById(int id) {
-		User user = null;
-		daoFactory.open();
-		try {
-			List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_ID, 1, id);
-			if (!list.isEmpty()) {
-				user = list.get(0);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+	public User findById(int id) throws SQLException {
+		List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_ID, 1, id);
+		if (!list.isEmpty()) {
+			return list.get(0);
 		}
-		daoFactory.close();
-		return user;
+		return null;
+
+//		User user = null;
+//		daoFactory.open();
+//		try {
+//			List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_ID, 1, id);
+//			if (!list.isEmpty()) {
+//				user = list.get(0);
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
+//		return user;
 	}
 
 	@Override
-	public List<User> findAllUsers() {
-		List<User> users = new ArrayList<>();
-		daoFactory.open();
-		try {
-			users = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		daoFactory.close();
-		return users;
+	public List<User> findAll() throws SQLException {
+		return findAll(daoFactory.getConnection(), SQL_FIND_ALL);
+//		List<User> users = new ArrayList<>();
+//		daoFactory.open();
+//		try {
+//			users = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
+//		return users;
 	}
 
 	@Override
-	public boolean updateUser(User user) {
-		boolean result = false;
-		daoFactory.open();
-		try {
-			if (update(daoFactory.getConnection(), user, SQL_UPDATE_USER_BY_ID, 10, user.getId())) {
-				result = true;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			result = false;
-		}
-		daoFactory.close();
-		return result;
+	public boolean update(User user) throws SQLException {
+		return update(daoFactory.getConnection(), user, SQL_UPDATE_USER_BY_ID, 10, user.getId());
+//		boolean result = false;
+//		daoFactory.open();
+//		try {
+//			if (update(daoFactory.getConnection(), user, SQL_UPDATE_USER_BY_ID, 10, user.getId())) {
+//				result = true;
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//			result = false;
+//		}
+//		daoFactory.close();
+//		return result;
+	}
+
+	@Override
+	public User findByEmail(String email) throws SQLException {
+		List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_EMAIL, 1, email);
+		if (!list.isEmpty())
+			return list.get(0);
+		return null;
+//		User user = null;
+//		daoFactory.open();
+//		try {
+//			List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_EMAIL, 1, email);
+//			if (!list.isEmpty()) {
+//				user = list.get(0);
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
+//		return user;
+	}
+
+	@Override
+	public List<User> findAllByRole(int roleId) throws SQLException {
+		return findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_ROLE, 1, roleId);
+//		List<User> users = null;
+//		daoFactory.open();
+//		try {
+//			users = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_ROLE, 1, roleId);
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
+//		return users;
+	}
+
+	@Override
+	public void addToManyToMany(int courseId, int userId) throws SQLException {
+		addToManyToMany(daoFactory.getConnection(), SQL_ENROLL_USER_TO_COURSE, courseId, userId);
+	}
+
+	@Override
+	public int getCoursesCountByUser(int userId, boolean enrolled) throws SQLException {
+		String sql = SQL_GET_COURSES_WITH_USER_COUNT + (enrolled ? " AND registered = true " : " AND registered = false");
+		return getCountByField(daoFactory.getConnection(), sql, userId);
+	}
+
+	@Override
+	public boolean delete(int userId) throws SQLException {
+		return deleteByField(daoFactory.getConnection(), SQL_DELETE_USER_BY_ID, userId);
 	}
 	
 	@Override
@@ -161,7 +219,7 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	protected boolean mapFromEntity(PreparedStatement ps, User user) {
 		try {
 			ps.setBoolean(1, user.isBlocked());
-			ps.setInt(2, user.getRole().ordinal());
+			ps.setInt(2, user.getRole().ordinal() + 1);
 			ps.setString(3, user.getLogin());
 			ps.setString(4, user.getPassword());
 			ps.setString(5, user.getName());
@@ -174,35 +232,6 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 			e.printStackTrace();
 			return false;
 		}
-	}
-
-	@Override
-	public User findUserByEmail(String email) {
-		User user = null;
-		daoFactory.open();
-		try {
-			List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_EMAIL, 1, email);
-			if (!list.isEmpty()) {
-				user = list.get(0);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		daoFactory.close();
-		return user;
-	}
-
-	@Override
-	public List<User> findAllByRole(int roleId) {
-		List<User> users = null;
-		daoFactory.open();
-		try {
-			users = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_ROLE, 1, roleId);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		daoFactory.close();
-		return users;
 	}
 
 }

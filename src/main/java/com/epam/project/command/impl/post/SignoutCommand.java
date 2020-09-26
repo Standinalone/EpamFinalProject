@@ -1,7 +1,5 @@
 package com.epam.project.command.impl.post;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,13 +9,10 @@ import com.epam.project.constants.Constants;
 public class SignoutCommand implements ICommand{
 
 	@Override
-	public void execute(HttpServletRequest request, HttpServletResponse response) {
-		request.getSession().invalidate();
-		try {
-			response.sendRedirect(Constants.PAGE_HOME);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+	public String execute(HttpServletRequest request, HttpServletResponse response) {
+		if (request.getSession() != null)
+			request.getSession().invalidate();
+		return Constants.PAGE_HOME;
 	}
 
 }

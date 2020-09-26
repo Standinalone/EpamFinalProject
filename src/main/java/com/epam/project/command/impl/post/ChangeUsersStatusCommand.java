@@ -1,6 +1,5 @@
 package com.epam.project.command.impl.post;
 
-import java.io.IOException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -29,34 +28,20 @@ public class ChangeUsersStatusCommand implements ICommand {
 	}
 
 	@Override
-	public void execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		User user = (User) request.getSession().getAttribute("user");
 		if (user == null || user.getRole() != RoleEnum.ADMIN) {
-			try {
-				response.sendRedirect(Constants.PAGE_LOGIN);
-				return;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			return Constants.PAGE_LOGIN;
 		}
 		String[] checkedIds = request.getParameterValues("users");
 		String action = request.getParameter("submit");
 
 		if ("block".equals(action)) {
-			for (String id : checkedIds) {
-				userService.blockUser(Integer.parseInt(id));
-			}
+			userService.blockUserById(checkedIds);
 		} else {
-			for (String id : checkedIds) {
-				userService.unblockUser(Integer.parseInt(id));
-			}
+			userService.unblockUserById(checkedIds);
 		}
-		try {
-			response.sendRedirect(Constants.PAGE_MANAGE_STUDENTS);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		System.out.println("ChangeUsersStatusCommand");
+		return Constants.PAGE_MANAGE_STUDENTS;
 	}
 
 }

@@ -1,25 +1,22 @@
 <%@ page import="com.epam.project.entity.User"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/sql" prefix="sql" %>
-<c:set value="${ sessionScope.get(\"error\") }" var="error" scope="page" />
+<c:set value="${ requestScope.get(\"error\") }" var="errorForward" scope="page" />
+<c:set value="${ sessionScope.get(\"error\") }" var="errorRedirect" scope="page" />
 <c:set value="Error" var="title" />
-<sql:query var="rs" dataSource="jdbc/epam">
-select id, name from users
-</sql:query>
 
 <!-- Header -->
 <%@include file='../jsp/header.jsp'%>
 
 <!-- Body -->
 
-<c:if test="${not empty error }">
-	<div class="alert alert-danger">${ error }</div>
+<c:if test="${not empty errorForward }">
+	<div class="alert alert-danger">Forward error: ${ errorForward }</div>
 </c:if>
-<c:if test="${empty error }">
+<c:if test="${not empty errorRedirect }">
+	<div class="alert alert-danger">Redirect error: ${ errorRedirect }</div>
+</c:if>
+<c:if test="${empty errorForward && empty errorRedirect}">
 	<div class="alert alert-danger">404</div>
 </c:if>
-<c:forEach var="row" items="${rs.rows}">
-    Foo ${row.name}<br/>
-</c:forEach>
 <!-- Footer -->
 <%@include file='../jsp/footer.jsp'%>

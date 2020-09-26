@@ -10,9 +10,9 @@ import java.util.List;
 import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dao.GenericDAO;
-import com.epam.project.dao.ICourseHomePageDAO;
+import com.epam.project.dao.ICourseDtoDAO;
 import com.epam.project.dao.ICourseProfilePageDAO;
-import com.epam.project.dto.CourseHomePageDto;
+import com.epam.project.dto.CourseDto;
 import com.epam.project.dto.CourseProfilePageDto;
 import com.epam.project.entity.Course;
 import com.epam.project.entity.CourseStatusEnum;
@@ -23,15 +23,18 @@ public class MySqlCourseProfilePageDAO extends GenericDAO<CourseProfilePageDto> 
 	private static final String FIELD_COURSE_NAME = "Courses.name";
 	private static final String FIELD_STARTDATE = "start_date";
 	private static final String FIELD_ENDDATE = "end_date";
-	private static final String FIELD_STATUS = "Statuses.name";
 	private static final String FIELD_USER_NAME = "Users.name";
 	private static final String FIELD_USER_SURNAME = "Users.surname";
 	private static final String FIELD_USER_PATRONYM = "Users.patronym";
 	private static final String FIELD_TOPIC_NAME = "Topics.name";
 	private static final String FIELD_GRADE = "grade";
 	private static final String FIELD_ID = "Courses.id";
+	private static final String FIELD_LECTURER_ID = "Courses.lecturer_id";
+	private static final String FIELD_TOPIC_ID = "Courses.topic_id";
+	private static final String FIELD_STATUS = "Statuses.name";
 	
 	private static final String SQL_FIND_COURSES_FROM_TO = "SELECT * FROM Courses_has_users, Courses, Topics, Users, Statuses WHERE course_id = Courses.id AND user_id = ? AND Topics.id = Courses.topic_id AND Users.id = Courses.lecturer_id AND Statuses.id = Courses.status_id";
+
 
 	
 
@@ -56,23 +59,21 @@ public class MySqlCourseProfilePageDAO extends GenericDAO<CourseProfilePageDto> 
 		return instance;
 	}
 	@Override
-	public List<CourseProfilePageDto> findAllCoursesProfilePageFromTo(int limit, int offset, User user, boolean enrolled) {
-		List<CourseProfilePageDto> courses = new ArrayList<>();
+	public List<CourseProfilePageDto> findAllFromTo(int limit, int offset, User user, boolean enrolled) throws SQLException {
+
 		String sql = SQL_FIND_COURSES_FROM_TO;
-		if (enrolled) {
-			sql += " and registered = true";
-		}
-		else {
-			sql += " and registered = false";
-		}
-		daoFactory.open();
-		try {
-			courses = findByFieldFromTo(daoFactory.getConnection(), sql, limit, offset, 1, user.getId());
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		daoFactory.close();
-		return courses;
+		sql += enrolled ? " AND registered = true " : " AND registered = false ";
+		
+		return findByFieldFromTo(daoFactory.getConnection(), sql, limit, offset, 1, user.getId());
+//		List<CourseProfilePageDto> courses = new ArrayList<>();
+//		daoFactory.open();
+//		try {
+//			courses = findByFieldFromTo(daoFactory.getConnection(), sql, limit, offset, 1, user.getId());
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
+//		return courses;
 	}
 
 	@Override
@@ -80,16 +81,18 @@ public class MySqlCourseProfilePageDAO extends GenericDAO<CourseProfilePageDto> 
 		Course course = new Course();
 		CourseProfilePageDto courseProfilePageDto = new CourseProfilePageDto();
 		try {
+			course.setId(rs.getInt(FIELD_ID));
 			course.setName(rs.getString(FIELD_COURSE_NAME));
 			course.setStartDate(rs.getDate(FIELD_STARTDATE).toLocalDate());
 			course.setEndDate(rs.getDate(FIELD_ENDDATE).toLocalDate());
+			course.setLecturerId(rs.getInt(FIELD_LECTURER_ID));
+			course.setTopicId(rs.getInt(FIELD_TOPIC_ID));
+			course.setStatus(CourseStatusEnum.valueOf(rs.getString(FIELD_STATUS).toUpperCase()));
+			
 			courseProfilePageDto.setCourse(course);
-			course.setId(rs.getInt(FIELD_ID));
 			
 			courseProfilePageDto.setTopic(rs.getString(FIELD_TOPIC_NAME));
 			courseProfilePageDto.setLecturer(rs.getString(FIELD_USER_NAME) + " " + rs.getString(FIELD_USER_SURNAME) + "  "  + rs.getString(FIELD_USER_PATRONYM));
-			
-			courseProfilePageDto.setStatus(CourseStatusEnum.valueOf(rs.getString(FIELD_STATUS).toUpperCase()));
 			courseProfilePageDto.setGrade(rs.getInt(FIELD_GRADE));
 		} catch (SQLException e) {
 			e.printStackTrace();

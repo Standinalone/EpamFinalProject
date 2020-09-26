@@ -19,7 +19,7 @@ import java.sql.SQLException;
 import com.epam.project.constants.Constants;
 import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.ICourseDAO;
-import com.epam.project.dao.ICourseHomePageDAO;
+import com.epam.project.dao.ICourseDtoDAO;
 import com.epam.project.dao.ICourseProfilePageDAO;
 import com.epam.project.dao.ITokenDAO;
 import com.epam.project.dao.ITopicDAO;
@@ -130,8 +130,8 @@ public final class MySqlDAOFactory extends DaoFactory {
 	}
 
 	@Override
-	public ICourseHomePageDAO getCourseHomePageDAO() {
-		return MySqlCourseHomePageDAO.getInstance();
+	public ICourseDtoDAO getCourseDtoDAO() {
+		return MySqlCourseDtoDAO.getInstance();
 	}
 
 	@Override

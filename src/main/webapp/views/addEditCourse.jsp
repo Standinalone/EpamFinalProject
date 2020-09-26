@@ -3,8 +3,9 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <c:set value="Courses Home Page" var="title" />
 <c:set value="${ sessionScope.get(\"user\") }" var="user" scope="page" />
-<c:set value="${ sessionScope.get(\"course\") }" var="user" scope="page" />
-<c:set value="${pageContext.request.locale.language}" var="language"
+<%-- <c:set value="${ sessionScope.get(\"course\") }" var="user" scope="page" /> --%>
+<c:set value="${ requestScope.get(\"course\") }" var="user" scope="page" />
+<c:set value="${ pageContext.request.locale.language }" var="language"
 	scope="page" />
 <c:set value="${ sessionScope.get(\"successMessage\") }"
 	var="successMessage" scope="page" />
@@ -35,7 +36,7 @@
 								key="table.topic" />:</label><br> <select id="topic" name="topic"
 							class="custom-select nopadding" id="inputGroupSelect01">
 
-							<c:forEach items="${  sessionScope.get(\"topics\")  }"
+							<c:forEach items="${  requestScope.get(\"topics\")  }"
 								var="topic">
 								<option
 									<c:if test = "${ topic.name == course.topic }">selected</c:if>
@@ -48,7 +49,7 @@
 								key="table.lecturer" />:</label><br> <select id="lecturer"
 							name="lecturer" class="custom-select nopadding"
 							id="inputGroupSelect02">
-							<c:forEach items="${  sessionScope.get(\"lecturers\")  }"
+							<c:forEach items="${  requestScope.get(\"lecturers\")  }"
 								var="lecturer">
 								<option
 									<c:if test = "${ lecturer.name == course.lecturer }">selected</c:if>
@@ -77,7 +78,7 @@
 								key="table.status" />:</label><br> <select id="status"
 							name="status" class="custom-select nopadding"
 							id="inputGroupSelect03">
-							<c:forEach items="${  sessionScope.get(\"statuses\")  }"
+							<c:forEach items="${  requestScope.get(\"statuses\")  }"
 								var="status">
 								<option
 									<c:if test = "${ status == course.course.status }">selected</c:if>

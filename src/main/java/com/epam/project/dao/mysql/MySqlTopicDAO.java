@@ -3,7 +3,6 @@ package com.epam.project.dao.mysql;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import com.epam.project.dao.DaoFactory;
@@ -11,7 +10,6 @@ import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dao.GenericDAO;
 import com.epam.project.dao.ITopicDAO;
 import com.epam.project.entity.Topic;
-import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 
 public class MySqlTopicDAO extends GenericDAO<Topic> implements ITopicDAO {
@@ -41,19 +39,39 @@ public class MySqlTopicDAO extends GenericDAO<Topic> implements ITopicDAO {
 	}
 
 	@Override
-	public Topic findById(int id) {
-		Topic topic = null;
-		daoFactory.open();
-		try {
-			List<Topic> list = findByField(daoFactory.getConnection(), SQL_FIND_TOPIC_BY_ID, 1, id);
-			if (!list.isEmpty()) {
-				topic = list.get(0);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+	public Topic findById(int id) throws SQLException {
+		List<Topic> list = findByField(daoFactory.getConnection(), SQL_FIND_TOPIC_BY_ID, 1, id);
+		if (!list.isEmpty()) {
+			return list.get(0);
 		}
-		daoFactory.close();
-		return topic;
+		return null;
+
+//		Topic topic = null;
+//		daoFactory.open();
+//		try {
+//			List<Topic> list = findByField(daoFactory.getConnection(), SQL_FIND_TOPIC_BY_ID, 1, id);
+//			if (!list.isEmpty()) {
+//				topic = list.get(0);
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
+//		return topic;
+	}
+
+	@Override
+	public List<Topic> findAll() throws SQLException {
+		return findAll(daoFactory.getConnection(), SQL_FIND_ALL);
+//		List<Topic> topics = new ArrayList<>();
+//		daoFactory.open();
+//		try {
+//			topics = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
+//		return topics;
 	}
 
 	@Override
@@ -71,19 +89,6 @@ public class MySqlTopicDAO extends GenericDAO<Topic> implements ITopicDAO {
 	@Override
 	protected boolean mapFromEntity(PreparedStatement ps, Topic topic) {
 		return false;
-	}
-
-	@Override
-	public List<Topic> findAll() {
-		List<Topic> topics = new ArrayList<>();
-		daoFactory.open();
-		try {
-			topics = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		daoFactory.close();
-		return topics;
 	}
 
 }

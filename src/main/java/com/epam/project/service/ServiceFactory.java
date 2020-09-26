@@ -11,10 +11,6 @@ public abstract class ServiceFactory {
 			switch (db) {
 			case MYSQL:
 				return MySqlServiceFactory.getInstance();
-			case ORACLE:
-				throw new IllegalArgumentException();
-			case H2:
-				throw new IllegalArgumentException();
 			default:
 				throw new IllegalArgumentException();
 			}
@@ -26,4 +22,8 @@ public abstract class ServiceFactory {
 	public abstract IUserService getUserService();
 
 	public abstract ICourseService getCourseService();
+	
+	public abstract ITopicService getTopicService();	
+	
+	public abstract ITokenService getTokenService();
 }

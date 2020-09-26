@@ -1,27 +1,27 @@
 package com.epam.project.command.impl.post;
 
-import java.io.IOException;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.mail.MessagingException;
-import javax.servlet.ServletException;
+import javax.mail.internet.AddressException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
-import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
-import com.epam.project.dao.ITokenDAO;
-import com.epam.project.dao.IUserDAO;
 import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
 import com.epam.project.entity.VerificationToken;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.l10n.Localization;
 import com.epam.project.mailer.Mailer;
+import com.epam.project.service.ITokenService;
+import com.epam.project.service.IUserService;
+import com.epam.project.service.ServiceFactory;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -29,15 +29,16 @@ import java.util.UUID;
 public class RegisterCommand implements ICommand {
 
 	public static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
-	public static DaoFactory daoFactory;
-	public static IUserDAO userDao;
-	public static ITokenDAO tokenDao;
+
+	public static ServiceFactory serviceFactory;
+	public static IUserService userService;
+	public static ITokenService tokenService;
 
 	static {
 		try {
-			daoFactory = DaoFactory.getDaoFactory(db);
-			userDao = daoFactory.getUserDAO();
-			tokenDao = daoFactory.getTokenDAO();
+			serviceFactory = ServiceFactory.getServiceFactory(db);
+			userService = serviceFactory.getUserService();
+			tokenService = serviceFactory.getTokenService();
 		} catch (DatabaseNotSupportedException e) {
 			e.printStackTrace();
 		}
@@ -57,7 +58,7 @@ public class RegisterCommand implements ICommand {
 		if (username == null || !Pattern.matches(Constants.REGEX_USERNAME, username)) {
 			errors.add(localization.getMessagesParam("register.invalidUsername"));
 		}
-		if (username != null && userDao.findUserByLogin(username) != null) {
+		if (username != null && userService.findUserByLogin(username) != null) {
 			errors.add(localization.getMessagesParam("register.userExists"));
 		}
 //		if (email != null && userDao.findUserByEmail(email) != null) {
@@ -85,12 +86,41 @@ public class RegisterCommand implements ICommand {
 	}
 
 	@Override
-	public void execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		List<String> errors = validate(request);
 		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
-		if (errors.size() == 0) {
-			request.setAttribute("errors", null);
-			User user = new User();
+		if (!errors.isEmpty()) {
+			request.getSession().setAttribute("errors", errors);
+			return Constants.PAGE_REGISTER;
+		}
+		request.getSession().setAttribute("errors", null);
+		User user = mapToUser(request);
+
+		if (!userService.addUser(user)) {
+			request.getSession().setAttribute("error", "Cannot add user :(");
+			return Constants.PAGE_ERROR;
+		}
+		
+		try {
+			sendConfirmationEmail(user, request);
+		} catch (MessagingException e) {
+			request.getSession().setAttribute("error", "Cannot send confirmation email :(");
+			userService.deleteUserById(user.getId());
+			return Constants.PAGE_ERROR;
+		} catch (SQLException e) {
+			request.getSession().setAttribute("error", "Cannot create token :(");
+			userService.deleteUserById(user.getId());
+			return Constants.PAGE_ERROR;
+		}
+		String successMessage = localization.getMessagesParam("success.email");
+		request.getSession().setAttribute("successMessage", successMessage);
+		return Constants.PAGE_SUCCESS;
+
+	}
+
+	private User mapToUser(HttpServletRequest request) {
+		User user = new User();
+		try {
 			user.setLogin(request.getParameter("username"));
 			user.setPassword(request.getParameter("password"));
 			user.setName(request.getParameter("name"));
@@ -98,38 +128,21 @@ public class RegisterCommand implements ICommand {
 			user.setPatronym(request.getParameter("patronym"));
 			user.setEmail(request.getParameter("email"));
 			user.setRole(RoleEnum.USER);
-			if (userDao.addUser(user)) {
-				confirmRegistration(user, request);
-				String successMessage = localization.getMessagesParam("success.email");
-				request.getSession().setAttribute("successMessage", successMessage);
-				try {
-					response.sendRedirect(Constants.PAGE_SUCCESS);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			} else {
-				try {
-					request.setAttribute("error", "Error :(");
-					response.sendRedirect(Constants.PAGE_ERROR);
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-			}
-		} else {
-			try {
-				request.setAttribute("errors", errors);
-				request.getRequestDispatcher(Constants.PATH_REGISTER_PAGE).forward(request, response);
-			} catch (ServletException | IOException e) {
-				e.printStackTrace();
-			}
+		} catch (Exception e) {
+			user = null;
 		}
+		return user;
+
 	}
 
-	private void confirmRegistration(User user, HttpServletRequest request) {
+	private void sendConfirmationEmail(User user, HttpServletRequest request)
+			throws AddressException, MessagingException, SQLException {
 		String token = UUID.randomUUID().toString();
 
 		VerificationToken myToken = new VerificationToken(token, user);
-		tokenDao.addToken(myToken);
+		if (!tokenService.addToken(myToken)) {
+			throw new SQLException();
+		}
 
 		String recipientAddress = user.getEmail();
 		String subject = "Registration Confirmation";
@@ -137,11 +150,7 @@ public class RegisterCommand implements ICommand {
 
 		String message = "Привет, " + user.getName();
 
-		try {
-			Mailer.sendMail(new String[] { recipientAddress }, message + "\r\n" + confirmationUrl, subject);
-		} catch (MessagingException e) {
-			e.printStackTrace();
-		}
+		Mailer.sendMail(new String[] { recipientAddress }, message + "\r\n" + confirmationUrl, subject);
 
 	}
 

@@ -2,22 +2,32 @@ package com.epam.project.service;
 
 import java.util.List;
 
-import com.epam.project.dto.CourseProfilePageDto;
 import com.epam.project.entity.User;
 
 public interface IUserService {
-	List<CourseProfilePageDto> getCoursesDTO(User user);
 
-	int getCoursesDTOCount(User user, boolean b);
+	void enrollToCourse(String[] checkedIds, int user_id);
+	
+	User findUserByLogin(String login);
+	
+	User findUserById(int lecturerId);
 
-	List<CourseProfilePageDto> getNotEnrolledCoursesDTOFromTo(User user, int limit, int offset);
+	boolean addUser(User user);
 
-	List<CourseProfilePageDto> getEnrolledCoursesDTOFromTo(User user, int pageSize, int i);
+	List<User> findAllUsers();
 
-	void blockUser(int id);
+	boolean updateUser(User user);
 
-	void unblockUser(int id);
+	User findUserByEmail(String email);
 
-	void enrollToCourse(int course_id, int user_id);
+	List<User> findAllUsersByRole(int roleId);
+
+	int getCoursesCountForUser(int userId, boolean enrolled);
+
+	void blockUserById(String[] checkedIds);
+
+	void unblockUserById(String[] checkedIds);
+
+	void deleteUserById(int id);
 
 }

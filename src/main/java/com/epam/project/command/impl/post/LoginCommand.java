@@ -14,23 +14,24 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
-import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
-import com.epam.project.dao.IUserDAO;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.l10n.Localization;
+import com.epam.project.service.IUserService;
+import com.epam.project.service.ServiceFactory;
 
 public class LoginCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(LoginCommand.class);
 	public static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
-	public static DaoFactory daoFactory;
-	public static IUserDAO userDao;
+
+	public static IUserService userService;
+	public static ServiceFactory serviceFactory;
 
 	static {
 		try {
-			daoFactory = DaoFactory.getDaoFactory(db);
-			userDao = daoFactory.getUserDAO();
+			serviceFactory = ServiceFactory.getServiceFactory(db);
+			userService = serviceFactory.getUserService();
 		} catch (DatabaseNotSupportedException e) {
 			e.printStackTrace();
 		}
@@ -42,7 +43,7 @@ public class LoginCommand implements ICommand {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 
-		User user = userDao.findUserByLogin(username);
+		User user = userService.findUserByLogin(username);
 		if (user == null) {
 			errors.add(localization.getMessagesParam("login.error"));
 			return errors;
@@ -64,26 +65,16 @@ public class LoginCommand implements ICommand {
 	}
 
 	@Override
-	public void execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		List<String> errors = validate(request);
-		if (errors.isEmpty()) {
-			request.setAttribute("errors", null);
-			try {
-				response.sendRedirect(Constants.PAGE_PROFILE);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		} else {
+		if (!errors.isEmpty()) {
 			log.error("Data is not valid for a user");
 			log.debug("debug error");
-			
-			try {
-				request.setAttribute("errors", errors);
-				request.getRequestDispatcher(Constants.PATH_LOGIN_PAGE).forward(request, response);
-			} catch (ServletException | IOException e) {
-				e.printStackTrace();
-			}
-			
+
+			request.getSession().setAttribute("errors", errors);
+			return Constants.PAGE_LOGIN;
 		}
+		request.setAttribute("errors", null);
+		return Constants.PAGE_PROFILE;
 	}
 }

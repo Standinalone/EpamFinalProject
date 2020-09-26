@@ -57,16 +57,16 @@
 						<c:forEach items="${ requestScope.coursesEnrolled }" var="course"
 							varStatus="loop">
 							<tr
-								<c:if test="${ course.status == 'FINISHED' }">class="table-success"</c:if>
-								<c:if test="${ course.status == 'NOT_STARTED' }">class="table-danger"</c:if>
-								<c:if test="${ course.status == 'IN_PROGRESS' }">class="table-warning"</c:if>>
+								<c:if test="${ course.course.status == 'FINISHED' }">class="table-success"</c:if>
+								<c:if test="${ course.course.status == 'NOT_STARTED' }">class="table-danger"</c:if>
+								<c:if test="${ course.course.status == 'IN_PROGRESS' }">class="table-warning"</c:if>>
 								<td>${ requestScope.startIndex + loop.index }</td>
 								<td>${ course.course.name }</td>
 								<td>${ course.topic }</td>
 								<td>${ course.lecturer }</td>
 								<td>${ course.course.startDate }</td>
 								<td>${ course.course.endDate }</td>
-								<td>${ course.status }</td>
+								<td>${ course.course.status }</td>
 								<td>${ course.grade }</td>
 							</tr>
 						</c:forEach>
@@ -74,7 +74,7 @@
 				</div>
 				<nav aria-label="Page navigation example">
 					<ul class="pagination">
-						<c:forEach begin="1" end="${ requestScope.totalPages }"
+						<c:forEach begin="1" end="${ requestScope.totalPagesEnrolled }"
 							varStatus="loop">
 							<li
 								class="page-item <c:if test = "${ param.pagenum == loop.index || (empty param.pagenum && loop.index == 1) }">active</c:if>"><a
@@ -109,7 +109,7 @@
 								<td>${ course.lecturer }</td>
 								<td>${ course.course.startDate }</td>
 								<td>${ course.course.endDate }</td>
-								<td>${ course.status }</td>
+								<td>${ course.course.status }</td>
 							</tr>
 						</c:forEach>
 					</table>

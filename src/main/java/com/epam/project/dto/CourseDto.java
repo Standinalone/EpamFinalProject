@@ -1,10 +1,8 @@
 package com.epam.project.dto;
 
-import java.time.LocalDate;
-
 import com.epam.project.entity.Course;
 
-public class CourseHomePageDto {
+public class CourseDto {
 
 	private Course course;
 	private String lecturer;

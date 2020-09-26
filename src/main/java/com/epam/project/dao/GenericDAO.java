@@ -13,7 +13,98 @@ public abstract class GenericDAO<T> {
 
 	protected abstract boolean mapFromEntity(PreparedStatement ps, T obj);
 
-	protected <V> List<T> findByFieldFromTo(Connection connection, String sql, int limit, int offset, int parameterIndex, V value) {
+	protected <V> boolean deleteByField(Connection connection, String sql, V value) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ps = connection.prepareStatement(sql);
+			switch (value.getClass().getSimpleName()) {
+			case "Integer":
+				ps.setInt(1, (Integer) value);
+				break;
+			case "String":
+				ps.setString(1, (String) value);
+				break;
+			default:
+				throw new IllegalArgumentException();
+			}
+			if (ps.executeUpdate() > 0) {
+				return true;
+			}
+			return false;
+		} finally {
+			closeStatementAndResultSet(ps, rs);
+		}
+	}
+
+	protected <V> boolean addToManyToMany(Connection connection, String sql, V id1, V id2) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ps = connection.prepareStatement(sql);
+			switch (id1.getClass().getSimpleName()) {
+			case "Integer":
+				ps.setInt(1, (Integer) id1);
+				ps.setInt(2, (Integer) id2);
+				break;
+			case "String":
+				ps.setString(1, (String) id1);
+				ps.setString(1, (String) id2);
+				break;
+			default:
+				throw new IllegalArgumentException();
+			}
+			if (ps.executeUpdate() > 0) {
+				return true;
+			}
+			return false;
+		} finally {
+			closeStatementAndResultSet(ps, rs);
+		}
+	}
+
+	protected int getCount(Connection connection, String sql) throws SQLException {
+		int count = 0;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ps = connection.prepareStatement(sql);
+			rs = ps.executeQuery();
+			rs.next();
+			count = rs.getInt(1);
+		} finally {
+			closeStatementAndResultSet(ps, rs);
+		}
+		return count;
+	}
+
+	protected <V> int getCountByField(Connection connection, String sql, V value) throws SQLException {
+		int count = 0;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ps = connection.prepareStatement(sql);
+			switch (value.getClass().getSimpleName()) {
+			case "Integer":
+				ps.setInt(1, (Integer) value);
+				break;
+			case "String":
+				ps.setString(1, (String) value);
+				break;
+			default:
+				throw new IllegalArgumentException();
+			}
+			rs = ps.executeQuery();
+			rs.next();
+			count = rs.getInt(1);
+		} finally {
+			closeStatementAndResultSet(ps, rs);
+		}
+		return count;
+	}
+
+	protected <V> List<T> findByFieldFromTo(Connection connection, String sql, int limit, int offset,
+			int parameterIndex, V value) throws SQLException {
 		List<T> list = new ArrayList<>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -33,15 +124,14 @@ public abstract class GenericDAO<T> {
 			while (rs.next()) {
 				list.add(mapToEntity(rs));
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
 		} finally {
 			closeStatementAndResultSet(ps, rs);
 		}
 		return list;
 	}
-	
-	protected <V> boolean update(Connection connection, T item, String sql, int parameterIndex, V value) {
+
+	protected <V> boolean update(Connection connection, T item, String sql, int parameterIndex, V value)
+			throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
@@ -60,15 +150,13 @@ public abstract class GenericDAO<T> {
 			if (ps.executeUpdate() > 0) {
 				return true;
 			}
-		} catch (SQLException e) {
-			return false;
 		} finally {
 			closeStatementAndResultSet(ps, rs);
 		}
 		return false;
 	}
-	
-	protected List<T> findFromTo(Connection connection, String sql, int limit, int offset) {
+
+	protected List<T> findFromTo(Connection connection, String sql, int limit, int offset) throws SQLException {
 		List<T> list = new ArrayList<>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -78,15 +166,13 @@ public abstract class GenericDAO<T> {
 			while (rs.next()) {
 				list.add(mapToEntity(rs));
 			}
-		} catch (SQLException e) {
-
 		} finally {
 			closeStatementAndResultSet(ps, rs);
 		}
 		return list;
 	}
 
-	protected List<T> findAll(Connection connection, String sql) {
+	protected List<T> findAll(Connection connection, String sql) throws SQLException {
 		List<T> list = new ArrayList<>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -96,8 +182,6 @@ public abstract class GenericDAO<T> {
 			while (rs.next()) {
 				list.add(mapToEntity(rs));
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
 		} finally {
 			closeStatementAndResultSet(ps, rs);
 		}
@@ -105,7 +189,8 @@ public abstract class GenericDAO<T> {
 		return list;
 	}
 
-	protected <V> List<T> findByField(Connection connection, String sql, int parameterIndex, V value) {
+	protected <V> List<T> findByField(Connection connection, String sql, int parameterIndex, V value)
+			throws SQLException {
 		List<T> list = new ArrayList<>();
 		PreparedStatement ps = null;
 		ResultSet rs = null;
@@ -125,15 +210,13 @@ public abstract class GenericDAO<T> {
 			while (rs.next()) {
 				list.add(mapToEntity(rs));
 			}
-		} catch (SQLException e) {
-			e.printStackTrace();
 		} finally {
 			closeStatementAndResultSet(ps, rs);
 		}
 		return list;
 	}
 
-	protected int addToDb(Connection connection, String sql, T item) {
+	protected int addToDb(Connection connection, String sql, T item) throws SQLException {
 		PreparedStatement ps = null;
 		ResultSet rs = null;
 		try {
@@ -148,8 +231,6 @@ public abstract class GenericDAO<T> {
 				}
 			}
 
-		} catch (SQLException e) {
-			e.printStackTrace();
 		} finally {
 			closeStatementAndResultSet(ps, rs);
 		}

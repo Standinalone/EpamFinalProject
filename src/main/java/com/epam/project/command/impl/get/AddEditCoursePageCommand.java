@@ -8,77 +8,113 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
-import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
-import com.epam.project.dao.ICourseDAO;
-import com.epam.project.dao.ICourseHomePageDAO;
-import com.epam.project.dao.ITokenDAO;
-import com.epam.project.dao.ITopicDAO;
-import com.epam.project.dao.IUserDAO;
-import com.epam.project.dto.CourseHomePageDto;
-import com.epam.project.entity.Course;
+import com.epam.project.dto.CourseDto;
 import com.epam.project.entity.CourseStatusEnum;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
+import com.epam.project.service.ICourseService;
+import com.epam.project.service.ITopicService;
+import com.epam.project.service.IUserService;
+import com.epam.project.service.ServiceFactory;
 
 public class AddEditCoursePageCommand implements ICommand {
 	public static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
-	public static DaoFactory daoFactory;
-	public static ICourseHomePageDAO courseHomePageDao;
-	public static IUserDAO userDao;
-	public static ITopicDAO topicDao;
+	public static IUserService userService;
+	public static ITopicService topicService;
+	public static ICourseService courseService;
+	public static ServiceFactory serviceFactory;
 
 	static {
 		try {
-			daoFactory = DaoFactory.getDaoFactory(db);
-			courseHomePageDao = daoFactory.getCourseHomePageDAO();
-			userDao = daoFactory.getUserDAO();
-			topicDao = daoFactory.getTopicDAO();
+			serviceFactory = ServiceFactory.getServiceFactory(db);
+			userService = serviceFactory.getUserService();
+			topicService = serviceFactory.getTopicService();
+			courseService = serviceFactory.getCourseService();
 		} catch (DatabaseNotSupportedException e) {
 			e.printStackTrace();
 		}
 	}
 	@Override
-	public void execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		String id = request.getParameter("id");
 		int courseId;
+		String forward = "";
+		if (id == null || id.isEmpty()) {
+			forward = Constants.PATH_ADD_COURSE_PAGE;
+		}
 		if (id != null && !id.isEmpty()) {
 			try {
 				courseId = Integer.parseInt(id);
-				CourseHomePageDto courseDto = courseHomePageDao.findById(courseId);
+				CourseDto courseDto = courseService.getCourseDtoByCourseId(courseId);
 				if (courseDto != null) {
-					request.getSession().setAttribute("course", courseDto);
+					request.setAttribute("course", courseDto);
+					forward = Constants.PATH_ADD_COURSE_PAGE;
 				}
 				else {
-					try {
-						request.getSession().setAttribute("error", "Course not found :(");
-						response.sendRedirect(Constants.PAGE_ERROR);
-						return;
-					} catch (IOException e1) {
-						e1.printStackTrace();
-						return;
-					}
+					request.setAttribute("error", "Course not found :(");
+					return Constants.PATH_ERROR_PAGE;
 				}
 			}
 			catch(NumberFormatException e) {
-				e.printStackTrace();
-				try {
-					request.getSession().setAttribute("error", "Cannot parse id :(");
-					response.sendRedirect(Constants.PAGE_ERROR);
-					return;
-				} catch (IOException e1) {
-					e1.printStackTrace();
-					return;
-				}
+				request.setAttribute("error", "Cannot parse id :(");
+				return Constants.PATH_ERROR_PAGE;
 			}
 		}
-		request.getSession().setAttribute("lecturers", userDao.findAllByRole(3));
-		request.getSession().setAttribute("topics", topicDao.findAll());
-		request.getSession().setAttribute("statuses", CourseStatusEnum.values());
-		try {
-			request.getRequestDispatcher(Constants.PATH_ADD_COURSE_PAGE).forward(request, response);
-		} catch (IOException | ServletException e) {
-			e.printStackTrace();
-		}
+		request.setAttribute("lecturers", userService.findAllUsersByRole(3));
+		request.setAttribute("topics", topicService.findAllTopics());
+		request.setAttribute("statuses", CourseStatusEnum.values());
+		return forward;
+		
+		
+		/////////////////////////
+//		try {
+//			request.getRequestDispatcher(Constants.PATH_ADD_COURSE_PAGE).forward(request, response);
+//		} catch (IOException | ServletException e) {
+//			e.printStackTrace();
+//		}
+		
+		/////////////////////////
+//		if (id != null && !id.isEmpty()) {
+//			try {
+//				courseId = Integer.parseInt(id);
+//				CourseDto courseDto = courseService.getCourseDtoByCourseId(courseId);
+//				if (courseDto != null) {
+//					request.setAttribute("course", courseDto);
+////					request.getSession().setAttribute("course", courseDto);
+//				}
+//				else {
+//					try {
+//						request.getSession().setAttribute("error", "Course not found :(");
+////						response.sendRedirect(Constants.PAGE_ERROR);
+//						request.getRequestDispatcher(Constants.PATH_ERROR_PAGE).forward(request, response);
+//						return;
+//					} catch (IOException | ServletException e1) {
+//						e1.printStackTrace();
+//						return;
+//					}
+//				}
+//			}
+//			catch(NumberFormatException e) {
+//				e.printStackTrace();
+//				try {
+//					request.getSession().setAttribute("error", "Cannot parse id :(");
+//					request.getRequestDispatcher(Constants.PATH_ERROR_PAGE).forward(request, response);
+////					response.sendRedirect(Constants.PAGE_ERROR);
+//					return;
+//				} catch (IOException | ServletException e1) {
+//					e1.printStackTrace();
+//					return;
+//				}
+//			}
+//		}
+//		request.getSession().setAttribute("lecturers", userService.findAllUsersByRole(3));
+//		request.getSession().setAttribute("topics", topicService.findAllTopics());
+//		request.getSession().setAttribute("statuses", CourseStatusEnum.values());
+//		try {
+//			request.getRequestDispatcher(Constants.PATH_ADD_COURSE_PAGE).forward(request, response);
+//		} catch (IOException | ServletException e) {
+//			e.printStackTrace();
+//		}
 	}
 
 }

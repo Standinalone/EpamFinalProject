@@ -8,7 +8,6 @@ import javax.servlet.http.HttpServletResponse;
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 import com.epam.project.dao.DatabaseEnum;
-import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.service.IUserService;
@@ -27,26 +26,16 @@ public class JoinCoursesCommand implements ICommand {
 			e.printStackTrace();
 		}
 	}
+
 	@Override
-	public void execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		User user = (User) request.getSession().getAttribute("user");
 		if (user == null) {
-			try {
-				response.sendRedirect(Constants.PAGE_LOGIN);
-				return;
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
+			return Constants.PAGE_LOGIN;
 		}
 		String[] checkedIds = request.getParameterValues("courses");
-		for (String id : checkedIds) {
-			userService.enrollToCourse(Integer.parseInt(id), user.getId());
-		}
-		try {
-			response.sendRedirect(Constants.PAGE_HOME);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		userService.enrollToCourse(checkedIds, user.getId());
+		return Constants.PAGE_HOME;
 	}
 
 }

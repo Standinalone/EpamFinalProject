@@ -46,7 +46,7 @@ public class MySqlTokenDAO extends GenericDAO<VerificationToken> implements ITok
 	}
 
 	@Override
-	public boolean addToken(VerificationToken token) {
+	public boolean add(VerificationToken token) {
 		boolean result = false;
 		daoFactory.open();
 		try {
@@ -63,7 +63,7 @@ public class MySqlTokenDAO extends GenericDAO<VerificationToken> implements ITok
 	}
 
 	@Override
-	public VerificationToken getVerificationToken(String token) {
+	public VerificationToken findByToken(String token) {
 		VerificationToken verificationToken = null;
 		daoFactory.open();
 		try {

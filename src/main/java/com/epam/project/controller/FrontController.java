@@ -1,7 +1,6 @@
 package com.epam.project.controller;
 
 import java.io.IOException;
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -13,22 +12,33 @@ import com.epam.project.command.factory.CommandFactory;
 public class FrontController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		handleRequest(request, response);
+	@Override
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+		String forward = handleRequest(request, response);
+		if (forward != null) {
+			try {
+				request.getRequestDispatcher(forward).forward(request, response);
+			} catch (ServletException | IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
+	@Override
 	protected void doPost(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {
-		handleRequest(request, response);
+		String redirect = handleRequest(request, response);
+		if (redirect != null) {
+			try {
+				response.sendRedirect(redirect);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
-	private void handleRequest(HttpServletRequest request, HttpServletResponse response) {
+	private String handleRequest(HttpServletRequest request, HttpServletResponse response) {
 		ICommand command = CommandFactory.getCommand(request);
-		try {
-			command.execute(request, response);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		return command.execute(request, response);
 	}
 }

@@ -11,11 +11,8 @@ import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dao.GenericDAO;
 import com.epam.project.dao.ICourseDAO;
-import com.epam.project.dto.CourseHomePageDto;
-import com.epam.project.dto.CourseProfilePageDto;
 import com.epam.project.entity.Course;
 import com.epam.project.entity.CourseStatusEnum;
-import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 
 public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
@@ -28,6 +25,9 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 	private static final String SQL_FIND_ALL = "SELECT * FROM Courses, Statuses WHERE Courses.status_id = Statuses.id";
 	private static final String SQL_FIND_COURSE_BY_ID = "SELECT * FROM Courses, Statuses WHERE Courses.status_id = Statuses.id AND Courses.id = ?";
 	private static final String SQL_UPDATE_COURSE_BY_ID = "UPDATE Courses SET name = ?, start_date = ?, end_date = ?, status_id = ?, topic_id = ?, lecturer_id = ? WHERE id = ?";
+	private static final String SQL_GET_COUNT = "SELECT COUNT(*) FROM Courses";
+	private static final String SQL_ADD_COURSE = "INSERT INTO Courses (`name`, `start_date`,`end_date`,`status_id`,`topic_id`,`lecturer_id`) VALUES(?, ?, ?, ?, ?, ?)";
+	private static final String SQL_DELETE_COURSE_BY_ID = "DELETE FROM Courses WHERE id = ?";
 	private static DaoFactory daoFactory;
 	private static MySqlCourseDAO instance;
 
@@ -50,18 +50,84 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 	}
 
 	@Override
-	public List<Course> findAllCourses() {
+	public List<Course> findAll() throws SQLException {
 		List<Course> courses = new ArrayList<>();
-		daoFactory.open();
-		try {
-			courses = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		daoFactory.close();
+		courses = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
 		return courses;
+
+//		List<Course> courses = new ArrayList<>();
+//		daoFactory.open();
+//		try {
+//			courses = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
+//		return courses;
 	}
 
+	@Override
+	public Course findById(int id) throws SQLException {
+		List<Course> list = findByField(daoFactory.getConnection(), SQL_FIND_COURSE_BY_ID, 1, id);
+		if (!list.isEmpty())
+			return list.get(0);
+		return null;
+
+//		Course course = null;
+//		daoFactory.open();
+//		try {
+//			List<Course> list = findByField(daoFactory.getConnection(), SQL_FIND_COURSE_BY_ID, 1, id);
+//			if (!list.isEmpty()) {
+//				course = list.get(0);
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//		}
+//		daoFactory.close();
+//		return course;
+	}
+
+	@Override
+	public boolean update(Course course) throws SQLException {
+		if (update(daoFactory.getConnection(), course, SQL_UPDATE_COURSE_BY_ID, 7, course.getId())) {
+			return true;
+		}
+		return false;
+
+//		boolean result = false;
+//		daoFactory.open();
+//		try {
+//			if (update(daoFactory.getConnection(), course, SQL_UPDATE_COURSE_BY_ID, 7, course.getId())) {
+//				result = true;
+//			}
+//		} catch (SQLException e) {
+//			e.printStackTrace();
+//			result = false;
+//		}
+//		daoFactory.close();
+//		return result;
+	}
+
+	@Override
+	public int getCount() throws SQLException {
+		return getCount(daoFactory.getConnection(), SQL_GET_COUNT);
+	}
+
+	@Override
+	public boolean add(Course course) throws SQLException {
+		int id = addToDb(daoFactory.getConnection(), SQL_ADD_COURSE, course);
+		if (id > 0) {
+			course.setId(id);
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean delete(int courseId) throws SQLException {
+		return deleteByField(daoFactory.getConnection(), SQL_DELETE_COURSE_BY_ID, courseId);
+	}
+	
 	@Override
 	protected Course mapToEntity(ResultSet rs) {
 		Course course = new Course();
@@ -84,45 +150,16 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 			ps.setString(1, course.getName());
 			ps.setDate(2, Date.valueOf(course.getStartDate()));
 			ps.setDate(3, Date.valueOf(course.getEndDate()));
-			ps.setInt(4, course.getStatus().ordinal()+1);
-			ps.setInt(5, course.getTopic_id());
-			ps.setInt(6, course.getLecturer_id());
+			ps.setInt(4, course.getStatus().ordinal() + 1);
+			ps.setInt(5, course.getTopicId());
+			ps.setInt(6, course.getLecturerId());
+			return true;
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
 		return false;
 	}
 
-	@Override
-	public Course findById(int id) {
-		Course course = null;
-		daoFactory.open();
-		try {
-			List<Course> list = findByField(daoFactory.getConnection(), SQL_FIND_COURSE_BY_ID, 1, id);
-			if (!list.isEmpty()) {
-				course = list.get(0);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		daoFactory.close();
-		return course;
-	}
 
-	@Override
-	public boolean update(Course course) {
-		boolean result = false;
-		daoFactory.open();
-		try {
-			if (update(daoFactory.getConnection(), course, SQL_UPDATE_COURSE_BY_ID, 7, course.getId())) {
-				result = true;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-			result = false;
-		}
-		daoFactory.close();
-		return result;
-	}
 
 }

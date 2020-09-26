@@ -1,9 +1,11 @@
 package com.epam.project.dao;
 
+import java.sql.SQLException;
+
 import com.epam.project.entity.VerificationToken;
 
 public interface ITokenDAO {
-	boolean addToken(VerificationToken token);
+	boolean add(VerificationToken token) throws SQLException;
 
-	VerificationToken getVerificationToken(String token);
+	VerificationToken findByToken(String token) throws SQLException;
 }

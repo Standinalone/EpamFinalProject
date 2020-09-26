@@ -14,20 +14,20 @@ public class Course implements Serializable{
 	private LocalDate startDate;
 	private LocalDate endDate;
 	private CourseStatusEnum status;
-	private int topic_id;
-	private int lecturer_id;
+	private int topicId;
+	private int lecturerId;
 	
-	public int getTopic_id() {
-		return topic_id;
+	public int getTopicId() {
+		return topicId;
 	}
-	public void setTopic_id(int topic_id) {
-		this.topic_id = topic_id;
+	public void setTopicId(int topicId) {
+		this.topicId = topicId;
 	}
-	public int getLecturer_id() {
-		return lecturer_id;
+	public int getLecturerId() {
+		return lecturerId;
 	}
-	public void setLecturer_id(int lecturer_id) {
-		this.lecturer_id = lecturer_id;
+	public void setLecturerId(int lecturerId) {
+		this.lecturerId = lecturerId;
 	}
 	public int getId() {
 		return id;

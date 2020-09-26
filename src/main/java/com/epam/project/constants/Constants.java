@@ -18,6 +18,8 @@ public class Constants {
 	public static final String PAGE_MANAGE_STUDENTS = "?command=MANAGE_STUDENTS_PAGE";
 	public static final String PAGE_SUCCESS = "?command=SUCCESS_PAGE";
 	public static final String PAGE_ADD_EDIT_COURSE = "?command=ADD_EDIT_COURSE_PAGE";
+	public static final String PAGE_REGISTER = "?command=REGISTER_PAGE";
+	public static final String PAGE_MANAGE_COURSES = "?command=MANAGE_COURSES_PAGE";
 
 	// Paths for all users
 	public static final String PATH_ERROR_PAGE = "/views/error.jsp";

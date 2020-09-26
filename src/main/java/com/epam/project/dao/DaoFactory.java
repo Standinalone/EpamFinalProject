@@ -16,7 +16,7 @@ public abstract class DaoFactory {
 
 	public abstract ICourseDAO getCourseDAO();
 	
-	public abstract ICourseHomePageDAO getCourseHomePageDAO();
+	public abstract ICourseDtoDAO getCourseDtoDAO();
 	
 	public abstract ITokenDAO getTokenDAO();
 
