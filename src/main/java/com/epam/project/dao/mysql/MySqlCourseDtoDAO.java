@@ -35,6 +35,8 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 	private static final String SQL_FIND_COURSES_FROM_TO = "SELECT * FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id";
 	//private static final String SQL_FIND_COURSE_BY_ID = "SELECT * FROM Courses, (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.course_id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id AND Courses.id = ?";
 	private static final String SQL_FIND_COURSE_BY_ID = "SELECT * FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id AND Courses.id = ?";
+	private static final String SQL_FIND_COURSES_BY_LECTURER_ID = "SELECT * FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id AND Courses.lecturer_id = ?";
+	private static final String SQL_FIND_ALL = "SELECT * FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id";
 
 	private static DaoFactory daoFactory;
 	private static MySqlCourseDtoDAO instance;
@@ -60,15 +62,6 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 	@Override
 	public List<CourseDto> findAllFromTo(int limit, int offset) throws SQLException {
 		return findFromTo(daoFactory.getConnection(), SQL_FIND_COURSES_FROM_TO, limit, offset);
-//		List<CourseDto> courses = new ArrayList<>();
-//		daoFactory.open();
-//		try {
-//			courses = findFromTo(daoFactory.getConnection(), SQL_FIND_COURSES_FROM_TO, limit, offset);
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		daoFactory.close();
-//		return courses;
 	}
 
 	@Override
@@ -77,21 +70,23 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 		if (!list.isEmpty())
 			return list.get(0);
 		return null;
-
-//		CourseDto course = null;
-//		daoFactory.open();
-//		try {
-//			List<CourseDto> list = findByField(daoFactory.getConnection(), SQL_FIND_COURSE_BY_ID, 1, id);
-//			if (!list.isEmpty()) {
-//				course = list.get(0);
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		daoFactory.close();
-//		return course;
 	}
 
+	@Override
+	public List<CourseDto> findByLecturerId(int userId) throws SQLException {
+		return findByField(daoFactory.getConnection(), SQL_FIND_COURSES_BY_LECTURER_ID, 1, userId);
+	}
+
+	@Override
+	public List<CourseDto> findAll() throws SQLException {
+		return findAll(daoFactory.getConnection(), SQL_FIND_ALL);
+	}
+
+	@Override
+	public List<CourseDto> findByLecturerIdFromTo(int lecturerId, int limit, int offset) throws SQLException {
+		return findByFieldFromTo(daoFactory.getConnection(), SQL_FIND_COURSES_BY_LECTURER_ID, limit, offset, 1, lecturerId);
+	}
+	
 	@Override
 	protected CourseDto mapToEntity(ResultSet rs) {
 		Course course = new Course();
@@ -124,4 +119,7 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 		// TODO Auto-generated method stub
 		return false;
 	}
+
+
+
 }

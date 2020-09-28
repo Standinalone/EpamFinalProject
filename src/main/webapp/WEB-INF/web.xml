@@ -1,51 +1,78 @@
-<!DOCTYPE web-app PUBLIC
- "-//Sun Microsystems, Inc.//DTD Web Application 2.3//EN"
- "http://java.sun.com/dtd/web-app_2_3.dtd" >
+<?xml version="1.0" encoding="UTF-8"?>
 
-<web-app>
-	<display-name>Archetype Created Web Application</display-name>
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" 
+         version="2.5" 
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+	
+	<display-name>Epam</display-name>
 
+<!--============================================================
+	Controller
+=============================================================-->
 
+	<servlet>
+		<servlet-name>FrontController</servlet-name>
+		<servlet-class>com.epam.project.controller.FrontController</servlet-class>
+	</servlet>
+	<servlet-mapping>
+		<servlet-name>FrontController</servlet-name>
+		<url-pattern>/controller</url-pattern>
+	</servlet-mapping>
+
+<!--============================================================
+	i18n filter
+=============================================================-->
 	<filter>
 		<filter-name>LocaleFilter</filter-name>
-		<display-name>LocaleFilter</display-name>
-		<description></description>
 		<filter-class>com.epam.project.filter.LocaleFilter</filter-class>
+		<init-param>
+			<param-name>defaultLocale</param-name>
+		    <param-value>ru</param-value>
+		</init-param>
 	</filter>
+	<filter-mapping>
+		<filter-name>LocaleFilter</filter-name>
+		<servlet-name>FrontController</servlet-name>
+	</filter-mapping>
+	<!-- supported locales -->
+	<context-param>
+		<param-name>locales</param-name>
+		<param-value>ru en</param-value>
+	</context-param>
+	
+<!--============================================================
+	CORS support
+=============================================================-->
 	<filter>
 		<filter-name>CorsFilter</filter-name>
 		<filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
 	</filter>
 	<filter-mapping>
-		<filter-name>LocaleFilter</filter-name>
-		<url-pattern>/*</url-pattern>
-	</filter-mapping>
-	<filter-mapping>
 		<filter-name>CorsFilter</filter-name>
-		<url-pattern>/*</url-pattern>
+		<servlet-name>FrontController</servlet-name>
+	</filter-mapping>
+	
+<!--============================================================
+	Encoding support filter
+=============================================================-->
+	<filter>
+		<filter-name>EncodingFilter</filter-name>
+		<filter-class>com.epam.project.filter.EncodingFilter</filter-class>
+		<init-param>
+			<param-name>encoding</param-name>
+			<param-value>UTF-8</param-value>
+		</init-param>
+	</filter>
+	<filter-mapping>
+		<filter-name>EncodingFilter</filter-name>
+		<url-pattern>/WEB-INF/views/*</url-pattern>
 	</filter-mapping>
 
-
-	<servlet>
-		<servlet-name>FrontController</servlet-name>
-		<display-name>FrontController</display-name>
-		<description></description>
-		<servlet-class>com.epam.project.controller.FrontController</servlet-class>
-		<init-param>
-			<param-name>param1</param-name>
-			<param-value>value1</param-value>
-			<description></description>
-		</init-param>
-	</servlet>
-	<servlet-mapping>
-		<servlet-name>FrontController</servlet-name>
-		<url-pattern>/FrontController</url-pattern>
-	</servlet-mapping>
-	<servlet-mapping>
-		<servlet-name>FrontController</servlet-name>
-		<url-pattern>/project/*</url-pattern>
-	</servlet-mapping>
-
+	
+<!--============================================================
+	Error page
+=============================================================-->
 	<error-page>
 		<error-code>404</error-code>
 		<location>/WEB-INF/vies/error.jsp</location>
@@ -58,7 +85,17 @@
 		<exception-type>java.lang.Throwable</exception-type>
 		<location>/WEB-INF/vies/error.jsp</location>
 	</error-page>
+	
+<!--============================================================
+	Context listener
+=============================================================-->
+	<listener>
+		<listener-class>com.epam.project.listener.ContextListener</listener-class>
+	</listener>
 
+<!--============================================================
+	DB resource reference
+=============================================================-->
 
 	<resource-ref>
 		<description>DB Connection</description>
@@ -67,33 +104,91 @@
 		<res-auth>Container</res-auth>
 	</resource-ref>
 
-	<resource-ref>
-		<description>
-			Resource reference to a factory for javax.mail.Session
-			instances that may be used for sending electronic mail
-			messages, preconfigured to connect to the appropriate
-			SMTP server.
-		</description>
-		<res-ref-name>
-			mail/Session
-		</res-ref-name>
-		<res-type>
-			javax.mail.Session
-		</res-type>
-		<res-auth>
-			Container
-		</res-auth>
-	</resource-ref>
+<!--============================================================
+	Mail session resource reference (Not used)
+=============================================================-->
 
-	<!-- <resource-env-ref> -->
-	<!-- <description> -->
-	<!-- Object factory for MyBean instances. -->
-	<!-- </description> -->
-	<!-- <resource-env-ref-name> -->
-	<!-- jdbc/epam -->
-	<!-- </resource-env-ref-name> -->
-	<!-- <resource-env-ref-type> -->
-	<!-- com.mycompany.MyBean -->
-	<!-- </resource-env-ref-type> -->
-	<!-- </resource-env-ref> -->
+<!-- 	<resource-ref> -->
+<!-- 		<description> -->
+<!-- 			Resource reference to a factory for javax.mail.Session -->
+<!-- 			instances that may be used for sending electronic mail -->
+<!-- 			messages, preconfigured to connect to the appropriate -->
+<!-- 			SMTP server. -->
+<!-- 		</description> -->
+<!-- 		<res-ref-name> -->
+<!-- 			mail/Session -->
+<!-- 		</res-ref-name> -->
+<!-- 		<res-type> -->
+<!-- 			javax.mail.Session -->
+<!-- 		</res-type> -->
+<!-- 		<res-auth> -->
+<!-- 			Container -->
+<!-- 		</res-auth> -->
+<!-- 	</resource-ref> -->
+
+<!--============================================================
+	Security filter.
+	1) admin: admin commands
+	2) client: client commands
+	3) commons: commands for all roles
+	4) out-of-control: commands without access control
+	Delimiter - space/tab
+=============================================================-->
+
+	<filter>
+		<filter-name>CommandAccessFilter</filter-name>
+		<filter-class>com.epam.project.filter.CommandAccessFilter</filter-class>
+		<init-param>
+			<param-name>admin</param-name>
+			<param-value>
+			ADD_LECTURER_PAGE 
+			MANAGE_STUDENTS_PAGE 
+			MANAGE_COURSES_PAGE 
+			ADD_EDIT_COURSE_PAGE 
+			EDIT_LECTURER_PAGE
+			EDIT_LECTURER
+			CHANGE_USERS_STATUS
+			ADD_EDIT_COURSE
+			DELETE_COURSE
+			</param-value>
+		</init-param>
+		<init-param>
+			<param-name>user</param-name>
+			<param-value></param-value>
+		</init-param>
+		<init-param>
+			<param-name>lecturer</param-name>
+			<param-value></param-value>
+		</init-param>
+		<init-param>
+			<param-name>common</param-name>
+			<param-value>
+			PROFILE_PAGE 
+			MY_COURSES_PAGE
+			SIGNOUT
+			JOIN_COURSES
+			</param-value>
+		</init-param>
+		<init-param>
+			<param-name>out-of-control</param-name>
+			<param-value>
+			HOME_PAGE 
+			LOGIN_PAGE 
+			REGISTER_PAGE 
+			LOGIN 
+			REGISTER 
+			SUCCESS_PAGE 
+			ERROR_PAGE
+			CHANGE_LANGUAGE
+			REGISTRATION_CONFIRM
+			</param-value>
+		</init-param>
+	</filter>
+	
+	<filter-mapping>
+		<filter-name>CommandAccessFilter</filter-name>
+		<servlet-name>FrontController</servlet-name>
+	</filter-mapping>
+
+
 </web-app>

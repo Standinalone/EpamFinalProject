@@ -10,7 +10,7 @@ public class ErrorPageCommand implements ICommand{
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		return Constants.PATH_ERROR_PAGE;
+		return Constants.PAGE__ERROR;
 	}
 
 }

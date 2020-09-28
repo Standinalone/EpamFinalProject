@@ -26,4 +26,8 @@ public interface IUserDAO {
 
 	boolean delete(int userId) throws SQLException;
 
+	List<User> findAllFromTo(int limit, int offset) throws SQLException;
+
+	int getCount() throws SQLException;
+
 }

@@ -12,7 +12,7 @@ public class SignoutCommand implements ICommand{
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		if (request.getSession() != null)
 			request.getSession().invalidate();
-		return Constants.PAGE_HOME;
+		return Constants.COMMAND__HOME;
 	}
 
 }

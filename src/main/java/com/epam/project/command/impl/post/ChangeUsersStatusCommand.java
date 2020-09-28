@@ -30,18 +30,19 @@ public class ChangeUsersStatusCommand implements ICommand {
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		User user = (User) request.getSession().getAttribute("user");
+		String page = request.getParameter("page");
 		if (user == null || user.getRole() != RoleEnum.ADMIN) {
-			return Constants.PAGE_LOGIN;
+			return Constants.COMMAND__LOGIN;
 		}
 		String[] checkedIds = request.getParameterValues("users");
 		String action = request.getParameter("submit");
 
 		if ("block".equals(action)) {
-			userService.blockUserById(checkedIds);
+			userService.blockUsersById(checkedIds);
 		} else {
-			userService.unblockUserById(checkedIds);
+			userService.unblockUsersById(checkedIds);
 		}
-		return Constants.PAGE_MANAGE_STUDENTS;
+		return "?" + (page == null ? "" : page);
 	}
 
 }

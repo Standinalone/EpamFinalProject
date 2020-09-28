@@ -11,9 +11,13 @@ public enum CommandEnum {
 	MANAGE_COURSES_PAGE(new ManageCoursesPageCommand()),
 	SUCCESS_PAGE(new SuccessPageCommand()),
 	ADD_EDIT_COURSE_PAGE(new AddEditCoursePageCommand()),
+	MY_COURSES_PAGE(new MyCoursesPageCommand()),
+	ADD_LECTURER_PAGE(new AddLecturerPageCommand()),
+	EDIT_LECTURER_PAGE(new EditLecturerPageCommand()),
 	
 	ERROR_PAGE(new ErrorPageCommand()),
 	
+	EDIT_LECTURER(new EditLecturerCommand()),
 	LOGIN(new LoginCommand()),
 	REGISTER(new RegisterCommand()),
 	CHANGE_LANGUAGE(new ChangeLanguageCommand()),

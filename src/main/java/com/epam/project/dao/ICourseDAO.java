@@ -17,4 +17,6 @@ public interface ICourseDAO {
 	boolean add(Course course) throws SQLException;
 
 	boolean delete(int courseId) throws SQLException;
+
+	int getCountByLecturerId(int lecturerId) throws SQLException;
 }

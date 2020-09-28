@@ -34,6 +34,8 @@ public class RegisterCommand implements ICommand {
 	public static IUserService userService;
 	public static ITokenService tokenService;
 
+	public boolean isLecturer = false;
+
 	static {
 		try {
 			serviceFactory = ServiceFactory.getServiceFactory(db);
@@ -46,7 +48,10 @@ public class RegisterCommand implements ICommand {
 
 	public List<String> validate(HttpServletRequest request) {
 		List<String> errors = new ArrayList<>();
-		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
+
+//		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
+
+		Localization localization = (Localization) request.getSession().getAttribute("localization");
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 		String passwordConfirmation = request.getParameter("passwordConfirmation");
@@ -55,67 +60,75 @@ public class RegisterCommand implements ICommand {
 		String patronym = request.getParameter("patronym");
 		String email = request.getParameter("email");
 
-		if (username == null || !Pattern.matches(Constants.REGEX_USERNAME, username)) {
-			errors.add(localization.getMessagesParam("register.invalidUsername"));
+		if (username == null || !Pattern.matches(Constants.REGEX__USERNAME, username)) {
+			errors.add(localization.getResourcesParam("register.invalidUsername"));
 		}
 		if (username != null && userService.findUserByLogin(username) != null) {
-			errors.add(localization.getMessagesParam("register.userExists"));
+			errors.add(localization.getResourcesParam("register.userExists"));
 		}
 //		if (email != null && userDao.findUserByEmail(email) != null) {
 //			errors.add(localization.getMessagesParam("register.emailExists"));
 //		}
-		if (password == null || !Pattern.matches(Constants.REGEX_PASSWORD, password)) {
-			errors.add(localization.getMessagesParam("register.invalidPassword"));
+		if (password == null || !Pattern.matches(Constants.REGEX__PASSWORD, password)) {
+			errors.add(localization.getResourcesParam("register.invalidPassword"));
 		}
 		if (passwordConfirmation == null || !passwordConfirmation.equals(password)) {
-			errors.add(localization.getMessagesParam("register.passwordConfirmation"));
+			errors.add(localization.getResourcesParam("register.passwordConfirmation"));
 		}
-		if (name == null || !Pattern.matches(Constants.REGEX_NAME, password)) {
-			errors.add(localization.getMessagesParam("register.nameerror"));
+		if (name == null || !Pattern.matches(Constants.REGEX__NAME, password)) {
+			errors.add(localization.getResourcesParam("register.nameerror"));
 		}
-		if (surname == null || !Pattern.matches(Constants.REGEX_NAME, surname)) {
-			errors.add(localization.getMessagesParam("register.nameerror"));
+		if (surname == null || !Pattern.matches(Constants.REGEX__NAME, surname)) {
+			errors.add(localization.getResourcesParam("register.nameerror"));
 		}
-		if (patronym == null || !Pattern.matches(Constants.REGEX_NAME, patronym)) {
-			errors.add(localization.getMessagesParam("register.nameerror"));
+		if (patronym == null || !Pattern.matches(Constants.REGEX__NAME, patronym)) {
+			errors.add(localization.getResourcesParam("register.nameerror"));
 		}
-		if (email == null || !Pattern.matches(Constants.REGEX_EMAIL, email)) {
-			errors.add(localization.getMessagesParam("register.email"));
+		if (email == null || !Pattern.matches(Constants.REGEX__EMAIL, email)) {
+			errors.add(localization.getResourcesParam("register.email"));
 		}
 		return errors;
 	}
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
+		User user = (User) request.getSession().getAttribute("user");
+		if (request.getParameter("lecturer") != null && user != null && user.getRole() == RoleEnum.ADMIN) {
+			isLecturer = true;
+		}
 		List<String> errors = validate(request);
 		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
 		if (!errors.isEmpty()) {
 			request.getSession().setAttribute("errors", errors);
-			return Constants.PAGE_REGISTER;
+			if (isLecturer)
+				return Constants.COMMAND__ADD_LECTURER;
+			return Constants.COMMAND__REGISTER;
 		}
 		request.getSession().setAttribute("errors", null);
-		User user = mapToUser(request);
+		user = mapToUser(request);
 
 		if (!userService.addUser(user)) {
 			request.getSession().setAttribute("error", "Cannot add user :(");
-			return Constants.PAGE_ERROR;
+			return Constants.COMMAND__ERROR;
 		}
-		
-		try {
-			sendConfirmationEmail(user, request);
-		} catch (MessagingException e) {
-			request.getSession().setAttribute("error", "Cannot send confirmation email :(");
-			userService.deleteUserById(user.getId());
-			return Constants.PAGE_ERROR;
-		} catch (SQLException e) {
-			request.getSession().setAttribute("error", "Cannot create token :(");
-			userService.deleteUserById(user.getId());
-			return Constants.PAGE_ERROR;
-		}
-		String successMessage = localization.getMessagesParam("success.email");
-		request.getSession().setAttribute("successMessage", successMessage);
-		return Constants.PAGE_SUCCESS;
 
+		if (!isLecturer) {
+			try {
+				sendConfirmationEmail(user, request);
+			} catch (MessagingException e) {
+				request.getSession().setAttribute("error", "Cannot send confirmation email :(");
+				userService.deleteUserById(user.getId());
+				return Constants.COMMAND__ERROR;
+			} catch (SQLException e) {
+				request.getSession().setAttribute("error", "Cannot create token :(");
+				userService.deleteUserById(user.getId());
+				return Constants.COMMAND__ERROR;
+			}
+			String successMessage = localization.getResourcesParam("success.email");
+			request.getSession().setAttribute("successMessage", successMessage);
+			return Constants.COMMAND__SUCCESS;
+		}
+		return Constants.COMMAND__MANAGE_STUDENTS;
 	}
 
 	private User mapToUser(HttpServletRequest request) {
@@ -127,7 +140,13 @@ public class RegisterCommand implements ICommand {
 			user.setSurname(request.getParameter("surname"));
 			user.setPatronym(request.getParameter("patronym"));
 			user.setEmail(request.getParameter("email"));
-			user.setRole(RoleEnum.USER);
+			if (!isLecturer) {
+				user.setRole(RoleEnum.USER);
+				user.setEnabled(false);
+			} else {
+				user.setRole(RoleEnum.LECTURER);
+				user.setEnabled(true);
+			}
 		} catch (Exception e) {
 			user = null;
 		}

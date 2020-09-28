@@ -1,6 +1,6 @@
 			</div>
 			<div class="col-sm-3 nopadding">
-				<fmt:bundle basename="menu" >
+				<fmt:bundle basename="tables" >
 				<div class="list-group list-group-flush">
 					<a href="?command=HOME_PAGE" class="list-group-item"><fmt:message key="menu.home" /></a>
 					<a href="?command=LOGIN_PAGE" class="list-group-item"><fmt:message key="menu.login" /></a>
@@ -23,19 +23,23 @@
 						<c:when test = "${ user.role == 'ADMIN' }">
 							<a href="?command=MANAGE_STUDENTS_PAGE" class="list-group-item"><fmt:message key="menu.manageStudents" /></a>
 							<a href="?command=MANAGE_COURSES_PAGE" class="list-group-item"><fmt:message key="menu.manageCourses" /></a>
+							<a href="?command=ADD_LECTURER_PAGE" class="list-group-item"><fmt:message key="menu.addlecturer" /></a>
 						</c:when>
 						<c:otherwise>
 							<li class="list-group-item disabled"><fmt:message key="menu.manageStudents" /></li>
 							<li class="list-group-item disabled"><fmt:message key="menu.manageCourses" /></li>
+							<li class="list-group-item disabled"><fmt:message key="menu.addlecturer" /></li>
 						</c:otherwise>
 					</c:choose>
 					
 					<p class = "list-group-item"><b><fmt:message key="menu.lecturers" /></b></p>
 					<c:choose>
 						<c:when test = "${ user.role == 'LECTURER' }">
+							<a href = "?command=MY_COURSES_PAGE" class="list-group-item"><fmt:message key="menu.mycourses" /></a>
 							<a href = "?command=MANAGE_JOURNAL" class="list-group-item"><fmt:message key="menu.manageJournal" /></a>
 						</c:when>
 						<c:otherwise>
+							<li class="list-group-item disabled"><fmt:message key="menu.mycourses" /></li>
 							<li class="list-group-item disabled"><fmt:message key="menu.manageJournal" /></li>
 						</c:otherwise>
 					</c:choose>
@@ -51,15 +55,14 @@
 		</svg>
 		<form action = "?command=CHANGE_LANGUAGE" method = "post">
 			<input class = "btn btn-link" name = "newLanguage" type = "submit" value = "en">
-			<input type = "hidden" name = "page" value = "${ param.command }" />
+			<input type = "hidden" name = "page" value = "${ pageContext.request.queryString }" />
 		</form>
 		|
 		<form action = "?command=CHANGE_LANGUAGE" method = "post">
 			<input class = "btn btn-link" name = "newLanguage" type = "submit" value = "ru">
-			<input type = "hidden" name = "page" value = "${ param.command }" />
+			<input type = "hidden" name = "page" value = "${ pageContext.request.queryString }" />
 		</form>
 	</div>
 	<div class = "text-center">© 2020 Courses.org</div>
-
 </body>
 </html>

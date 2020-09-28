@@ -10,7 +10,7 @@ public class RegisterPageCommand implements ICommand {
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		return Constants.PATH_REGISTER_PAGE;
+		return Constants.PAGE__REGISTER;
 
 	}
 

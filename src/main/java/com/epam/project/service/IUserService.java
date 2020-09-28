@@ -24,10 +24,14 @@ public interface IUserService {
 
 	int getCoursesCountForUser(int userId, boolean enrolled);
 
-	void blockUserById(String[] checkedIds);
+	void blockUsersById(String[] checkedIds);
 
-	void unblockUserById(String[] checkedIds);
+	void unblockUsersById(String[] checkedIds);
 
 	void deleteUserById(int id);
+
+	List<User> findAllUsersFromTo(int limit, int offset);
+
+	int getUsersCount();
 
 }

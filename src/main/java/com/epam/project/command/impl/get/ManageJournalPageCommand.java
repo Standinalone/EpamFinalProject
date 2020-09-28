@@ -10,7 +10,7 @@ public class ManageJournalPageCommand implements ICommand {
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		return Constants.PATH_MANAGE_JOURNAL_PAGE;
+		return Constants.PAGE__MANAGE_JOURNAL;
 	}
 
 }

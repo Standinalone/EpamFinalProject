@@ -58,8 +58,8 @@ public class MySqlUserService implements IUserService {
 
 	@Override
 	public void enrollToCourse(String[] courseIds, int userId) {
-		daoFactory.open();
 		try {
+			daoFactory.open();
 			for (String id : courseIds) {
 				userDao.addToManyToMany(Integer.parseInt(id), userId);
 			}
@@ -162,7 +162,7 @@ public class MySqlUserService implements IUserService {
 	}
 
 	@Override
-	public void blockUserById(String[] userIds) {
+	public void blockUsersById(String[] userIds) {
 		try {
 			daoFactory.open();
 			for (String id : userIds) {
@@ -179,7 +179,7 @@ public class MySqlUserService implements IUserService {
 	}
 
 	@Override
-	public void unblockUserById(String[] userIds) {
+	public void unblockUsersById(String[] userIds) {
 		try {
 			daoFactory.open();
 			for (String id : userIds) {
@@ -201,6 +201,32 @@ public class MySqlUserService implements IUserService {
 			userDao.delete(userId);
 		} catch (SQLException e) {
 			log.error("Deleting user error", e);
+		} finally {
+			daoFactory.close();
+		}
+	}
+
+	@Override
+	public List<User> findAllUsersFromTo(int limit, int offset) {
+		try {
+			daoFactory.open();
+			return userDao.findAllFromTo(limit, offset);
+		} catch (SQLException e) {
+			log.error("Getting users error", e);
+			return new ArrayList<>();
+		} finally {
+			daoFactory.close();
+		}
+	}
+
+	@Override
+	public int getUsersCount() {
+		daoFactory.open();
+		try {
+			return userDao.getCount();
+		} catch (SQLException e) {
+			log.error("Enrolling error", e);
+			return 0;
 		} finally {
 			daoFactory.close();
 		}

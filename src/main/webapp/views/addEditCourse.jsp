@@ -13,14 +13,14 @@
 <%@include file='../jsp/header.jsp'%>
 
 <!-- Body -->
-<fmt:bundle basename="manageCourses">
+<fmt:bundle basename="tables">
 	<div class="container">
 		<h3 class="text-center text-info">
 			<c:if test="${ empty param.id }">
-				<fmt:message key="table.adding" />
+				<fmt:message key="manageCourses.adding" />
 			</c:if>
 			<c:if test="${ not empty param.id }">
-				<fmt:message key="table.editing" />
+				<fmt:message key="manageCourses.editing" />
 			</c:if>
 		</h3>
 		<form class="form" action="?command=ADD_EDIT_COURSE" method="post">
@@ -28,12 +28,12 @@
 				<div class="col-sm-6">
 					<div class="form-group">
 						<label for="name" class="text-info"><fmt:message
-								key="table.name" />:</label><br> <input type="text" name="name"
+								key="manageCourses.name" />:</label><br> <input type="text" name="name"
 							id="name" class="form-control" value="${ course.course.name }">
 					</div>
 					<div class="form-group">
 						<label for="topic" class="text-info"><fmt:message
-								key="table.topic" />:</label><br> <select id="topic" name="topic"
+								key="manageCourses.topic" />:</label><br> <select id="topic" name="topic"
 							class="custom-select nopadding" id="inputGroupSelect01">
 
 							<c:forEach items="${  requestScope.get(\"topics\")  }"
@@ -46,7 +46,7 @@
 					</div>
 					<div class="form-group">
 						<label for="lecturer" class="text-info"><fmt:message
-								key="table.lecturer" />:</label><br> <select id="lecturer"
+								key="manageCourses.lecturer" />:</label><br> <select id="lecturer"
 							name="lecturer" class="custom-select nopadding"
 							id="inputGroupSelect02">
 							<c:forEach items="${  requestScope.get(\"lecturers\")  }"
@@ -63,19 +63,19 @@
 				<div class="col-sm-6">
 					<div class="form-group">
 						<label for="startdate" class="text-info"><fmt:message
-								key="table.startdate" />:</label><br> <input id="startdate"
+								key="manageCourses.startdate" />:</label><br> <input id="startdate"
 							name="startdate" class="form-control nopadding" type="date"
 							value="${ course.course.startDate }" />
 					</div>
 					<div class="form-group">
 						<label for="enddate" class="text-info"><fmt:message
-								key="table.enddate" />:</label><br> <input id="enddate"
+								key="manageCourses.enddate" />:</label><br> <input id="enddate"
 							name="enddate" class="form-control nopadding" type="date"
 							value="${ course.course.endDate }" />
 					</div>
 					<div class="form-group">
 						<label for="status" class="text-info"><fmt:message
-								key="table.status" />:</label><br> <select id="status"
+								key="manageCourses.status" />:</label><br> <select id="status"
 							name="status" class="custom-select nopadding"
 							id="inputGroupSelect03">
 							<c:forEach items="${  requestScope.get(\"statuses\")  }"
@@ -97,12 +97,12 @@
 							<c:out value="${ course.course.id }" />
 						</h5>
 						<h5>
-							<fmt:message key="table.students" />
+							<fmt:message key="manageCourses.students" />
 							:
 							<c:out value="${ course.students }" />
 						</h5>
 						<h5>
-							<fmt:message key="table.duration" />
+							<fmt:message key="manageCourses.duration" />
 							:
 							<c:out value="${ course.duration }" />
 						</h5>

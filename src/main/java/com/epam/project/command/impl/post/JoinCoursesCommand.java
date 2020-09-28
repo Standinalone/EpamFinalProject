@@ -31,11 +31,11 @@ public class JoinCoursesCommand implements ICommand {
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		User user = (User) request.getSession().getAttribute("user");
 		if (user == null) {
-			return Constants.PAGE_LOGIN;
+			return Constants.COMMAND__LOGIN;
 		}
 		String[] checkedIds = request.getParameterValues("courses");
 		userService.enrollToCourse(checkedIds, user.getId());
-		return Constants.PAGE_HOME;
+		return Constants.COMMAND__HOME;
 	}
 
 }

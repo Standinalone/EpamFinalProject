@@ -40,7 +40,7 @@ public class AddEditCoursePageCommand implements ICommand {
 		int courseId;
 		String forward = "";
 		if (id == null || id.isEmpty()) {
-			forward = Constants.PATH_ADD_COURSE_PAGE;
+			forward = Constants.PAGE__ADD_COURSE;
 		}
 		if (id != null && !id.isEmpty()) {
 			try {
@@ -48,16 +48,16 @@ public class AddEditCoursePageCommand implements ICommand {
 				CourseDto courseDto = courseService.getCourseDtoByCourseId(courseId);
 				if (courseDto != null) {
 					request.setAttribute("course", courseDto);
-					forward = Constants.PATH_ADD_COURSE_PAGE;
+					forward = Constants.PAGE__ADD_COURSE;
 				}
 				else {
 					request.setAttribute("error", "Course not found :(");
-					return Constants.PATH_ERROR_PAGE;
+					return Constants.PAGE__ERROR;
 				}
 			}
 			catch(NumberFormatException e) {
 				request.setAttribute("error", "Cannot parse id :(");
-				return Constants.PATH_ERROR_PAGE;
+				return Constants.PAGE__ERROR;
 			}
 		}
 		request.setAttribute("lecturers", userService.findAllUsersByRole(3));

@@ -116,9 +116,68 @@ public class MySqlCourseService implements ICourseService {
 			daoFactory.close();
 		}
 	}
+
+	@Override
+	public void setLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds) {
+		try {
+			daoFactory.open();
+			for (String id : checkedIds) {
+				Course course = courseDao.findById(Integer.parseInt(id));
+				course.setLecturerId(lecturerId);
+				courseDao.update(course);
+			}
+		} catch (SQLException e) {
+			log.error("Editing courses error", e);
+		} finally {
+			daoFactory.close();
+		}
+	}
+
+	@Override
+	public void deleteLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds) {
+		try {
+			daoFactory.open();
+			for (String id : checkedIds) {
+				Course course = courseDao.findById(Integer.parseInt(id));
+				course.setLecturerId(0);
+				courseDao.update(course);
+			}
+		} catch (SQLException e) {
+			log.error("Editing courses error", e);
+		} finally {
+			daoFactory.close();
+		}
+	}
 	
 	// CourseDto Methods
 
+
+	@Override
+	public List<CourseDto> findAllCoursesDto() {
+		try {
+			daoFactory.open();
+			return courseDtoDao.findAll();
+		} catch (SQLException e) {
+			log.error("Getting courses dto error", e);
+			return new ArrayList<>();
+		} finally {
+			daoFactory.close();
+		}
+	}
+	
+	@Override
+	public List<CourseDto> findAllCoursesDtoByLecturerId(int userId) {
+		try {
+			daoFactory.open();
+			return courseDtoDao.findByLecturerId(userId);
+		} catch (SQLException e) {
+			log.error("Getting courses dto error", e);
+			return new ArrayList<>();
+		} finally {
+			daoFactory.close();
+		}
+	}
+	
 	@Override
 	public CourseDto getCourseDtoByCourseId(int courseId) {
 		try {
@@ -174,5 +233,29 @@ public class MySqlCourseService implements ICourseService {
 		}
 	}
 
+	@Override
+	public List<CourseDto> findAllCoursesDtoByLecturerIdFromTo(int lecturerId, int limit, int offset) {
+		try {
+			daoFactory.open();
+			return courseDtoDao.findByLecturerIdFromTo(lecturerId, limit, offset);
+		} catch (SQLException e) {
+			log.error("Getting courses error", e);
+			return new ArrayList<>();
+		} finally {
+			daoFactory.close();
+		}
+	}
 
+	@Override
+	public int getCoursesWithLecturerCount(int lecturerId) {
+		try {
+			daoFactory.open();
+			return courseDao.getCountByLecturerId(lecturerId);
+		} catch (SQLException e) {
+			log.error("Get courses count error", e);
+			return 0;
+		} finally {
+			daoFactory.close();
+		}
+	}
 }

@@ -42,33 +42,36 @@ public class RegistrationConfirmCommand implements ICommand {
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		String token = request.getParameter("token");
-		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
 
+//		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
+
+		Localization localization = (Localization) request.getSession().getAttribute("localization");
+		
 		if (token == null) {
 			log.error("Token wasn't provided");
-			request.getSession().setAttribute("error", localization.getMessagesParam("register.token"));
-			return Constants.PAGE_ERROR;
+			request.getSession().setAttribute("error", localization.getResourcesParam("register.token"));
+			return Constants.COMMAND__ERROR;
 		}
 		
 		VerificationToken verificationToken = tokenService.findTokenByToken(token);
 		if (verificationToken == null) {
-			request.getSession().setAttribute("error", localization.getMessagesParam("register.badtoken"));
-			return Constants.PATH_ERROR_PAGE;
+			request.getSession().setAttribute("error", localization.getResourcesParam("register.badtoken"));
+			return Constants.PAGE__ERROR;
 		}
 		
 		User user = userService.findUserById(verificationToken.getUserId());
 		if (verificationToken.getExpiryDate().isBefore(LocalDate.now())) {
-			request.getSession().setAttribute("error", localization.getMessagesParam("register.tokenexpired"));
-			return Constants.PATH_ERROR_PAGE;
+			request.getSession().setAttribute("error", localization.getResourcesParam("register.tokenexpired"));
+			return Constants.PAGE__ERROR;
 		} 
 		
 		user.setEnabled(true);
 		if (!userService.updateUser(user)) {
 			request.getSession().setAttribute("error", "Couldn't update user");
-			return Constants.PATH_ERROR_PAGE;
+			return Constants.PAGE__ERROR;
 		}
 		
-		request.getSession().setAttribute("successMessage", localization.getMessagesParam("success.registration"));
-		return Constants.PAGE_SUCCESS;
+		request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.registration"));
+		return Constants.COMMAND__SUCCESS;
 	}
 }

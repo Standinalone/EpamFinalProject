@@ -15,6 +15,7 @@ import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.ServiceFactory;
+import com.epam.project.util.Page;
 
 public class ManageCoursesPageCommand implements ICommand {
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
@@ -32,33 +33,18 @@ public class ManageCoursesPageCommand implements ICommand {
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		User user = (User) request.getSession().getAttribute("user");
-		if (user == null || user.getRole() != RoleEnum.ADMIN) {
-			try {
-				response.sendRedirect(Constants.PAGE_LOGIN);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return null;
+		
+		Page<CourseDto> page = new Page<>(request,
+				(limit, offset) -> courseService.findAllCoursesDtoFromTo(limit, offset),
+				() -> courseService.getCoursesCount());
+
+		if (page.getList() == null) {
+			request.setAttribute("error", "Cannot parse id");
+			return Constants.PAGE__ERROR;
 		}
 
-		int count = courseService.getCoursesCount();
-		request.setAttribute("totalPages", Math.ceil((double) count / Constants.PAGE_SIZE));
+		request.setAttribute("page", page);
 
-		int pageNum = 0;
-		if (request.getParameter("pagenum") != null) {
-			try {
-				pageNum = Integer.parseInt(request.getParameter("pagenum")) - 1;
-			} catch (NumberFormatException e) {
-				request.setAttribute("error", "Cannot parse id");
-				return Constants.PATH_ERROR_PAGE;
-			}
-		}
-
-		List<CourseDto> courses = courseService.findAllCoursesDtoFromTo(Constants.PAGE_SIZE,
-				pageNum * Constants.PAGE_SIZE);
-		request.setAttribute("courses", courses);
-
-		return Constants.PATH_MANAGE_COURSES_PAGE;
+		return Constants.PAGE__MANAGE_COURSES;
 	}
 }

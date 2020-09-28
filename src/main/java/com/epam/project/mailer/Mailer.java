@@ -10,17 +10,11 @@ import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
 import javax.mail.Transport;
-import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.naming.Context;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
-import com.epam.project.constants.Constants;
 
 public class Mailer {
-	private static String username ;
+	private static String username;
 	private static String password;
 	private static String host;
 	private static Properties props = new Properties();
@@ -29,19 +23,21 @@ public class Mailer {
 	}
 
 	static {
+		// Option 1 - app.properties
 		try {
-		ResourceBundle db = ResourceBundle.getBundle(Constants.PROPS_FILE);
-		username = db.getString("mailer.username");
-		password = db.getString("mailer.password");
-		host = db.getString("mailer.host");
-	} catch (MissingResourceException e) {
-		e.printStackTrace();
-	}
-		
+			ResourceBundle db = ResourceBundle.getBundle("app");
+			username = db.getString("mailer.username");
+			password = db.getString("mailer.password");
+			host = db.getString("mailer.host");
+		} catch (MissingResourceException e) {
+			e.printStackTrace();
+		}
+
 		props.setProperty("mail.smtp.ssl.enable", "true");
 		props.put("mail.smtp.ssl.enable", true);
 		props.put("mail.smtp.host", host);
-		
+
+		// Option 2 - JNDI (Not succeeded)
 //		Context envCtx;
 //		try {
 //			Context initCtx = new InitialContext();
@@ -55,7 +51,7 @@ public class Mailer {
 	private static Message msg = new MimeMessage(session);
 
 	public static void sendMail(String[] usernames, String text, String subject)
-			throws AddressException, MessagingException {
+			throws MessagingException {
 		Address[] recipients = new Address[usernames.length];
 		for (int i = 0; i < usernames.length; i++) {
 			recipients[i] = new InternetAddress(usernames[i]);

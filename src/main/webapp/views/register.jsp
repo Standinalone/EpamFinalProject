@@ -7,7 +7,7 @@
 
 <!-- Body -->
 
-<fmt:bundle basename="labels">
+<fmt:bundle basename="tables">
 	<div id="login">
 		<div class="container">
 			<h3 class="text-center text-info">

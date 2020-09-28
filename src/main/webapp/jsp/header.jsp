@@ -9,7 +9,6 @@
 <c:set value="${ sessionScope.get(\"locale\") }" var="locale"
 	scope="page" />
 
-
 <!DOCTYPE html>
 <html>
 <head>

@@ -10,7 +10,7 @@ public class AddLecturerPageCommand implements ICommand {
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		return Constants.PATH_ADD_LECTURER_PAGE;
+		return Constants.PAGE__ADD_LECTURER;
 	}
 
 }

@@ -39,25 +39,28 @@ public class LoginCommand implements ICommand {
 
 	public List<String> validate(HttpServletRequest request) {
 		List<String> errors = new ArrayList<>();
-		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
+
+//		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
+
+		Localization localization = (Localization) request.getSession().getAttribute("localization");
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 
 		User user = userService.findUserByLogin(username);
 		if (user == null) {
-			errors.add(localization.getMessagesParam("login.error"));
+			errors.add(localization.getResourcesParam("login.error"));
 			return errors;
 		}
 		if (!password.equals(user.getPassword())) {
-			errors.add(localization.getMessagesParam("login.error"));
+			errors.add(localization.getResourcesParam("login.error"));
 			return errors;
 		}
 		if (user.isBlocked()) {
-			errors.add(localization.getMessagesParam("login.blocked"));
+			errors.add(localization.getResourcesParam("login.blocked"));
 			return errors;
 		}
 		if (!user.isEnabled()) {
-			errors.add(localization.getMessagesParam("login.enabled"));
+			errors.add(localization.getResourcesParam("login.enabled"));
 			return errors;
 		}
 		request.getSession().setAttribute("user", user);
@@ -72,9 +75,9 @@ public class LoginCommand implements ICommand {
 			log.debug("debug error");
 
 			request.getSession().setAttribute("errors", errors);
-			return Constants.PAGE_LOGIN;
+			return Constants.COMMAND__LOGIN;
 		}
 		request.setAttribute("errors", null);
-		return Constants.PAGE_PROFILE;
+		return Constants.COMMAND__PROFILE;
 	}
 }

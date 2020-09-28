@@ -25,7 +25,8 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	private static final String FIELD_EMAIL = "email";
 	private static final String FIELD_ROLE_NAME = "roles.name";
 	private static final String FIELD_ENABLED = "enabled";
-
+	
+	private static final String SQL_GET_COUNT = "SELECT COUNT(*) FROM Users";
 	private static final String SQL_FIND_USER_BY_LOGIN = "SELECT * FROM Users, Roles WHERE Users.role_id = Roles.id AND login = ?";
 	private static final String SQL_ADD_USER = "INSERT INTO Users (`blocked`, `role_id`, `login`, `password`, `name`, `surname`, `patronym`, `email`, `enabled`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
 	private static final String SQL_FIND_USER_BY_ID = "SELECT * FROM Users, Roles WHERE Users.role_id = Roles.id AND users.id = ?";
@@ -67,19 +68,6 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 		if (!list.isEmpty())
 			return list.get(0);
 		return null;
-//		User user = null;
-//		daoFactory.open();
-//		try {
-//			List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_LOGIN, 1, login);
-//			if (!list.isEmpty()) {
-//				user = list.get(0);
-//			}
-//
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		daoFactory.close();
-//		return user;
 	}
 
 	@Override
@@ -99,50 +87,16 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 			return list.get(0);
 		}
 		return null;
-
-//		User user = null;
-//		daoFactory.open();
-//		try {
-//			List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_ID, 1, id);
-//			if (!list.isEmpty()) {
-//				user = list.get(0);
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		daoFactory.close();
-//		return user;
 	}
 
 	@Override
 	public List<User> findAll() throws SQLException {
 		return findAll(daoFactory.getConnection(), SQL_FIND_ALL);
-//		List<User> users = new ArrayList<>();
-//		daoFactory.open();
-//		try {
-//			users = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		daoFactory.close();
-//		return users;
 	}
 
 	@Override
 	public boolean update(User user) throws SQLException {
 		return update(daoFactory.getConnection(), user, SQL_UPDATE_USER_BY_ID, 10, user.getId());
-//		boolean result = false;
-//		daoFactory.open();
-//		try {
-//			if (update(daoFactory.getConnection(), user, SQL_UPDATE_USER_BY_ID, 10, user.getId())) {
-//				result = true;
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//			result = false;
-//		}
-//		daoFactory.close();
-//		return result;
 	}
 
 	@Override
@@ -151,32 +105,11 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 		if (!list.isEmpty())
 			return list.get(0);
 		return null;
-//		User user = null;
-//		daoFactory.open();
-//		try {
-//			List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_EMAIL, 1, email);
-//			if (!list.isEmpty()) {
-//				user = list.get(0);
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		daoFactory.close();
-//		return user;
 	}
 
 	@Override
 	public List<User> findAllByRole(int roleId) throws SQLException {
 		return findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_ROLE, 1, roleId);
-//		List<User> users = null;
-//		daoFactory.open();
-//		try {
-//			users = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_ROLE, 1, roleId);
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		daoFactory.close();
-//		return users;
 	}
 
 	@Override
@@ -193,6 +126,12 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	@Override
 	public boolean delete(int userId) throws SQLException {
 		return deleteByField(daoFactory.getConnection(), SQL_DELETE_USER_BY_ID, userId);
+	}
+
+	@Override
+	public List<User> findAllFromTo(int limit, int offset) throws SQLException {
+		// TODO Auto-generated method stub
+		return findFromTo(daoFactory.getConnection(), SQL_FIND_ALL, limit, offset);
 	}
 	
 	@Override
@@ -232,6 +171,11 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 			e.printStackTrace();
 			return false;
 		}
+	}
+
+	@Override
+	public int getCount() throws SQLException {
+		return getCount(daoFactory.getConnection(), SQL_GET_COUNT);
 	}
 
 }

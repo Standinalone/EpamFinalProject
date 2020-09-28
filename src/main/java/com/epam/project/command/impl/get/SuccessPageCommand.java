@@ -10,6 +10,6 @@ public class SuccessPageCommand implements ICommand{
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		return Constants.PATH_SUCCESS_PAGE;
+		return Constants.PAGE__SUCCESS;
 	}
 }

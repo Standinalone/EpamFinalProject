@@ -9,7 +9,7 @@
 <%@include file='../jsp/header.jsp'%>
 
 <!-- Body -->
-<fmt:bundle basename="manageCourses">
+<fmt:bundle basename="tables">
 	<div class="container-fluid">
 		<div class="panel panel-default">
 			<div class="panel-body">
@@ -20,28 +20,28 @@
 				<div class="table-responsive">
 					<table class="table table-hover">
 						<tr>
-							<th><fmt:message key="manageCourses.action" /></th>
 							<th>#</th>
-							<th><fmt:message key="table.students" /></th>
-							<th><fmt:message key="table.name" /></th>
-							<th><fmt:message key="table.topic" /></th>
-							<th><fmt:message key="table.lecturer" /></th>
-							<th><fmt:message key="table.startdate" /></th>
-							<th><fmt:message key="table.enddate" /></th>
-							<th><fmt:message key="table.duration" /></th>
+							<th><fmt:message key="manageCourses.action" /></th>
+							<th><fmt:message key="manageCourses.students" /></th>
+							<th><fmt:message key="manageCourses.name" /></th>
+							<th><fmt:message key="manageCourses.topic" /></th>
+							<th><fmt:message key="manageCourses.lecturer" /></th>
+							<th><fmt:message key="manageCourses.startdate" /></th>
+							<th><fmt:message key="manageCourses.enddate" /></th>
+							<th><fmt:message key="manageCourses.duration" /></th>
 						</tr>
-						<c:forEach items="${ requestScope.courses }" var="course"
+						<c:forEach items="${ requestScope.page.list }" var="course"
 							varStatus="loop">
 							<tr>
+								<td>${ requestScope.startIndex + loop.index}</td>
 								<td><a
 									href="?command=ADD_EDIT_COURSE_PAGE&id=${ course.course.id }"
-									class="btn btn-info"><fmt:message key="table.edit" /></a>
+									class="btn btn-info"><fmt:message key="manageCourses.edit" /></a>
 									<form action="?command=DELETE_COURSE&id=${ course.course.id }"
 										method="post">
-										<input type="submit" class="btn btn-info" value = "<fmt:message key="table.delete" />"/>
+										<input type="submit" class="btn btn-info" value = "<fmt:message key="manageCourses.delete" />"/>
 										
 									</form></td>
-								<td>${ requestScope.startIndex + loop.index}</td>
 								<td>${ course.students }</td>
 								<td>${ course.course.name }</td>
 								<td>${ course.topic }</td>

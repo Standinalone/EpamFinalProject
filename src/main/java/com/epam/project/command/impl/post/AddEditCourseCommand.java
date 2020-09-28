@@ -51,7 +51,7 @@ public class AddEditCourseCommand implements ICommand {
 		List<String> mappingErrors = mapToCourse(request, courseId);
 		if (!mappingErrors.isEmpty()) {
 			request.getSession().setAttribute("errors", mappingErrors);
-			return Constants.PAGE_ADD_EDIT_COURSE;
+			return Constants.COMMAND__ADD_EDIT_COURSE;
 		}
 		List<String> errors = validate(course);
 
@@ -59,19 +59,19 @@ public class AddEditCourseCommand implements ICommand {
 			request.getSession().setAttribute("successMessage", null);
 			request.getSession().setAttribute("errors", errors);
 			if (courseId != null && !courseId.isEmpty())
-				return Constants.PAGE_ADD_EDIT_COURSE + "&id=" + request.getParameter("id").toString();
-			return Constants.PAGE_ADD_EDIT_COURSE;
+				return Constants.COMMAND__ADD_EDIT_COURSE + "&id=" + request.getParameter("id").toString();
+			return Constants.COMMAND__ADD_EDIT_COURSE;
 		}
 
 		if (courseId != null && !courseId.isEmpty()) {
 			if (!courseService.updateCourse(course)) {
 				request.getSession().setAttribute("error", "Error updating course");
-				return Constants.PAGE_ERROR;
+				return Constants.COMMAND__ERROR;
 			}
 		} else {
 			if (!courseService.addCourse(course)) {
 				request.getSession().setAttribute("error", "Error adding course");
-				return Constants.PAGE_ERROR;
+				return Constants.COMMAND__ERROR;
 			}
 		}
 		final HttpSession s = request.getSession();
@@ -80,11 +80,13 @@ public class AddEditCourseCommand implements ICommand {
 		list.add(new User());
 		request.getSession().setAttribute("list" , list);
 		
-		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
+//		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
 
-		request.getSession().setAttribute("successMessage", localization.getMessagesParam("update.success"));
+		Localization localization = (Localization) request.getSession().getAttribute("localization");
+		
+		request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.updated"));
 
-		return Constants.PAGE_ADD_EDIT_COURSE + "&id=" + course.getId();
+		return Constants.COMMAND__ADD_EDIT_COURSE + "&id=" + course.getId();
 	}
 
 	private List<String> mapToCourse(HttpServletRequest request, String courseId) {

@@ -9,11 +9,13 @@ import javax.servlet.http.HttpServletResponse;
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 import com.epam.project.dao.DatabaseEnum;
+import com.epam.project.dto.CourseDto;
 import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
+import com.epam.project.util.Page;
 
 public class ManageStudentsPageCommand implements ICommand {
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
@@ -31,18 +33,16 @@ public class ManageStudentsPageCommand implements ICommand {
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		User user = (User) request.getSession().getAttribute("user");
-		if (user == null || user.getRole() != RoleEnum.ADMIN) {
-			try {
-				response.sendRedirect(Constants.PAGE_LOGIN);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-			return null;
-		}
-		List<User> users = userService.findAllUsers();
 
-		request.setAttribute("users", users);
-		return Constants.PATH_MANAGE_STUDENTS_PAGE;
+		Page<User> page = new Page<>(request, (limit, offset) -> userService.findAllUsersFromTo(limit, offset),
+				() -> userService.getUsersCount());
+
+		if (page.getList() == null) {
+			request.setAttribute("error", "Cannot parse id");
+			return Constants.PAGE__ERROR;
+		}
+
+		request.setAttribute("page", page);
+		return Constants.PAGE__MANAGE_STUDENTS;
 	}
 }

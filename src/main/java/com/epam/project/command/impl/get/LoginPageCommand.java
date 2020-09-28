@@ -10,7 +10,7 @@ public class LoginPageCommand implements ICommand{
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		return Constants.PATH_LOGIN_PAGE;
+		return Constants.PAGE__LOGIN;
 	}
 
 }

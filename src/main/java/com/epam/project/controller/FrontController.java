@@ -30,7 +30,7 @@ public class FrontController extends HttpServlet {
 		String redirect = handleRequest(request, response);
 		if (redirect != null) {
 			try {
-				response.sendRedirect(redirect);
+				response.sendRedirect(request.getRequestURL().append(redirect).toString());
 			} catch (IOException e) {
 				e.printStackTrace();
 			}

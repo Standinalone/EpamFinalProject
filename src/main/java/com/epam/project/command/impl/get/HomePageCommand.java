@@ -12,6 +12,7 @@ import com.epam.project.dto.CourseDto;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.ServiceFactory;
+import com.epam.project.util.Page;
 
 public class HomePageCommand implements ICommand {
 
@@ -30,25 +31,18 @@ public class HomePageCommand implements ICommand {
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		int count = courseService.getCoursesCount();
-		request.setAttribute("totalPages", Math.ceil((double) count / Constants.PAGE_SIZE));
 
-		int pageNum = 0;
-		if (request.getParameter("pagenum") != null) {
-			try {
-				pageNum = Integer.parseInt(request.getParameter("pagenum")) - 1;
-			} catch (NumberFormatException e) {
-				request.setAttribute("error", "Cannot parse id");
-				return Constants.PATH_ERROR_PAGE;
-			}
+		Page<CourseDto> page = new Page<>(request,
+				(limit, offset) -> courseService.findAllCoursesDtoFromTo(limit, offset),
+				() -> courseService.getCoursesCount());
 
+		if (page.getList() == null) {
+			request.setAttribute("error", "Cannot parse id");
+			return Constants.PAGE__ERROR;
 		}
-		List<CourseDto> courses = courseService.findAllCoursesDtoFromTo(Constants.PAGE_SIZE,
-				pageNum * Constants.PAGE_SIZE);
-		request.setAttribute("courses", courses);
-		request.setAttribute("startIndex", pageNum * Constants.PAGE_SIZE + 1);
 
-		return Constants.PATH_HOMEPAGE;
+		request.setAttribute("page", page);
+		return Constants.PAGE__HOME;
 	}
 
 }

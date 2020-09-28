@@ -25,4 +25,16 @@ public interface ICourseService {
 	boolean addCourse(Course course);
 
 	boolean deleteCourseById(int id);
+
+	List<CourseDto> findAllCoursesDtoByLecturerId(int userId);
+
+	List<CourseDto> findAllCoursesDto();
+
+	void setLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds);
+
+	void deleteLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds);
+
+	List<CourseDto> findAllCoursesDtoByLecturerIdFromTo(int lecturerId, int limit, int offset);
+
+	int getCoursesWithLecturerCount(int lecturerId);
 }
