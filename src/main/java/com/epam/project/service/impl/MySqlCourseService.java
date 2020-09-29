@@ -3,6 +3,7 @@ package com.epam.project.service.impl;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -148,9 +149,8 @@ public class MySqlCourseService implements ICourseService {
 			daoFactory.close();
 		}
 	}
-	
-	// CourseDto Methods
 
+	// CourseDto Methods
 
 	@Override
 	public List<CourseDto> findAllCoursesDto() {
@@ -164,7 +164,7 @@ public class MySqlCourseService implements ICourseService {
 			daoFactory.close();
 		}
 	}
-	
+
 	@Override
 	public List<CourseDto> findAllCoursesDtoByLecturerId(int userId) {
 		try {
@@ -177,7 +177,7 @@ public class MySqlCourseService implements ICourseService {
 			daoFactory.close();
 		}
 	}
-	
+
 	@Override
 	public CourseDto getCourseDtoByCourseId(int courseId) {
 		try {
@@ -192,7 +192,7 @@ public class MySqlCourseService implements ICourseService {
 	}
 
 	@Override
-	public List<CourseDto> findAllCoursesDtoFromTo(int limit, int offset) {
+	public synchronized List<CourseDto> findAllCoursesDtoFromTo(int limit, int offset) {
 		try {
 			daoFactory.open();
 			return courseDtoDao.findAllFromTo(limit, offset);
@@ -258,4 +258,32 @@ public class MySqlCourseService implements ICourseService {
 			daoFactory.close();
 		}
 	}
+
+	@Override
+	public List<CourseDto> findAllCoursesDtoFromToWithParameters(int limit, int offset, String conditions,
+			String orderBy) {
+		try {
+			daoFactory.open();
+			return courseDtoDao.findAllFromToWithParameters(limit, offset, conditions, orderBy);
+		} catch (SQLException e) {
+			log.error("Getting courses error", e);
+			return new ArrayList<>();
+		} finally {
+			daoFactory.close();
+		}
+	}
+
+	@Override
+	public int getCoursesWithParametersCount(String conditions) {
+		try {
+			daoFactory.open();
+			return courseDao.getCountWithParameters(conditions);
+		} catch (SQLException e) {
+			log.error("Get courses count error", e);
+			return 0;
+		} finally {
+			daoFactory.close();
+		}
+	}
+
 }

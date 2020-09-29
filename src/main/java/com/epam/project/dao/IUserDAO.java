@@ -30,4 +30,14 @@ public interface IUserDAO {
 
 	int getCount() throws SQLException;
 
+	List<User> findAllByCourseIdFromTo(int courseId, int limit, int offset, boolean enrolled) throws SQLException;
+
+	int getUsersWithCourseCount(int courseId, boolean enrolled) throws SQLException;
+
+	void deleteUserFromCourse(int parseInt, int courseId) throws SQLException;
+
+	void registerInCourse(int parseInt, int courseId, boolean registered) throws SQLException;
+
+	void updateGradeForUser(int courseId, int userId, int grade) throws SQLException;
+
 }

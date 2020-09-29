@@ -1,6 +1,8 @@
 package com.epam.project.service;
 
+import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
 
 import com.epam.project.dto.CourseDto;
 import com.epam.project.dto.CourseProfilePageDto;
@@ -37,4 +39,8 @@ public interface ICourseService {
 	List<CourseDto> findAllCoursesDtoByLecturerIdFromTo(int lecturerId, int limit, int offset);
 
 	int getCoursesWithLecturerCount(int lecturerId);
+	
+	List<CourseDto> findAllCoursesDtoFromToWithParameters(int limit, int offset, String conditions, String orderBy);
+	
+	int getCoursesWithParametersCount(String conditions);
 }

@@ -36,11 +36,11 @@
 					<c:choose>
 						<c:when test = "${ user.role == 'LECTURER' }">
 							<a href = "?command=MY_COURSES_PAGE" class="list-group-item"><fmt:message key="menu.mycourses" /></a>
-							<a href = "?command=MANAGE_JOURNAL" class="list-group-item"><fmt:message key="menu.manageJournal" /></a>
+							
 						</c:when>
 						<c:otherwise>
 							<li class="list-group-item disabled"><fmt:message key="menu.mycourses" /></li>
-							<li class="list-group-item disabled"><fmt:message key="menu.manageJournal" /></li>
+							
 						</c:otherwise>
 					</c:choose>
 				</div>

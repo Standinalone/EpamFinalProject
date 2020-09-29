@@ -9,9 +9,70 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class GenericDAO<T> {
+	
 	protected abstract T mapToEntity(ResultSet rs);
 
 	protected abstract boolean mapFromEntity(PreparedStatement ps, T obj);
+
+	protected <V, R> void updateManyToMany(Connection connection, String sql, R value1, V value2, V value3)
+			throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ps = connection.prepareStatement(sql);
+			switch (value1.getClass().getSimpleName()) {
+			case "Integer":
+				ps.setInt(1, (Integer) value1);
+				break;
+			case "String":
+				ps.setString(1, (String) value1);
+				break;
+			case "Boolean":
+				ps.setBoolean(1, (Boolean) value1);
+				break;
+			default:
+				throw new IllegalArgumentException();
+			}
+			switch (value3.getClass().getSimpleName()) {
+			case "Integer":
+				ps.setInt(2, (Integer) value2);
+				ps.setInt(3, (Integer) value3);
+				break;
+			case "String":
+				ps.setString(2, (String) value2);
+				ps.setString(3, (String) value3);
+				break;
+			default:
+				throw new IllegalArgumentException();
+			}
+			ps.executeUpdate();
+		} finally {
+			closeStatementAndResultSet(ps, rs);
+		}
+	}
+
+	protected <V> void deleteFromManyToMany(Connection connection, String sql, V value1, V value2) throws SQLException {
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		try {
+			ps = connection.prepareStatement(sql);
+			switch (value1.getClass().getSimpleName()) {
+			case "Integer":
+				ps.setInt(1, (Integer) value1);
+				ps.setInt(2, (Integer) value2);
+				break;
+			case "String":
+				ps.setString(1, (String) value1);
+				ps.setString(1, (String) value2);
+				break;
+			default:
+				throw new IllegalArgumentException();
+			}
+			ps.executeUpdate();
+		} finally {
+			closeStatementAndResultSet(ps, rs);
+		}
+	}
 
 	protected <V> boolean deleteByField(Connection connection, String sql, V value) throws SQLException {
 		PreparedStatement ps = null;

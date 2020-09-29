@@ -5,9 +5,15 @@
 <c:set value="${ sessionScope.get(\"user\") }" var="user" scope="page" />
 <c:set value="${pageContext.request.locale.language}" var="language"
 	scope="page" />
+<c:set value="${ pageContext.request.queryString }" var="queryString" />
 <!-- Header -->
 <%@include file='../jsp/header.jsp'%>
-
+<style>
+table th {
+  cursor: pointer;
+}
+</style>
+<script src="${pageContext.servletContext.contextPath}/js/home.js"></script>
 <!-- Body -->
 <fmt:bundle basename="tables">
 	<div class="container-fluid">
@@ -16,22 +22,69 @@
 				<h5 class="panel-title pull-left">
 					<fmt:message key="courses.courselist" />
 				</h5>
+				<div class="form-group">
+					<div class="row">
+						<div class="col-sm-4">
+							<label for="lecturer" class="text-info"><fmt:message
+									key="courses.lecturers" />:</label><br> <select id="lecturer"
+								name="lecturer" class="custom-select nopadding"
+								id="lecturers">
+								<option selected value="">NOT_SELECTED</option>
+								<c:forEach items="${  requestScope.get(\"lecturers\")  }"
+									var="lecturer">
+<%-- 									<option <c:if test = "${ lecturer.id == param.lecturer }">selected</c:if> value="${ pageContext.request.contextPath }/controller?command=HOME_PAGE&lecturer=${ lecturer.id }&topic=${ param.topic }&status=${ param.status }&sort=${ param.sort }&order=${ param.order }">${ lecturer.name }</option> --%>
+									<option <c:if test = "${ lecturer.id == param.lecturer }">selected</c:if> value="${ lecturer.id }">${ lecturer.name }</option>
+
+								</c:forEach>
+							</select>
+						</div>
+						<div class="col-sm-4">
+							<label for="topic" class="text-info"><fmt:message
+									key="courses.topics" />:</label><br> <select id="topic"
+								name="topic" class="custom-select nopadding"
+								id="inputGroupSelect03">
+								<option selected value="">NOT_SELECTED</option>
+								<c:forEach items="${  requestScope.get(\"topics\")  }"
+									var="topic">
+<%-- 									<option <c:if test = "${ topic.id == param.topic }">selected</c:if> value="${ pageContext.request.contextPath }/controller?command=HOME_PAGE&lecturer=${ param.lecturer }&topic=${ topic.id }&status=${ param.status }&sort=${ param.sort }&order=${ param.order }">${ topic.name }</option> --%>
+										<option <c:if test = "${ topic.id == param.topic }">selected</c:if> value="${ topic.id }">${ topic.name }</option>
+
+								</c:forEach>
+							</select>
+						</div>
+						<div class="col-sm-4">
+							<label for="status" class="text-info"><fmt:message
+									key="courses.statuses" />:</label><br> <select id="status"
+								name="status" class="custom-select nopadding"
+								id="inputGroupSelect03">
+								<option selected value="">NOT_SELECTED</option>
+								<c:forEach items="${  requestScope.get(\"statuses\")  }"
+									var="status">
+<%-- 									<option <c:if test = "${ status == param.status }">selected</c:if> value="${ pageContext.request.contextPath }/controller?command=HOME_PAGE&lecturer=${ param.lecturer }&topic=${ param.topic }&status=${ status }&sort=${ param.sort }&order=${ param.order }">${ status }</option> --%>
+										<option <c:if test = "${ status == param.status }">selected</c:if> value="${ status }">${ status }</option>
+
+								</c:forEach>
+							</select>
+						</div>
+					</div>
+				</div>
 				<form action="?command=JOIN_COURSES" method="post">
 
 					<div class="table-responsive">
-						<table class="table table-hover">
+						<table id = "mainTable" class="table table-hover">
 							<tr>
 								<th>#</th>
 								<c:if test="${ not empty user }">
 									<th><fmt:message key="courses.check" /></th>
 								</c:if>
-								<th><fmt:message key="courses.students" /></th>
-								<th><fmt:message key="courses.name" /></th>
-								<th><fmt:message key="courses.topic" /></th>
-								<th><fmt:message key="courses.lecturer" /></th>
-								<th><fmt:message key="courses.startdate" /></th>
-								<th><fmt:message key="courses.enddate" /></th>
-								<th><fmt:message key="courses.duration" /></th>
+								<th id = "students" ><fmt:message key="courses.students" /></th>
+								<th id = "name"><fmt:message key="courses.name" /></th>
+								<th id = "topic"><fmt:message key="courses.topic" /></th>
+								<th id = "lecturer"><fmt:message key="courses.lecturer" /></th>
+								<th id = "startdate"><fmt:message key="courses.startdate" /></th>
+								<th id = "enddate"><fmt:message key="courses.enddate" /></th>
+								<th id = "duration"><fmt:message key="courses.duration" /></th>
+								<th id = "status"><fmt:message key="courses.status" /></th>
 							</tr>
 							<c:forEach items="${ requestScope.page.list }" var="course"
 								varStatus="loop">
@@ -54,6 +107,7 @@
 									<td>${ course.course.startDate }</td>
 									<td>${ course.course.endDate }</td>
 									<td>${ course.duration }</td>
+									<td>${ course.course.status }</td>
 								</tr>
 							</c:forEach>
 						</table>
@@ -65,7 +119,7 @@
 								<li
 									class="page-item <c:if test = "${ param.pagenum == loop.index || (empty param.pagenum && loop.index == 1) }">active</c:if>"><a
 									class="page-link "
-									href="?command=HOME_PAGE&pagenum=${ loop.index }"><c:out
+									href="?command=HOME_PAGE&pagenum=${ loop.index }&topic=${ param.topic }&lecturer=${ param.lecturer }&sort=${ param.sort }&order=${ param.order }"><c:out
 											value="${ loop.index }" /></a></li>
 							</c:forEach>
 						</ul>

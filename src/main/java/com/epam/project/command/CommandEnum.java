@@ -14,9 +14,11 @@ public enum CommandEnum {
 	MY_COURSES_PAGE(new MyCoursesPageCommand()),
 	ADD_LECTURER_PAGE(new AddLecturerPageCommand()),
 	EDIT_LECTURER_PAGE(new EditLecturerPageCommand()),
+	EDIT_JOURNAL_PAGE(new EditJournalPageCommand()),
+	
 	
 	ERROR_PAGE(new ErrorPageCommand()),
-	
+	DECLINE_OR_ADD_USERS_TO_COURSE(new LecturerPanelCommand()),
 	EDIT_LECTURER(new EditLecturerCommand()),
 	LOGIN(new LoginCommand()),
 	REGISTER(new RegisterCommand()),

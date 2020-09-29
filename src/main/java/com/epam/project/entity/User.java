@@ -11,7 +11,16 @@ public class User implements Serializable {
 	private String login;
 	private String password;
 	private boolean enabled;
+	private int grade;
 	
+	public int getGrade() {
+		return grade;
+	}
+
+	public void setGrade(int grade) {
+		this.grade = grade;
+	}
+
 	public boolean isEnabled() {
 		return enabled;
 	}

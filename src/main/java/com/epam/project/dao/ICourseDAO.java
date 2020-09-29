@@ -19,4 +19,6 @@ public interface ICourseDAO {
 	boolean delete(int courseId) throws SQLException;
 
 	int getCountByLecturerId(int lecturerId) throws SQLException;
+
+	int getCountWithParameters(String conditions) throws SQLException;
 }

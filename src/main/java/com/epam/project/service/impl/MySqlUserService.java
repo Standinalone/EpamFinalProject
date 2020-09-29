@@ -3,6 +3,7 @@ package com.epam.project.service.impl;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -227,6 +228,74 @@ public class MySqlUserService implements IUserService {
 		} catch (SQLException e) {
 			log.error("Enrolling error", e);
 			return 0;
+		} finally {
+			daoFactory.close();
+		}
+	}
+
+	@Override
+	public List<User> findAllUsersWithCourseFromTo(int courseId, int limit, int offset, boolean enrolled) {
+		try {
+			daoFactory.open();
+			return userDao.findAllByCourseIdFromTo(courseId, limit, offset, enrolled);
+		} catch (SQLException e) {
+			log.error("Getting users error", e);
+			return new ArrayList<>();
+		} finally {
+			daoFactory.close();
+		}
+	}
+
+	@Override
+	public int getUsersWithCourseCount(int courseId, boolean enrolled) {
+		daoFactory.open();
+		try {
+			return userDao.getUsersWithCourseCount(courseId, enrolled);
+		} catch (SQLException e) {
+			log.error("Enrolling error", e);
+			return 0;
+		} finally {
+			daoFactory.close();
+		}
+	}
+
+	@Override
+	public void declineRequestForIds(int courseId, String[] userIds) {
+		try {
+			daoFactory.open();
+			for (String userId : userIds) {
+				userDao.deleteUserFromCourse(Integer.parseInt(userId), courseId);
+			}
+		} catch (SQLException e) {
+			log.error("Unblocking users error", e);
+		} finally {
+			daoFactory.close();
+		}
+	}
+
+	@Override
+	public void registerInCourseByUsersIds(int courseId, String[] userIds, boolean registered) {
+		try {
+			daoFactory.open();
+			for (String userId : userIds) {
+				userDao.registerInCourse(Integer.parseInt(userId), courseId, registered);
+			}
+		} catch (SQLException e) {
+			log.error("Unblocking users error", e);
+		} finally {
+			daoFactory.close();
+		}
+	}
+
+	@Override
+	public void updateGrades(int courseId, Map<Integer, Integer> userGrade) {
+		try {
+			daoFactory.open();
+			for (Map.Entry<Integer, Integer> entry : userGrade.entrySet()) {
+				userDao.updateGradeForUser(courseId, entry.getKey(), entry.getValue());
+			}
+		} catch (SQLException e) {
+			log.error("Unblocking users error", e);
 		} finally {
 			daoFactory.close();
 		}

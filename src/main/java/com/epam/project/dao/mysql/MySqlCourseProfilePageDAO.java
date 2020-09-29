@@ -65,15 +65,6 @@ public class MySqlCourseProfilePageDAO extends GenericDAO<CourseProfilePageDto> 
 		sql += enrolled ? " AND registered = true " : " AND registered = false ";
 		
 		return findByFieldFromTo(daoFactory.getConnection(), sql, limit, offset, 1, user.getId());
-//		List<CourseProfilePageDto> courses = new ArrayList<>();
-//		daoFactory.open();
-//		try {
-//			courses = findByFieldFromTo(daoFactory.getConnection(), sql, limit, offset, 1, user.getId());
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		daoFactory.close();
-//		return courses;
 	}
 
 	@Override

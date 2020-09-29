@@ -25,6 +25,7 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	private static final String FIELD_EMAIL = "email";
 	private static final String FIELD_ROLE_NAME = "roles.name";
 	private static final String FIELD_ENABLED = "enabled";
+	private static final String FIELD_GRADE = "grade";
 	
 	private static final String SQL_GET_COUNT = "SELECT COUNT(*) FROM Users";
 	private static final String SQL_FIND_USER_BY_LOGIN = "SELECT * FROM Users, Roles WHERE Users.role_id = Roles.id AND login = ?";
@@ -38,9 +39,15 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	private static final String SQL_DELETE_USER_BY_ID = "DELETE FROM Users WHERE id = ?";
 //	private static final String SQL_GET_COURSES_WITH_USER_COUNT = "SELECT COUNT(*) FROM (" + SQL_GET_COURSES_FOR_USER
 //			+ " and registered = ?) as t";
-	
+
 	private static final String SQL_GET_COURSES_WITH_USER_COUNT = "SELECT COUNT(*) FROM Courses_has_users WHERE user_id = ?";
-	
+	private static final String SQL_FIND_ALL_BY_COURSE_ID = "SELECT * FROM Users, Roles, Courses_has_users WHERE Users.role_id = Roles.id AND user_id = Users.id AND course_id = ?";
+	private static final String SQL_GET_USERS_WITH_COURSE_COUNT = "SELECT COUNT(*) FROM Courses_has_users WHERE course_id = ?";
+	private static final String SQL_DELETE_USER_FROM_COURSE = "DELETE FROM Courses_has_users WHERE course_id = ? AND user_id = ?";
+	private static final String SQL_UPDATE_COURSES_HAS_USERS = "UPDATE Courses_has_users SET registered = ? WHERE course_id = ? AND user_id = ?";
+	private static final String SQL_UPDATE_GRADE_FOR_USER = "UPDATE Courses_has_users SET grade = ? WHERE course_id = ? AND user_id = ?";
+
+
 	private static DaoFactory daoFactory;
 	private static MySqlUserDAO instance;
 
@@ -119,7 +126,8 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 
 	@Override
 	public int getCoursesCountByUser(int userId, boolean enrolled) throws SQLException {
-		String sql = SQL_GET_COURSES_WITH_USER_COUNT + (enrolled ? " AND registered = true " : " AND registered = false");
+		String sql = SQL_GET_COURSES_WITH_USER_COUNT
+				+ (enrolled ? " AND registered = true " : " AND registered = false");
 		return getCountByField(daoFactory.getConnection(), sql, userId);
 	}
 
@@ -130,10 +138,43 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 
 	@Override
 	public List<User> findAllFromTo(int limit, int offset) throws SQLException {
-		// TODO Auto-generated method stub
 		return findFromTo(daoFactory.getConnection(), SQL_FIND_ALL, limit, offset);
 	}
-	
+
+	@Override
+	public int getCount() throws SQLException {
+		return getCount(daoFactory.getConnection(), SQL_GET_COUNT);
+	}
+
+	@Override
+	public List<User> findAllByCourseIdFromTo(int courseId, int limit, int offset, boolean enrolled)
+			throws SQLException {
+		String sql = SQL_FIND_ALL_BY_COURSE_ID + " AND registered = " + (enrolled ? "true" : "false");
+		return findByFieldFromTo(daoFactory.getConnection(), sql, limit, offset, 1, courseId);
+	}
+
+	@Override
+	public int getUsersWithCourseCount(int courseId, boolean enrolled) throws SQLException {
+		String sql = SQL_GET_USERS_WITH_COURSE_COUNT
+				+ (enrolled ? " AND registered = true " : " AND registered = false");
+		return getCountByField(daoFactory.getConnection(), sql, courseId);
+	}
+
+	@Override
+	public void deleteUserFromCourse(int userId, int courseId) throws SQLException {
+		deleteFromManyToMany(daoFactory.getConnection(), SQL_DELETE_USER_FROM_COURSE, courseId, userId);
+	}
+
+	@Override
+	public void registerInCourse(int userId, int courseId, boolean registered) throws SQLException {
+		updateManyToMany(daoFactory.getConnection(), SQL_UPDATE_COURSES_HAS_USERS, registered, courseId, userId);
+	}
+
+	@Override
+	public void updateGradeForUser(int courseId, int userId, int grade) throws SQLException {
+		updateManyToMany(daoFactory.getConnection(), SQL_UPDATE_GRADE_FOR_USER, grade, courseId, userId);
+	}
+
 	@Override
 	protected User mapToEntity(ResultSet rs) {
 		User user = new User();
@@ -148,6 +189,11 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 			user.setEmail(rs.getString(FIELD_EMAIL));
 			user.setEnabled(rs.getBoolean(FIELD_ENABLED));
 			user.setRole(RoleEnum.valueOf(rs.getString(FIELD_ROLE_NAME).toUpperCase()));
+			try {
+				user.setGrade(rs.getInt(FIELD_GRADE));
+			} catch (SQLException e) {
+				//
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -171,11 +217,6 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 			e.printStackTrace();
 			return false;
 		}
-	}
-
-	@Override
-	public int getCount() throws SQLException {
-		return getCount(daoFactory.getConnection(), SQL_GET_COUNT);
 	}
 
 }
