@@ -1,6 +1,8 @@
 <%@ page import="com.epam.project.entity.User"%>
 <%@ page import="com.epam.project.constants.Constants"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
+
+
 <c:set value="Courses Home Page" var="title" />
 <c:set value="${ sessionScope.get(\"user\") }" var="user" scope="page" />
 <c:set value="${pageContext.request.locale.language}" var="language"
@@ -13,8 +15,14 @@ table th {
   cursor: pointer;
 }
 </style>
-<script src="${pageContext.servletContext.contextPath}/js/home.js"></script>
+<%-- <script src="${pageContext.servletContext.contextPath}/home.js"></script> --%>
+<script src="${pageContext.servletContext.contextPath}/home.js"></script>
 <!-- Body -->
+
+
+
+
+
 <fmt:bundle basename="tables">
 	<div class="container-fluid">
 		<div class="panel panel-default">

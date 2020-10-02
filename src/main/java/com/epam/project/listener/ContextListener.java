@@ -25,10 +25,16 @@ public class ContextListener implements ServletContextListener {
 		log.debug("Servlet context initialization starts");
 
 		ServletContext servletContext = event.getServletContext();
-		initCommandContainer();
+//		initCommandContainer();
 		initI18N(servletContext);
+		initDb();
 	
 		log.debug("Servlet context initialization finished");
+	}
+
+	private void initDb() {
+
+//		throw new RuntimeException();
 	}
 
 	/**
@@ -39,9 +45,10 @@ public class ContextListener implements ServletContextListener {
 		
 		String localesValue = servletContext.getInitParameter("locales");
 		if (localesValue == null || localesValue.isEmpty()) {
-			log.warn("'locales' init parameter is empty, the default encoding will be used");
+			log.warn("'locales' init parameter is empty!");
+//			throw new RuntimeException();
 		} else {
-			List<String> locales = new ArrayList<String>();
+			List<String> locales = new ArrayList<>();
 			StringTokenizer st = new StringTokenizer(localesValue);
 			while (st.hasMoreTokens()) {
 				String localeName = st.nextToken();
@@ -55,14 +62,9 @@ public class ContextListener implements ServletContextListener {
 		log.debug("I18N subsystem initialization finished");
 	}
 	
-	/**
-	 * Initializes CommandContainer.
-	 * 
-	 * @param servletContext
-	 */
-	private void initCommandContainer() {
-		log.debug("Command container initialization started");
-		
+//	private void initCommandContainer() {
+//		log.debug("Command container initialization started");
+//		
 //		// initialize commands container
 //		// just load class to JVM
 //		try {
@@ -70,8 +72,8 @@ public class ContextListener implements ServletContextListener {
 //		} catch (ClassNotFoundException ex) {
 //			throw new RuntimeException(ex);
 //		}
-		
-		log.debug("Command container initialization finished");
-	}
+//		
+//		log.debug("Command container initialization finished");
+//	}
 
 }

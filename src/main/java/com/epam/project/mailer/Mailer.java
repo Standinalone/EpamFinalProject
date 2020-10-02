@@ -1,5 +1,6 @@
 package com.epam.project.mailer;
 
+import java.util.Arrays;
 import java.util.Date;
 import java.util.MissingResourceException;
 import java.util.Properties;
@@ -13,7 +14,11 @@ import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public class Mailer {
+	private static final Logger log = LoggerFactory.getLogger(Mailer.class);
 	private static String username;
 	private static String password;
 	private static String host;
@@ -37,7 +42,7 @@ public class Mailer {
 		props.put("mail.smtp.ssl.enable", true);
 		props.put("mail.smtp.host", host);
 
-		// Option 2 - JNDI (Not succeeded)
+		// Option 2 - JNDI (Not succeeded :()
 //		Context envCtx;
 //		try {
 //			Context initCtx = new InitialContext();
@@ -62,6 +67,7 @@ public class Mailer {
 		msg.setSentDate(new Date());
 
 		Transport.send(msg, username, password);
+		log.info("Message sent to {}", Arrays.asList(recipients));
 //		Transport.send(msg);
 	}
 

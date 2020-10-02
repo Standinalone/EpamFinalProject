@@ -1,15 +1,16 @@
 package com.epam.project.util;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
-import com.epam.project.entity.CourseStatusEnum;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public final class QueryFactory {
+	private static final Logger log = LoggerFactory.getLogger(QueryFactory.class);
 	private static final List<String> orders = Arrays.asList("ASC", "DESC");
 
 	private QueryFactory() {
@@ -32,39 +33,12 @@ public final class QueryFactory {
 		String order = request.getParameter("order");
 		
 		if (columnName == null || order == null || !COLUMN_NAMES.keySet().contains(columnName)
-				|| !orders.contains(order.toUpperCase()))
+				|| !orders.contains(order.toUpperCase())) {
+			log.debug("Cannot form orderBy query");
 			return "";
+		}
 
 		StringBuilder sb = new StringBuilder();
 		return sb.append(" ORDER BY ").append(COLUMN_NAMES.get(columnName)).append(' ').append(order).toString();
 	}
-
-//	public static String formExtraConditionQuery(HttpServletRequest request, String[] params) {
-//		Map<String, Object> map = new HashMap<>();
-//		for (String param : params) {
-//			int i = 0;
-//			try {
-//				i = Integer.parseInt(request.getParameter(param));
-//			} catch (NumberFormatException e) {
-//			}
-//			map.put(param, i);
-//		}
-//		int topicId = 0, lecturerId = 0, statusId = 0;
-//		try {
-//			lecturerId = Integer.parseInt(request.getParameter("lecturer"));
-//		} catch (NumberFormatException e) {
-//		}
-//		try {
-//			topicId = Integer.parseInt(request.getParameter("topic"));
-//		} catch (NumberFormatException e) {
-//		}
-//		try {
-//			statusId = CourseStatusEnum.valueOf(request.getParameter("status")).ordinal() + 1;
-//		} catch (IllegalArgumentException | NullPointerException e) {
-//		}
-//		
-//		map.put("lecturer_id", lecturerId);
-//		map.put("topic_id", topicId);
-//		map.put("status_id", statusId);
-//	}
 }

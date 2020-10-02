@@ -40,7 +40,7 @@
 									<c:if test="${ user.role == 'LECTURER' }">
 									<td>
 										<a title="<fmt:message key="users.edit" />"
-											href="?command=EDIT_JOURNAL_PAGE&id=${ course.course.id }"><svg
+											href="?command=LECTURER_PANEL_PAGE&id=${ course.course.id }"><svg
 												width="1em" height="1em" viewBox="0 0 16 16"
 												class="bi bi-pencil" fill="currentColor"
 												xmlns="http://www.w3.org/2000/svg">

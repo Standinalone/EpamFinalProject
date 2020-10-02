@@ -20,16 +20,10 @@ public class EncodingFilter implements Filter {
 	private static final Logger log = LoggerFactory.getLogger(EncodingFilter.class);
 	private String encoding;
 
-	@Override
-	public void destroy() {
-		log.debug("Filter destruction starts");
-		// do nothing
-		log.debug("Filter destruction finished");
-	}
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		log.debug("Filter starts");
+		log.trace("EncodingFilter starts");
 
 		HttpServletRequest httpRequest = (HttpServletRequest) request;
 		log.trace("Request uri --> {}", httpRequest.getRequestURI());
@@ -40,7 +34,7 @@ public class EncodingFilter implements Filter {
 			request.setCharacterEncoding(encoding);
 		}
 
-		log.debug("Filter finished");
+		log.trace("Filter finished");
 		chain.doFilter(request, response);
 	}
 

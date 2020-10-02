@@ -3,15 +3,14 @@ package com.epam.project.dao.mysql;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dao.GenericDAO;
-import com.epam.project.dao.ICourseDAO;
 import com.epam.project.dao.ICourseDtoDAO;
 import com.epam.project.dto.CourseDto;
 import com.epam.project.entity.Course;
@@ -19,6 +18,7 @@ import com.epam.project.entity.CourseStatusEnum;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 
 public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseDtoDAO {
+	private static final Logger log = LoggerFactory.getLogger(MySqlCourseDtoDAO.class);
 	private static final String FIELD_COURSE_NAME = "Courses.name";
 	private static final String FIELD_STARTDATE = "start_date";
 	private static final String FIELD_ENDDATE = "end_date";
@@ -33,13 +33,7 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 	private static final String FIELD_TOPIC_ID = "Courses.topic_id";
 	private static final String FIELD_DURATION = "duration";
 
-//	private static final String SQL_FIND_COURSES_FROM_TO = "SELECT * FROM Courses, (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.course_id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id";
 	private static final String SQL_FIND_COURSES_FROM_TO = "SELECT *, datediff(end_date, start_date) as duration FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id";
-	// private static final String SQL_FIND_COURSE_BY_ID = "SELECT * FROM Courses,
-	// (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY
-	// course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.course_id AND
-	// Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND
-	// Courses.status_id = Statuses.id AND Courses.id = ?";
 	private static final String SQL_FIND_COURSE_BY_ID = "SELECT *, datediff(end_date, start_date) as duration  FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id AND Courses.id = ?";
 	private static final String SQL_FIND_COURSES_BY_LECTURER_ID = "SELECT *, datediff(end_date, start_date) as duration  FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id AND Courses.lecturer_id = ?";
 	private static final String SQL_FIND_ALL = "SELECT *, datediff(end_date, start_date) as duration  FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id";
@@ -55,6 +49,7 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
+			log.trace("Database not supported");
 			e.printStackTrace();
 		}
 	}
@@ -65,9 +60,7 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 		}
 		return instance;
 	}
-
-//	private String extraQuery = "";
-
+	
 	@Override
 	public List<CourseDto> findAllFromTo(int limit, int offset) throws SQLException {
 		return findFromTo(daoFactory.getConnection(), SQL_FIND_COURSES_FROM_TO, limit, offset);

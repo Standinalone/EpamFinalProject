@@ -1,15 +1,15 @@
 package com.epam.project.command.impl.post;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
@@ -26,6 +26,7 @@ import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 
 public class AddEditCourseCommand implements ICommand {
+	private static final Logger log = LoggerFactory.getLogger(AddEditCourseCommand.class);
 	public static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
 	public static IUserService userService;
 	public static ITopicService topicService;
@@ -33,6 +34,8 @@ public class AddEditCourseCommand implements ICommand {
 	public static ServiceFactory serviceFactory;
 
 	private Course course;
+	private Localization localization;
+	
 	static {
 		try {
 			serviceFactory = ServiceFactory.getServiceFactory(db);
@@ -46,58 +49,53 @@ public class AddEditCourseCommand implements ICommand {
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		String courseId = request.getParameter("id");
-		request.getSession().setAttribute("errors", null);
-		List<String> mappingErrors = mapToCourse(request, courseId);
+		localization = (Localization) request.getSession().getAttribute("localization");
+		String page = request.getParameter("page");
+		
+		List<String> mappingErrors = mapToCourse(request);
 		if (!mappingErrors.isEmpty()) {
+			log.error("Error mapping to course");
 			request.getSession().setAttribute("errors", mappingErrors);
 			return Constants.COMMAND__ADD_EDIT_COURSE;
 		}
 		List<String> errors = validate(course);
 
+		String courseId = request.getParameter("id");
 		if (!errors.isEmpty()) {
-			request.getSession().setAttribute("successMessage", null);
+			log.error("Error validating course");
 			request.getSession().setAttribute("errors", errors);
-			if (courseId != null && !courseId.isEmpty())
-				return Constants.COMMAND__ADD_EDIT_COURSE + "&id=" + request.getParameter("id").toString();
-			return Constants.COMMAND__ADD_EDIT_COURSE;
+			return "?" + (page == null ? "" : page);
 		}
 
 		if (courseId != null && !courseId.isEmpty()) {
 			if (!courseService.updateCourse(course)) {
-				request.getSession().setAttribute("error", "Error updating course");
+				log.error("Error updating course");
+				request.getSession().setAttribute("error", localization.getResourcesParam("error.updating"));
 				return Constants.COMMAND__ERROR;
 			}
 		} else {
 			if (!courseService.addCourse(course)) {
-				request.getSession().setAttribute("error", "Error adding course");
+				log.error("Error adding course");
+				request.getSession().setAttribute("error", localization.getResourcesParam("error.adding"));
 				return Constants.COMMAND__ERROR;
 			}
 		}
-		final HttpSession s = request.getSession();
-		List<User> list = (List<User> ) s.getAttribute("asd" );
-		list = new ArrayList<>();
-		list.add(new User());
-		request.getSession().setAttribute("list" , list);
-		
-//		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
-
-		Localization localization = (Localization) request.getSession().getAttribute("localization");
-		
 		request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.updated"));
 
+		log.info("Course {} edited by {}", course.getName(), ((User) request.getSession().getAttribute("user")).getLogin());
 		return Constants.COMMAND__ADD_EDIT_COURSE + "&id=" + course.getId();
 	}
 
-	private List<String> mapToCourse(HttpServletRequest request, String courseId) {
+	private List<String> mapToCourse(HttpServletRequest request) {
 		List<String> errors = new ArrayList<>();
+		String courseId = request.getParameter("id");
 		course = new Course();
 		if (courseId != null && !courseId.isEmpty()) {
 			try {
 				int id = Integer.parseInt(request.getParameter("id"));
 				course.setId(id);
 			} catch (NumberFormatException e) {
-				errors.add("Error parsing id");
+				errors.add(localization.getResourcesParam("error.badid"));
 			}
 		}
 
@@ -107,38 +105,46 @@ public class AddEditCourseCommand implements ICommand {
 			course.setStartDate(startDate);
 			course.setEndDate(endDate);
 		} catch (DateTimeParseException e) {
-			errors.add("Error parsing date");
+			errors.add(localization.getResourcesParam("error.badDate"));
 		}
+
 		try {
 			course.setLecturerId(Integer.parseInt(request.getParameter("lecturer")));
 		} catch (NumberFormatException e) {
-			errors.add("Error parsing lecturer");
+			errors.add(localization.getResourcesParam("error.lecturer"));
 		}
 		try {
 			course.setStatus(CourseStatusEnum.valueOf(request.getParameter("status")));
 		} catch (IllegalArgumentException e) {
-			errors.add("Error parsing status");
+			errors.add(localization.getResourcesParam("error.badStatus"));
 		}
 		String name = request.getParameter("name");
-		course.setTopicId(Integer.parseInt(request.getParameter("topic")));
+		if (name == null) {
+			errors.add(localization.getResourcesParam("error.emptyName"));
+		}
 		course.setName(name);
+		try {
+			course.setTopicId(Integer.parseInt(request.getParameter("topic")));
+		} catch (NumberFormatException e) {
+			errors.add(localization.getResourcesParam("error.badTopic"));
+		}
 		return errors;
 	}
 
 	private List<String> validate(Course course) {
 		List<String> errors = new ArrayList<>();
 		if (topicService.findTopicById(course.getTopicId()) == null) {
-			errors.add("topic not found");
+			errors.add(localization.getResourcesParam("error.topicnotfound"));
 		}
 		User user = userService.findUserById(course.getLecturerId());
 		if (user == null) {
-			errors.add("lecturer not found");
+			errors.add(localization.getResourcesParam("error.lecturernotfound"));
 		}
 		if (user != null && user.getRole() != RoleEnum.LECTURER) {
-			errors.add("Not a lecturer");
+			errors.add(localization.getResourcesParam("error.notlecturer"));
 		}
 		if (course.getEndDate().isBefore(course.getStartDate())) {
-			errors.add("Date error");
+			errors.add(localization.getResourcesParam("error.badDate"));
 		}
 		return errors;
 	}

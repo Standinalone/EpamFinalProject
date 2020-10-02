@@ -7,6 +7,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dao.GenericDAO;
@@ -16,6 +19,7 @@ import com.epam.project.entity.CourseStatusEnum;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 
 public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
+	private static final Logger log = LoggerFactory.getLogger(MySqlCourseDAO.class);
 	private static final String FIELD_NAME = "name";
 	private static final String FIELD_STARTDATE = "start_date";
 	private static final String FIELD_ENDDATE = "end_date";
@@ -35,8 +39,7 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 
 	private static DaoFactory daoFactory;
 	private static MySqlCourseDAO instance;
-
-//	private String extraQuery = "";
+	
 	private MySqlCourseDAO() {
 	}
 
@@ -44,6 +47,7 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
+			log.trace("Database not supported");
 			e.printStackTrace();
 		}
 	}
@@ -60,16 +64,6 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 		List<Course> courses = new ArrayList<>();
 		courses = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
 		return courses;
-
-//		List<Course> courses = new ArrayList<>();
-//		daoFactory.open();
-//		try {
-//			courses = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		daoFactory.close();
-//		return courses;
 	}
 
 	@Override
@@ -78,37 +72,11 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 		if (!list.isEmpty())
 			return list.get(0);
 		return null;
-
-//		Course course = null;
-//		daoFactory.open();
-//		try {
-//			List<Course> list = findByField(daoFactory.getConnection(), SQL_FIND_COURSE_BY_ID, 1, id);
-//			if (!list.isEmpty()) {
-//				course = list.get(0);
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//		}
-//		daoFactory.close();
-//		return course;
 	}
 
 	@Override
 	public boolean update(Course course) throws SQLException {
 		return update(daoFactory.getConnection(), course, SQL_UPDATE_COURSE_BY_ID, 7, course.getId());
-
-//		boolean result = false;
-//		daoFactory.open();
-//		try {
-//			if (update(daoFactory.getConnection(), course, SQL_UPDATE_COURSE_BY_ID, 7, course.getId())) {
-//				result = true;
-//			}
-//		} catch (SQLException e) {
-//			e.printStackTrace();
-//			result = false;
-//		}
-//		daoFactory.close();
-//		return result;
 	}
 
 	@Override
@@ -174,10 +142,4 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 		}
 		return false;
 	}
-
-
-//	@Override
-//	public void setExtraQuery(String extraQuery) {
-//		this.extraQuery = extraQuery;
-//	}
 }

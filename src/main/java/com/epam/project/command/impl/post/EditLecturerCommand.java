@@ -3,21 +3,27 @@ package com.epam.project.command.impl.post;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
+import com.epam.project.l10n.Localization;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 
 public class EditLecturerCommand implements ICommand {
+	private static final Logger log = LoggerFactory.getLogger(EditLecturerCommand.class);
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
 	private static ServiceFactory serviceFactory;
 	private static ICourseService courseService;
 	public static IUserService userService;
+	private Localization localization;
 
 	static {
 		try {
@@ -31,31 +37,30 @@ public class EditLecturerCommand implements ICommand {
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		User user = (User) request.getSession().getAttribute("user");
-		if (user == null || user.getRole() != RoleEnum.ADMIN) {
-			return Constants.COMMAND__LOGIN;
-		}
-		int lecturerId;
+		localization = (Localization) request.getSession().getAttribute("localization");
+		int lecturerId = 0;
 		try {
 			lecturerId = Integer.parseInt(request.getParameter("id"));
 		} catch (NumberFormatException e) {
-			request.getSession().setAttribute("error", "Cannot parse id :(");
+			log.error("Cannot parse id");
+			request.getSession().setAttribute("error", localization.getResourcesParam("error.badid"));
 			return Constants.COMMAND__ERROR;
 		}
-		user = userService.findUserById(lecturerId);
+		User user = userService.findUserById(lecturerId);
 		if (user == null) {
-			request.getSession().setAttribute("error", "Cannot find user :(");
+			log.error("Cannot find user");
+			request.getSession().setAttribute("error", localization.getResourcesParam("error.cannotfind"));
 			return Constants.COMMAND__ERROR;
 		}
 		if (user.getRole() != RoleEnum.LECTURER) {
-			request.getSession().setAttribute("error", "Not a lecturer :(");
+			log.error("User is not a lecturer");
+			request.getSession().setAttribute("error", localization.getResourcesParam("error.notlecturer"));
 			return Constants.COMMAND__ERROR;
 		}
 		String[] checkedIds = request.getParameterValues("courses");
-		String action = request.getParameter("submit");
 
 		courseService.setLecturerForCoursesByLecturerId(lecturerId, checkedIds);
-
+		log.info("Courses were set to lecturer {}", user.getLogin());
 		return Constants.COMMAND__EDIT_LECTURER + "&id=" + lecturerId;
 	}
 

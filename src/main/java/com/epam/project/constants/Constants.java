@@ -24,6 +24,7 @@ public class Constants {
 	public static final String COMMAND__MANAGE_COURSES = "?command=MANAGE_COURSES_PAGE";
 	public static final String COMMAND__EDIT_LECTURER = "?command=EDIT_LECTURER_PAGE";
 	public static final String COMMAND__ADD_LECTURER = "?command=ADD_LECTURER_PAGE";
+	public static final String COMMAND_LECTURER_PANEL_PAGE = "?command=LECTURER_PANEL_PAGE";
 
 	// Paths for all users
 	public static final String PAGE__ERROR = "/views/error.jsp";

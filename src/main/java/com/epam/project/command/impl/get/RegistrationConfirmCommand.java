@@ -1,7 +1,6 @@
-package com.epam.project.command.impl.post;
+package com.epam.project.command.impl.get;
 
 import java.time.LocalDate;
-import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,11 +22,11 @@ import com.epam.project.service.ServiceFactory;
 public class RegistrationConfirmCommand implements ICommand {
 
 	private static final Logger log = LoggerFactory.getLogger(RegistrationConfirmCommand.class);
-	public static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
+	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
 
-	public static ServiceFactory serviceFactory;
-	public static IUserService userService;
-	public static ITokenService tokenService;
+	private static ServiceFactory serviceFactory;
+	private static IUserService userService;
+	private static ITokenService tokenService;
 
 	static {
 		try {
@@ -35,6 +34,7 @@ public class RegistrationConfirmCommand implements ICommand {
 			userService = serviceFactory.getUserService();
 			tokenService = serviceFactory.getTokenService();
 		} catch (DatabaseNotSupportedException e) {
+			log.error("Databae not supported - {}", db.name());
 			e.printStackTrace();
 		}
 	}
@@ -42,15 +42,12 @@ public class RegistrationConfirmCommand implements ICommand {
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		String token = request.getParameter("token");
-
-//		Localization localization = new Localization((Locale) request.getSession().getAttribute("locale"));
-
 		Localization localization = (Localization) request.getSession().getAttribute("localization");
 		
 		if (token == null) {
 			log.error("Token wasn't provided");
 			request.getSession().setAttribute("error", localization.getResourcesParam("register.token"));
-			return Constants.COMMAND__ERROR;
+			return Constants.PAGE__ERROR;
 		}
 		
 		VerificationToken verificationToken = tokenService.findTokenByToken(token);
@@ -67,11 +64,11 @@ public class RegistrationConfirmCommand implements ICommand {
 		
 		user.setEnabled(true);
 		if (!userService.updateUser(user)) {
-			request.getSession().setAttribute("error", "Couldn't update user");
+			request.getSession().setAttribute("error", localization.getResourcesParam("error.updating"));
 			return Constants.PAGE__ERROR;
 		}
 		
 		request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.registration"));
-		return Constants.COMMAND__SUCCESS;
+		return Constants.PAGE__SUCCESS;
 	}
 }

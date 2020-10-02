@@ -3,6 +3,10 @@
 <%@ page import="com.epam.project.constants.Constants"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
+
+<%@ taglib tagdir="/WEB-INF/tags" prefix="h" %>
+<%@ taglib uri="myTLD" prefix="myTagLib" %>
+
 <fmt:setLocale value="${ sessionScope.get(\"locale\").language }" />
 <%-- <fmt:setLocale value="ru_RU"/> --%>
 <c:set value="${ sessionScope.get(\"user\") }" var="user" scope="page" />

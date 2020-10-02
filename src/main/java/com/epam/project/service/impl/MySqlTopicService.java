@@ -28,6 +28,7 @@ public class MySqlTopicService implements ITopicService{
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 			topicDao = daoFactory.getTopicDAO();
 		} catch (DatabaseNotSupportedException e) {
+			log.error("Database not supported");
 			e.printStackTrace();
 		}
 	}
@@ -48,7 +49,7 @@ public class MySqlTopicService implements ITopicService{
 			daoFactory.open();
 			return topicDao.findById(topicId);
 		} catch (SQLException e) {
-			log.error("Updating user error", e);
+			log.error("Getting topic error", e);
 			return null;
 		} finally {
 			daoFactory.close();

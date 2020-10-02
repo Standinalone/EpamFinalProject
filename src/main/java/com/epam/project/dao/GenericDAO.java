@@ -8,7 +8,11 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public abstract class GenericDAO<T> {
+	private static final Logger log = LoggerFactory.getLogger(GenericDAO.class);
 	
 	protected abstract T mapToEntity(ResultSet rs);
 
@@ -31,6 +35,7 @@ public abstract class GenericDAO<T> {
 				ps.setBoolean(1, (Boolean) value1);
 				break;
 			default:
+				log.trace("Uknown format");
 				throw new IllegalArgumentException();
 			}
 			switch (value3.getClass().getSimpleName()) {
@@ -43,6 +48,7 @@ public abstract class GenericDAO<T> {
 				ps.setString(3, (String) value3);
 				break;
 			default:
+				log.trace("Uknown format");
 				throw new IllegalArgumentException();
 			}
 			ps.executeUpdate();
@@ -66,6 +72,7 @@ public abstract class GenericDAO<T> {
 				ps.setString(1, (String) value2);
 				break;
 			default:
+				log.trace("Uknown format");
 				throw new IllegalArgumentException();
 			}
 			ps.executeUpdate();
@@ -87,6 +94,7 @@ public abstract class GenericDAO<T> {
 				ps.setString(1, (String) value);
 				break;
 			default:
+				log.trace("Uknown format");
 				throw new IllegalArgumentException();
 			}
 			if (ps.executeUpdate() > 0) {
@@ -113,6 +121,7 @@ public abstract class GenericDAO<T> {
 				ps.setString(1, (String) id2);
 				break;
 			default:
+				log.trace("Uknown format");
 				throw new IllegalArgumentException();
 			}
 			if (ps.executeUpdate() > 0) {
@@ -134,6 +143,7 @@ public abstract class GenericDAO<T> {
 			rs.next();
 			count = rs.getInt(1);
 		} finally {
+			log.trace("Uknown format");
 			closeStatementAndResultSet(ps, rs);
 		}
 		return count;
@@ -153,6 +163,7 @@ public abstract class GenericDAO<T> {
 				ps.setString(1, (String) value);
 				break;
 			default:
+				log.trace("Uknown format");
 				throw new IllegalArgumentException();
 			}
 			rs = ps.executeQuery();
@@ -179,6 +190,7 @@ public abstract class GenericDAO<T> {
 				ps.setString(parameterIndex, (String) value);
 				break;
 			default:
+				log.trace("Uknown format");
 				throw new IllegalArgumentException();
 			}
 			rs = ps.executeQuery();
@@ -205,6 +217,7 @@ public abstract class GenericDAO<T> {
 				ps.setString(parameterIndex, (String) value);
 				break;
 			default:
+				log.trace("Uknown format");
 				throw new IllegalArgumentException();
 			}
 			mapFromEntity(ps, item);
@@ -265,6 +278,7 @@ public abstract class GenericDAO<T> {
 				ps.setString(parameterIndex, (String) value);
 				break;
 			default:
+				log.trace("Uknown format");
 				throw new IllegalArgumentException();
 			}
 			rs = ps.executeQuery();

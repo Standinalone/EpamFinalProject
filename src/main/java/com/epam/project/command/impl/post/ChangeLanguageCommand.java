@@ -7,17 +7,24 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.project.command.ICommand;
 import com.epam.project.l10n.Localization;
 
 public class ChangeLanguageCommand implements ICommand {
+	private static final Logger log = LoggerFactory.getLogger(ChangeLanguageCommand.class);
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		String newLanguage = request.getParameter("newLanguage");
 		String page = request.getParameter("page");
-		String localesValues =  request.getServletContext().getInitParameter("locales");
-		
+		String localesValues = request.getServletContext().getInitParameter("locales");
+		if (localesValues == null) {
+			log.error("Parameter `localesValues` is empty");
+			return "?" + (page == null ? "" : page);
+		}
 		StringTokenizer st = new StringTokenizer(localesValues);
 		while (st.hasMoreTokens()) {
 			String localeName = st.nextToken();
@@ -26,6 +33,7 @@ public class ChangeLanguageCommand implements ICommand {
 				response.addCookie(cookie);
 				request.getSession().setAttribute("locale", new Locale(newLanguage));
 				request.getSession().setAttribute("localization", new Localization(new Locale(newLanguage)));
+				log.info("Language changed to {}",newLanguage);
 				break;
 			}
 		}

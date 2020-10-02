@@ -4,19 +4,20 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.time.ZoneId;
 import java.util.List;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dao.GenericDAO;
 import com.epam.project.dao.ITokenDAO;
-import com.epam.project.entity.RoleEnum;
-import com.epam.project.entity.User;
 import com.epam.project.entity.VerificationToken;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 
 public class MySqlTokenDAO extends GenericDAO<VerificationToken> implements ITokenDAO {
+	private static final Logger log = LoggerFactory.getLogger(MySqlTokenDAO.class);
 	private static final String FIELD_ID = "id";
 	private static final String FIELD_USER_ID = "user_id";
 	private static final String FIELD_TOKEN = "token";
@@ -34,6 +35,7 @@ public class MySqlTokenDAO extends GenericDAO<VerificationToken> implements ITok
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
+			log.trace("Database not supported");
 			e.printStackTrace();
 		}
 	}
@@ -46,35 +48,22 @@ public class MySqlTokenDAO extends GenericDAO<VerificationToken> implements ITok
 	}
 
 	@Override
-	public boolean add(VerificationToken token) {
-		boolean result = false;
-		daoFactory.open();
-		try {
-			int id = addToDb(daoFactory.getConnection(), SQL_ADD_TOKEN, token);
-			if (id > 0) {
-				token.setId(id);
-				result = true;
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+	public boolean add(VerificationToken token) throws SQLException {
+		int id = addToDb(daoFactory.getConnection(), SQL_ADD_TOKEN, token);
+		if (id > 0) {
+			token.setId(id);
+			return true;
 		}
-		daoFactory.close();
-		return result;
+		return false;
 	}
 
 	@Override
-	public VerificationToken findByToken(String token) {
+	public VerificationToken findByToken(String token) throws SQLException {
 		VerificationToken verificationToken = null;
-		daoFactory.open();
-		try {
-			List<VerificationToken> list = findByField(daoFactory.getConnection(), SQL_FIND_TOKEN_BY_TOKEN, 1, token);
-			if (!list.isEmpty()) {
-				verificationToken = list.get(0);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+		List<VerificationToken> list = findByField(daoFactory.getConnection(), SQL_FIND_TOKEN_BY_TOKEN, 1, token);
+		if (!list.isEmpty()) {
+			verificationToken = list.get(0);
 		}
-		daoFactory.close();
 		return verificationToken;
 	}
 
@@ -86,7 +75,7 @@ public class MySqlTokenDAO extends GenericDAO<VerificationToken> implements ITok
 			verificationToken.setToken(rs.getString(FIELD_TOKEN));
 			verificationToken.setExpiryDate(rs.getDate(FIELD_EXPIRY_DATE).toLocalDate());
 			verificationToken.setUserId(rs.getInt(FIELD_USER_ID));
-			
+
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

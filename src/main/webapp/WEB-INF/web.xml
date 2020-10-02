@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<web-app xmlns="http://java.sun.com/xml/ns/javaee" 
-         version="2.5" 
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
-         xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
-	
+<web-app xmlns="http://java.sun.com/xml/ns/javaee" version="2.5"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
 	<display-name>Epam</display-name>
 
-<!--============================================================
-	Controller
-=============================================================-->
+	<!--============================================================ Controller 
+		============================================================= -->
 
 	<servlet>
 		<servlet-name>FrontController</servlet-name>
@@ -20,15 +18,14 @@
 		<url-pattern>/controller</url-pattern>
 	</servlet-mapping>
 
-<!--============================================================
-	i18n filter
-=============================================================-->
+	<!--============================================================ i18n filter 
+		============================================================= -->
 	<filter>
 		<filter-name>LocaleFilter</filter-name>
 		<filter-class>com.epam.project.filter.LocaleFilter</filter-class>
 		<init-param>
 			<param-name>defaultLocale</param-name>
-		    <param-value>ru</param-value>
+			<param-value>ru</param-value>
 		</init-param>
 	</filter>
 	<filter-mapping>
@@ -40,10 +37,9 @@
 		<param-name>locales</param-name>
 		<param-value>ru en</param-value>
 	</context-param>
-	
-<!--============================================================
-	CORS support
-=============================================================-->
+
+	<!--============================================================ CORS support 
+		============================================================= -->
 	<filter>
 		<filter-name>CorsFilter</filter-name>
 		<filter-class>org.apache.catalina.filters.CorsFilter</filter-class>
@@ -52,10 +48,9 @@
 		<filter-name>CorsFilter</filter-name>
 		<servlet-name>FrontController</servlet-name>
 	</filter-mapping>
-	
-<!--============================================================
-	Encoding support filter
-=============================================================-->
+
+	<!--============================================================ Encoding 
+		support filter ============================================================= -->
 	<filter>
 		<filter-name>EncodingFilter</filter-name>
 		<filter-class>com.epam.project.filter.EncodingFilter</filter-class>
@@ -69,10 +64,9 @@
 		<url-pattern>/WEB-INF/views/*</url-pattern>
 	</filter-mapping>
 
-	
-<!--============================================================
-	Error page
-=============================================================-->
+
+	<!--============================================================ Error page 
+		============================================================= -->
 	<error-page>
 		<error-code>404</error-code>
 		<location>/views/error.jsp</location>
@@ -85,17 +79,15 @@
 		<exception-type>java.lang.Throwable</exception-type>
 		<location>/views/error.jsp</location>
 	</error-page>
-	
-<!--============================================================
-	Context listener
-=============================================================-->
+
+	<!--============================================================ Context 
+		listener ============================================================= -->
 	<listener>
 		<listener-class>com.epam.project.listener.ContextListener</listener-class>
 	</listener>
 
-<!--============================================================
-	DB resource reference
-=============================================================-->
+	<!--============================================================ DB resource 
+		reference ============================================================= -->
 
 	<resource-ref>
 		<description>DB Connection</description>
@@ -104,36 +96,31 @@
 		<res-auth>Container</res-auth>
 	</resource-ref>
 
-<!--============================================================
-	Mail session resource reference (Not used)
-=============================================================-->
+	<!--============================================================ Mail session 
+		resource reference (Not used) ============================================================= -->
 
-<!-- 	<resource-ref> -->
-<!-- 		<description> -->
-<!-- 			Resource reference to a factory for javax.mail.Session -->
-<!-- 			instances that may be used for sending electronic mail -->
-<!-- 			messages, preconfigured to connect to the appropriate -->
-<!-- 			SMTP server. -->
-<!-- 		</description> -->
-<!-- 		<res-ref-name> -->
-<!-- 			mail/Session -->
-<!-- 		</res-ref-name> -->
-<!-- 		<res-type> -->
-<!-- 			javax.mail.Session -->
-<!-- 		</res-type> -->
-<!-- 		<res-auth> -->
-<!-- 			Container -->
-<!-- 		</res-auth> -->
-<!-- 	</resource-ref> -->
+	<!-- <resource-ref> -->
+	<!-- <description> -->
+	<!-- Resource reference to a factory for javax.mail.Session -->
+	<!-- instances that may be used for sending electronic mail -->
+	<!-- messages, preconfigured to connect to the appropriate -->
+	<!-- SMTP server. -->
+	<!-- </description> -->
+	<!-- <res-ref-name> -->
+	<!-- mail/Session -->
+	<!-- </res-ref-name> -->
+	<!-- <res-type> -->
+	<!-- javax.mail.Session -->
+	<!-- </res-type> -->
+	<!-- <res-auth> -->
+	<!-- Container -->
+	<!-- </res-auth> -->
+	<!-- </resource-ref> -->
 
-<!--============================================================
-	Security filter.
-	1) admin: admin commands
-	2) client: client commands
-	3) commons: commands for all roles
-	4) out-of-control: commands without access control
-	Delimiter - space/tab
-=============================================================-->
+	<!--============================================================ Security 
+		filter. 1) admin: admin commands 2) client: client commands 3) commons: commands 
+		for all roles 4) out-of-control: commands without access control Delimiter 
+		- space/tab ============================================================= -->
 
 	<filter>
 		<filter-name>CommandAccessFilter</filter-name>
@@ -184,11 +171,17 @@
 			</param-value>
 		</init-param>
 	</filter>
-	
+
 	<filter-mapping>
 		<filter-name>CommandAccessFilter</filter-name>
 		<servlet-name>FrontController</servlet-name>
 	</filter-mapping>
 
+	<jsp-config>
+		<taglib>
+			<taglib-uri>myTLD</taglib-uri>
+			<taglib-location>/WEB-INF/tag/myTLD.tld</taglib-location>
+		</taglib>
+	</jsp-config>
 
 </web-app>

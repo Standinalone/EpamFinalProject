@@ -29,6 +29,7 @@ public class MySqlUserService implements IUserService {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 			userDao = daoFactory.getUserDAO();
 		} catch (DatabaseNotSupportedException e) {
+			log.error("Database not supported");
 			e.printStackTrace();
 		}
 	}
@@ -50,7 +51,7 @@ public class MySqlUserService implements IUserService {
 		try {
 			return userDao.getCoursesCountByUser(userId, enrolled);
 		} catch (SQLException e) {
-			log.error("Enrolling error", e);
+			log.error("Getting count error", e);
 			return -1;
 		} finally {
 			daoFactory.close();
@@ -77,7 +78,7 @@ public class MySqlUserService implements IUserService {
 			daoFactory.open();
 			return userDao.findByLogin(login);
 		} catch (SQLException e) {
-			log.error("Updating user error", e);
+			log.error("Getting user error", e);
 			return null;
 		} finally {
 			daoFactory.close();
@@ -90,7 +91,7 @@ public class MySqlUserService implements IUserService {
 			daoFactory.open();
 			return userDao.findById(userId);
 		} catch (SQLException e) {
-			log.error("Updating user error", e);
+			log.error("Getting user error", e);
 			return null;
 		} finally {
 			daoFactory.close();
@@ -226,7 +227,7 @@ public class MySqlUserService implements IUserService {
 		try {
 			return userDao.getCount();
 		} catch (SQLException e) {
-			log.error("Enrolling error", e);
+			log.error("Getting count error", e);
 			return 0;
 		} finally {
 			daoFactory.close();
@@ -252,7 +253,7 @@ public class MySqlUserService implements IUserService {
 		try {
 			return userDao.getUsersWithCourseCount(courseId, enrolled);
 		} catch (SQLException e) {
-			log.error("Enrolling error", e);
+			log.error("Getting users error", e);
 			return 0;
 		} finally {
 			daoFactory.close();
@@ -267,7 +268,7 @@ public class MySqlUserService implements IUserService {
 				userDao.deleteUserFromCourse(Integer.parseInt(userId), courseId);
 			}
 		} catch (SQLException e) {
-			log.error("Unblocking users error", e);
+			log.error("Declining users error", e);
 		} finally {
 			daoFactory.close();
 		}
@@ -281,7 +282,7 @@ public class MySqlUserService implements IUserService {
 				userDao.registerInCourse(Integer.parseInt(userId), courseId, registered);
 			}
 		} catch (SQLException e) {
-			log.error("Unblocking users error", e);
+			log.error("Registering in course error", e);
 		} finally {
 			daoFactory.close();
 		}
@@ -295,7 +296,7 @@ public class MySqlUserService implements IUserService {
 				userDao.updateGradeForUser(courseId, entry.getKey(), entry.getValue());
 			}
 		} catch (SQLException e) {
-			log.error("Unblocking users error", e);
+			log.error("Updating grades error", e);
 		} finally {
 			daoFactory.close();
 		}

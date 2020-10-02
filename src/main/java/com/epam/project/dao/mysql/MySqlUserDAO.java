@@ -5,6 +5,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dao.GenericDAO;
@@ -15,6 +18,7 @@ import com.epam.project.exceptions.DatabaseNotSupportedException;
 
 public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 
+	private static final Logger log = LoggerFactory.getLogger(MySqlUserDAO.class);
 	private static final String FIELD_ID = "id";
 	private static final String FIELD_LOGIN = "login";
 	private static final String FIELD_PASSWORD = "password";
@@ -55,6 +59,7 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
+			log.trace("Database not supported");
 			e.printStackTrace();
 		}
 	}

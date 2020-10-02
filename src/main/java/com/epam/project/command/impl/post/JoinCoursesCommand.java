@@ -1,9 +1,10 @@
 package com.epam.project.command.impl.post;
 
-import java.io.IOException;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
@@ -14,6 +15,7 @@ import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 
 public class JoinCoursesCommand implements ICommand {
+	private static final Logger log = LoggerFactory.getLogger(JoinCoursesCommand.class);
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
 	private static ServiceFactory serviceFactory;
 	private static IUserService userService;
@@ -30,11 +32,9 @@ public class JoinCoursesCommand implements ICommand {
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		User user = (User) request.getSession().getAttribute("user");
-		if (user == null) {
-			return Constants.COMMAND__LOGIN;
-		}
 		String[] checkedIds = request.getParameterValues("courses");
 		userService.enrollToCourse(checkedIds, user.getId());
+		log.info("User {} was enrolled to courses", user.getLogin());
 		return Constants.COMMAND__HOME;
 	}
 

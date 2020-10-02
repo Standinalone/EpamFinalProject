@@ -11,6 +11,7 @@
 	var="successMessage" scope="page" />
 <!-- Header -->
 <%@include file='../jsp/header.jsp'%>
+<script src="${pageContext.servletContext.contextPath}/duration.js"></script>
 
 <!-- Body -->
 <fmt:bundle basename="tables">
@@ -52,7 +53,7 @@
 							<c:forEach items="${  requestScope.get(\"lecturers\")  }"
 								var="lecturer">
 								<option
-									<c:if test = "${ lecturer.name == course.lecturer }">selected</c:if>
+									<c:if test = "${ lecturer.id == course.course.lecturerId }">selected</c:if>
 									value="${ lecturer.id }">${ lecturer.name }&nbsp;${ lecturer.surname }
 									&nbsp;${ lecturer.patronym }</option>
 
@@ -101,10 +102,12 @@
 							:
 							<c:out value="${ course.students }" />
 						</h5>
-						<h5>
+						<h5 >
 							<fmt:message key="manageCourses.duration" />
 							:
+							<span id = "duration">
 							<c:out value="${ course.duration }" />
+							</span>
 						</h5>
 					</div>
 				</div>
@@ -124,6 +127,7 @@
 			<c:if test="${ not empty course }">
 				<input name="id" type="hidden" value="${ param.id }" />
 			</c:if>
+			<input type="hidden" name="page" value="${ pageContext.request.queryString }" />
 		</form>
 	</div>
 	<div class="col-md-12">

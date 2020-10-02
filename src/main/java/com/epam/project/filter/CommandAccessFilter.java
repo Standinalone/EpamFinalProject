@@ -35,7 +35,7 @@ public class CommandAccessFilter implements Filter {
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
-		log.debug("Filter starts");
+		log.trace("CommandAccessFilter starts");
 
 //		if (accessAllowed(request)) {
 //			log.debug("Filter finished");
@@ -47,6 +47,7 @@ public class CommandAccessFilter implements Filter {
 //				e.printStackTrace();
 //			}
 //		}
+		log.trace("CommandAccessFilter finished");
 		chain.doFilter(request, response);
 	}
 
@@ -76,7 +77,7 @@ public class CommandAccessFilter implements Filter {
 	}
 
 	public void init(FilterConfig fConfig) throws ServletException {
-		log.debug("Filter initialization starts");
+		log.debug("CommandAccessFilter initialization starts");
 
 		// roles
 		accessMap.put(RoleEnum.ADMIN, asList(fConfig.getInitParameter("admin")));
@@ -92,7 +93,7 @@ public class CommandAccessFilter implements Filter {
 		outOfControl = asList(fConfig.getInitParameter("out-of-control"));
 		log.trace("Out of control commands --> {}", outOfControl);
 
-		log.debug("Filter initialization finished");
+		log.debug("CommandAccessFilter initialization finished");
 	}
 
 	/**
@@ -107,6 +108,12 @@ public class CommandAccessFilter implements Filter {
 		while (st.hasMoreTokens())
 			list.add(st.nextToken());
 		return list;
+	}
+
+	@Override
+	public void destroy() {
+		// TODO Auto-generated method stub
+		
 	}
 
 }

@@ -26,15 +26,15 @@ import com.epam.project.l10n.Localization;
  */
 public class LocaleFilter implements Filter {
 	private static final Logger log = LoggerFactory.getLogger(LocaleFilter.class);
-	private static Locale DEFAULT_LOCALE = null;
+	private static Locale defaultLocale = null;
 	private static final String ATTRIBUTE_LOCALE = "locale";
 
 	@Override
 	public void init(FilterConfig filterConfig) throws ServletException {
 		log.debug("Locale filter initialization starts");
 
-		String defaultLocale = filterConfig.getInitParameter("defaultLocale");
-		DEFAULT_LOCALE = new Locale(defaultLocale);
+		String def = filterConfig.getInitParameter("defaultLocale");
+		defaultLocale = new Locale(def);
 	}
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
@@ -75,13 +75,13 @@ public class LocaleFilter implements Filter {
 				}
 			}
 			if (!locales.hasMoreElements()) {
-				session.setAttribute(ATTRIBUTE_LOCALE, DEFAULT_LOCALE);
+				session.setAttribute(ATTRIBUTE_LOCALE, defaultLocale);
 			}
 		} else {
-			if (supportedLocales.contains(languageCookie.getValue())) {
+			if (supportedLocales != null && supportedLocales.contains(languageCookie.getValue())) {
 				session.setAttribute(ATTRIBUTE_LOCALE, new Locale(languageCookie.getValue()));
 			} else {
-				session.setAttribute(ATTRIBUTE_LOCALE, DEFAULT_LOCALE);
+				session.setAttribute(ATTRIBUTE_LOCALE, defaultLocale);
 			}
 		}
 		session.setAttribute("localization", new Localization((Locale)session.getAttribute(ATTRIBUTE_LOCALE)));
@@ -99,5 +99,11 @@ public class LocaleFilter implements Filter {
 			}
 		}
 		return languageCookie;
+	}
+
+	@Override
+	public void destroy() {
+		// TODO Auto-generated method stub
+		
 	}
 }
