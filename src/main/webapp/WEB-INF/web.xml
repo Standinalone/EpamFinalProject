@@ -61,7 +61,8 @@
 	</filter>
 	<filter-mapping>
 		<filter-name>EncodingFilter</filter-name>
-		<url-pattern>/WEB-INF/views/*</url-pattern>
+		<url-pattern>/views/*</url-pattern>
+		<dispatcher >FORWARD</dispatcher>
 	</filter-mapping>
 
 

@@ -14,9 +14,9 @@ import org.slf4j.LoggerFactory;
 public abstract class GenericDAO<T> {
 	private static final Logger log = LoggerFactory.getLogger(GenericDAO.class);
 	
-	protected abstract T mapToEntity(ResultSet rs);
+	protected abstract T mapToEntity(ResultSet rs) throws SQLException;
 
-	protected abstract boolean mapFromEntity(PreparedStatement ps, T obj);
+	protected abstract void mapFromEntity(PreparedStatement ps, T obj) throws SQLException;
 
 	protected <V, R> void updateManyToMany(Connection connection, String sql, R value1, V value2, V value3)
 			throws SQLException {
@@ -296,9 +296,7 @@ public abstract class GenericDAO<T> {
 		ResultSet rs = null;
 		try {
 			ps = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
-			if (!mapFromEntity(ps, item)) {
-				return 0;
-			}
+			mapFromEntity(ps, item);
 			if (ps.executeUpdate() > 0) {
 				rs = ps.getGeneratedKeys();
 				if (rs.next()) {

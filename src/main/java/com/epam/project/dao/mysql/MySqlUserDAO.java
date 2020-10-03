@@ -30,7 +30,7 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	private static final String FIELD_ROLE_NAME = "roles.name";
 	private static final String FIELD_ENABLED = "enabled";
 	private static final String FIELD_GRADE = "grade";
-	
+
 	private static final String SQL_GET_COUNT = "SELECT COUNT(*) FROM Users";
 	private static final String SQL_FIND_USER_BY_LOGIN = "SELECT * FROM Users, Roles WHERE Users.role_id = Roles.id AND login = ?";
 	private static final String SQL_ADD_USER = "INSERT INTO Users (`blocked`, `role_id`, `login`, `password`, `name`, `surname`, `patronym`, `email`, `enabled`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)";
@@ -50,7 +50,6 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	private static final String SQL_DELETE_USER_FROM_COURSE = "DELETE FROM Courses_has_users WHERE course_id = ? AND user_id = ?";
 	private static final String SQL_UPDATE_COURSES_HAS_USERS = "UPDATE Courses_has_users SET registered = ? WHERE course_id = ? AND user_id = ?";
 	private static final String SQL_UPDATE_GRADE_FOR_USER = "UPDATE Courses_has_users SET grade = ? WHERE course_id = ? AND user_id = ?";
-
 
 	private static DaoFactory daoFactory;
 	private static MySqlUserDAO instance;
@@ -181,47 +180,39 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	}
 
 	@Override
-	protected User mapToEntity(ResultSet rs) {
+	protected User mapToEntity(ResultSet rs) throws SQLException {
 		User user = new User();
+		user.setId(rs.getInt(FIELD_ID));
+		user.setLogin(rs.getString(FIELD_LOGIN));
+		user.setPassword(rs.getString(FIELD_PASSWORD));
+		user.setBlocked(rs.getBoolean(FIELD_BLOCKED));
+		user.setName(rs.getString(FIELD_NAME));
+		user.setSurname(rs.getString(FIELD_SURNAME));
+		user.setPatronym(rs.getString(FIELD_PATRONYM));
+		user.setEmail(rs.getString(FIELD_EMAIL));
+		user.setEnabled(rs.getBoolean(FIELD_ENABLED));
+		user.setRole(RoleEnum.valueOf(rs.getString(FIELD_ROLE_NAME).toUpperCase()));
 		try {
-			user.setId(rs.getInt(FIELD_ID));
-			user.setLogin(rs.getString(FIELD_LOGIN));
-			user.setPassword(rs.getString(FIELD_PASSWORD));
-			user.setBlocked(rs.getBoolean(FIELD_BLOCKED));
-			user.setName(rs.getString(FIELD_NAME));
-			user.setSurname(rs.getString(FIELD_SURNAME));
-			user.setPatronym(rs.getString(FIELD_PATRONYM));
-			user.setEmail(rs.getString(FIELD_EMAIL));
-			user.setEnabled(rs.getBoolean(FIELD_ENABLED));
-			user.setRole(RoleEnum.valueOf(rs.getString(FIELD_ROLE_NAME).toUpperCase()));
-			try {
-				user.setGrade(rs.getInt(FIELD_GRADE));
-			} catch (SQLException e) {
-				//
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
+			user.setGrade(rs.getInt(FIELD_GRADE));
 		}
+		catch(SQLException e) {
+			log.trace("`Grade` column was omitted");
+		}
+
 		return user;
 	}
 
 	@Override
-	protected boolean mapFromEntity(PreparedStatement ps, User user) {
-		try {
-			ps.setBoolean(1, user.isBlocked());
-			ps.setInt(2, user.getRole().ordinal() + 1);
-			ps.setString(3, user.getLogin());
-			ps.setString(4, user.getPassword());
-			ps.setString(5, user.getName());
-			ps.setString(6, user.getSurname());
-			ps.setString(7, user.getPatronym());
-			ps.setString(8, user.getEmail());
-			ps.setBoolean(9, user.isEnabled());
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
+	protected void mapFromEntity(PreparedStatement ps, User user) throws SQLException {
+		ps.setBoolean(1, user.isBlocked());
+		ps.setInt(2, user.getRole().ordinal() + 1);
+		ps.setString(3, user.getLogin());
+		ps.setString(4, user.getPassword());
+		ps.setString(5, user.getName());
+		ps.setString(6, user.getSurname());
+		ps.setString(7, user.getPatronym());
+		ps.setString(8, user.getEmail());
+		ps.setBoolean(9, user.isEnabled());
 	}
 
 }

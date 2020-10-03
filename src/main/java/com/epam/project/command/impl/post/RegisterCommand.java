@@ -20,7 +20,7 @@ import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
 import com.epam.project.entity.VerificationToken;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
-import com.epam.project.l10n.Localization;
+import com.epam.project.i18n.Localization;
 import com.epam.project.mailer.Mailer;
 import com.epam.project.service.ITokenService;
 import com.epam.project.service.IUserService;
@@ -69,7 +69,7 @@ public class RegisterCommand implements ICommand {
 //		if (passwordConfirmation == null || !passwordConfirmation.equals(password)) {
 //			errors.add(localization.getResourcesParam("register.passwordConfirmation"));
 //		}
-		if (!Pattern.matches(Constants.REGEX__NAME, user.getPassword())) {
+		if (!Pattern.matches(Constants.REGEX__NAME, user.getName())) {
 			errors.add(localization.getResourcesParam("register.nameerror"));
 		}
 		if (!Pattern.matches(Constants.REGEX__NAME, user.getSurname())) {
@@ -164,7 +164,7 @@ public class RegisterCommand implements ICommand {
 			errors.add(localization.getResourcesParam("error.email"));
 		if (passwordConfirmation == null || passwordConfirmation.isEmpty())
 			errors.add(localization.getResourcesParam("error.passwordConfirmation"));
-		if (passwordConfirmation.equals(password))
+		if (!passwordConfirmation.equals(password))
 			errors.add(localization.getResourcesParam("register.passwordConfirmation"));
 		user.setLogin(username);
 		user.setPassword(password);
@@ -202,4 +202,8 @@ public class RegisterCommand implements ICommand {
 
 	}
 
+//	public static void main(String[] args) {
+//		System.out.println(Pattern.matches(Constants.REGEX__USERNAME, "asda"));
+//		System.out.println(Pattern.matches("\\p{L}{4,20}", "АвыВ"));
+//	}
 }

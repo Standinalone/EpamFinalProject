@@ -60,7 +60,7 @@ public final class MySqlDAOFactory extends DaoFactory {
 			String port = db.getString("db.port");
 			String dbName = db.getString("db.dbName");
 
-			String url = String.format("jdbc:mysql://%s:%s/%s", host, port, dbName);
+			String url = String.format("jdbc:mysql://%s:%s/%s?characterEncoding=utf-8", host, port, dbName);
 			ds.setUrl(url);
 			ds.setPassword(password);
 			ds.setUser(user);
@@ -119,25 +119,6 @@ public final class MySqlDAOFactory extends DaoFactory {
 	}
 
 	@Override
-	public void closeStatementAndResultSet(PreparedStatement ps, ResultSet rs) {
-		if (ps != null) {
-			try {
-				ps.close();
-			} catch (SQLException e) {
-				log.error("Error closing prepared statement");
-			}
-		}
-		if (rs != null) {
-			try {
-				rs.close();
-			} catch (SQLException e) {
-				log.error("Error closingresult set");
-				e.printStackTrace();
-			}
-		}
-	}
-
-	@Override
 	public ICourseDtoDAO getCourseDtoDAO() {
 		return MySqlCourseDtoDAO.getInstance();
 	}
@@ -150,6 +131,33 @@ public final class MySqlDAOFactory extends DaoFactory {
 	@Override
 	public ITokenDAO getTokenDAO() {
 		return MySqlTokenDAO.getInstance();
+	}
+
+	@Override
+	public void beginTransation() throws SQLException {
+		open();
+		connection.setAutoCommit(false);
+	}
+
+	@Override
+	public void endTransaction() {
+		try {
+			connection.setAutoCommit(true);
+		} catch (SQLException e) {
+			log.error("Error ending transaction ", e);
+			e.printStackTrace();
+		}
+		close();
+	}
+
+	@Override
+	public void rollback() {
+		try {
+			connection.rollback();
+		} catch (SQLException e) {
+			log.error("Error rollbacking transaction ", e);
+			e.printStackTrace();
+		}
 	}
 
 }

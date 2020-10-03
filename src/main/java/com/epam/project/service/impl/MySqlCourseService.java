@@ -106,73 +106,88 @@ public class MySqlCourseService implements ICourseService {
 	}
 
 	@Override
-	public boolean updateCourse(Course courseId) {
+	public boolean updateCourse(Course courseId) throws SQLException {
 		try {
-			daoFactory.open();
-			return courseDao.update(courseId);
+			daoFactory.beginTransation();
+			courseDao.update(courseId);
+			daoFactory.getConnection().commit();
+			return true;
 		} catch (SQLException e) {
 			log.error("Updating course error", e.getMessage());
-			return false;
+			daoFactory.rollback();				
+			throw new SQLException();
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public boolean deleteCourseById(int courseId) {
+	public boolean deleteCourseById(int courseId) throws SQLException {
 		try {
-			daoFactory.open();
-			return courseDao.delete(courseId);
+			daoFactory.beginTransation();
+			courseDao.delete(courseId);
+			daoFactory.getConnection().commit();
+			return true;
 		} catch (SQLException e) {
 			log.error("Deleting course error", e.getMessage());
-			return false;
+			daoFactory.rollback();
+			throw new SQLException();
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public void setLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds) {
+	public void setLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds) throws SQLException {
 		try {
-			daoFactory.open();
+			daoFactory.beginTransation();
 			for (String id : checkedIds) {
 				Course course = courseDao.findById(Integer.parseInt(id));
 				course.setLecturerId(lecturerId);
 				courseDao.update(course);
 			}
+			daoFactory.getConnection().commit();
 		} catch (SQLException e) {
 			log.error("Editing courses error", e.getMessage());
+			daoFactory.rollback();
+			throw new SQLException();
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public void deleteLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds) {
+	public void deleteLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds) throws SQLException {
 		try {
-			daoFactory.open();
+			daoFactory.beginTransation();
 			for (String id : checkedIds) {
 				Course course = courseDao.findById(Integer.parseInt(id));
 				course.setLecturerId(0);
 				courseDao.update(course);
 			}
+			daoFactory.getConnection().commit();
 		} catch (SQLException e) {
 			log.error("Editing courses error", e.getMessage());
+			daoFactory.rollback();
+			throw new SQLException();
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public boolean addCourse(Course course) {
+	public boolean addCourse(Course course) throws SQLException {
 		try {
-			daoFactory.open();
-			return courseDao.add(course);
+			daoFactory.beginTransation();
+			courseDao.add(course);
+			daoFactory.getConnection().commit();
+			return true;
 		} catch (SQLException e) {
 			log.error("Adding course error", e.getMessage());
-			return false;
+			daoFactory.rollback();
+			throw new SQLException();
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 

@@ -9,7 +9,7 @@
 	var="successMessage" scope="page" />
 <!-- Header -->
 <%@include file='../jsp/header.jsp'%>
-<script src="${pageContext.servletContext.contextPath}/grades.js"></script>
+<script src="${pageContext.servletContext.contextPath}/js/grades.js"></script>
 
 <!-- Body -->
 <fmt:bundle basename="tables">

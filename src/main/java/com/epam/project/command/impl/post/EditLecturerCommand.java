@@ -1,5 +1,7 @@
 package com.epam.project.command.impl.post;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,7 +14,7 @@ import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
-import com.epam.project.l10n.Localization;
+import com.epam.project.i18n.Localization;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
@@ -59,8 +61,12 @@ public class EditLecturerCommand implements ICommand {
 		}
 		String[] checkedIds = request.getParameterValues("courses");
 
-		courseService.setLecturerForCoursesByLecturerId(lecturerId, checkedIds);
-		log.info("Courses were set to lecturer {}", user.getLogin());
+		try {
+			courseService.setLecturerForCoursesByLecturerId(lecturerId, checkedIds);
+			log.info("Courses were set to lecturer {}", user.getLogin());
+		} catch (SQLException e) {
+			log.error("Error setting lecturer", e);
+		}
 		return Constants.COMMAND__EDIT_LECTURER + "&id=" + lecturerId;
 	}
 

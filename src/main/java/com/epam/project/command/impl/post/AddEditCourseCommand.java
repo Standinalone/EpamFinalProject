@@ -1,5 +1,6 @@
 package com.epam.project.command.impl.post;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -19,7 +20,7 @@ import com.epam.project.entity.CourseStatusEnum;
 import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
-import com.epam.project.l10n.Localization;
+import com.epam.project.i18n.Localization;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.ITopicService;
 import com.epam.project.service.IUserService;
@@ -35,7 +36,7 @@ public class AddEditCourseCommand implements ICommand {
 
 	private Course course;
 	private Localization localization;
-	
+
 	static {
 		try {
 			serviceFactory = ServiceFactory.getServiceFactory(db);
@@ -51,7 +52,7 @@ public class AddEditCourseCommand implements ICommand {
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		localization = (Localization) request.getSession().getAttribute("localization");
 		String page = request.getParameter("page");
-		
+
 		List<String> mappingErrors = mapToCourse(request);
 		if (!mappingErrors.isEmpty()) {
 			log.error("Error mapping to course");
@@ -68,13 +69,18 @@ public class AddEditCourseCommand implements ICommand {
 		}
 
 		if (courseId != null && !courseId.isEmpty()) {
-			if (!courseService.updateCourse(course)) {
+			try {
+				courseService.updateCourse(course);
+			} catch (SQLException e) {
 				log.error("Error updating course");
 				request.getSession().setAttribute("error", localization.getResourcesParam("error.updating"));
 				return Constants.COMMAND__ERROR;
 			}
 		} else {
-			if (!courseService.addCourse(course)) {
+			try {
+				courseService.addCourse(course);
+
+			} catch (SQLException e) {
 				log.error("Error adding course");
 				request.getSession().setAttribute("error", localization.getResourcesParam("error.adding"));
 				return Constants.COMMAND__ERROR;
@@ -82,7 +88,8 @@ public class AddEditCourseCommand implements ICommand {
 		}
 		request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.updated"));
 
-		log.info("Course {} edited by {}", course.getName(), ((User) request.getSession().getAttribute("user")).getLogin());
+		log.info("Course {} edited by {}", course.getName(),
+				((User) request.getSession().getAttribute("user")).getLogin());
 		return Constants.COMMAND__ADD_EDIT_COURSE + "&id=" + course.getId();
 	}
 

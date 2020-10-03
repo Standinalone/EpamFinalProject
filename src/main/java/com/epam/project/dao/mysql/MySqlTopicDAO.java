@@ -58,20 +58,16 @@ public class MySqlTopicDAO extends GenericDAO<Topic> implements ITopicDAO {
 	}
 
 	@Override
-	protected Topic mapToEntity(ResultSet rs) {
+	protected Topic mapToEntity(ResultSet rs) throws SQLException {
 		Topic topic = new Topic();
-		try {
-			topic.setId(rs.getInt(FIELD_ID));
-			topic.setName(rs.getString(FIELD_NAME));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		topic.setId(rs.getInt(FIELD_ID));
+		topic.setName(rs.getString(FIELD_NAME));
+
 		return topic;
 	}
 
 	@Override
-	protected boolean mapFromEntity(PreparedStatement ps, Topic topic) {
-		return false;
+	protected void mapFromEntity(PreparedStatement ps, Topic topic) {
 	}
 
 }

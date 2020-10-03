@@ -68,31 +68,23 @@ public class MySqlTokenDAO extends GenericDAO<VerificationToken> implements ITok
 	}
 
 	@Override
-	protected VerificationToken mapToEntity(ResultSet rs) {
+	protected VerificationToken mapToEntity(ResultSet rs) throws SQLException {
 		VerificationToken verificationToken = new VerificationToken();
-		try {
-			verificationToken.setId(rs.getInt(FIELD_ID));
-			verificationToken.setToken(rs.getString(FIELD_TOKEN));
-			verificationToken.setExpiryDate(rs.getDate(FIELD_EXPIRY_DATE).toLocalDate());
-			verificationToken.setUserId(rs.getInt(FIELD_USER_ID));
+		verificationToken.setId(rs.getInt(FIELD_ID));
+		verificationToken.setToken(rs.getString(FIELD_TOKEN));
+		verificationToken.setExpiryDate(rs.getDate(FIELD_EXPIRY_DATE).toLocalDate());
+		verificationToken.setUserId(rs.getInt(FIELD_USER_ID));
 
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
 		return verificationToken;
 	}
 
 	@Override
-	protected boolean mapFromEntity(PreparedStatement ps, VerificationToken token) {
-		try {
-			ps.setString(1, token.getToken());
-			ps.setDate(2, Date.valueOf(token.getExpiryDate()));
-			ps.setInt(3, token.getUserId());
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-			return false;
-		}
+	protected void mapFromEntity(PreparedStatement ps, VerificationToken token) throws SQLException {
+
+		ps.setString(1, token.getToken());
+		ps.setDate(2, Date.valueOf(token.getExpiryDate()));
+		ps.setInt(3, token.getUserId());
+
 	}
 
 }

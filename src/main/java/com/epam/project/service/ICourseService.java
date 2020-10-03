@@ -16,7 +16,7 @@ public interface ICourseService {
 
 	Course findCourseById(int courseId);
 
-	boolean updateCourse(Course course);
+	boolean updateCourse(Course course) throws SQLException;
 
 	CourseDto getCourseDtoByCourseId(int courseId);
 	
@@ -24,17 +24,17 @@ public interface ICourseService {
 	
 	List<CourseProfilePageDto> findAllCoursesProfilePageFromTo(int limit, int offset, User user, boolean enrolled);
 
-	boolean addCourse(Course course);
+	boolean addCourse(Course course) throws SQLException;
 
-	boolean deleteCourseById(int id);
+	boolean deleteCourseById(int id) throws SQLException;
 
 	List<CourseDto> findAllCoursesDtoByLecturerId(int userId);
 
 	List<CourseDto> findAllCoursesDto();
 
-	void setLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds);
+	void setLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds) throws SQLException;
 
-	void deleteLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds);
+	void deleteLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds) throws SQLException;
 
 	List<CourseDto> findAllCoursesDtoByLecturerIdFromTo(int lecturerId, int limit, int offset);
 

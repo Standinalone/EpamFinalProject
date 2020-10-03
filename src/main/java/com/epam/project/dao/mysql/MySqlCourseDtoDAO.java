@@ -38,7 +38,6 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 	private static final String SQL_FIND_COURSES_BY_LECTURER_ID = "SELECT *, datediff(end_date, start_date) as duration  FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id AND Courses.lecturer_id = ?";
 	private static final String SQL_FIND_ALL = "SELECT *, datediff(end_date, start_date) as duration  FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id";
 
-
 	private static DaoFactory daoFactory;
 	private static MySqlCourseDtoDAO instance;
 
@@ -60,7 +59,7 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 		}
 		return instance;
 	}
-	
+
 	@Override
 	public List<CourseDto> findAllFromTo(int limit, int offset) throws SQLException {
 		return findFromTo(daoFactory.getConnection(), SQL_FIND_COURSES_FROM_TO, limit, offset);
@@ -91,45 +90,41 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 	}
 
 	@Override
-	public List<CourseDto> findAllFromToWithParameters(int limit, int offset, String conditions, String orderBy) throws SQLException {
+	public List<CourseDto> findAllFromToWithParameters(int limit, int offset, String conditions, String orderBy)
+			throws SQLException {
 		String appendix = (conditions.length() == 0 ? "" : " AND " + conditions);
-		return findFromTo(daoFactory.getConnection(), SQL_FIND_COURSES_FROM_TO + appendix + " " +  orderBy, limit, offset);
+		return findFromTo(daoFactory.getConnection(), SQL_FIND_COURSES_FROM_TO + appendix + " " + orderBy, limit,
+				offset);
 	}
-	
+
 	@Override
-	protected CourseDto mapToEntity(ResultSet rs) {
+	protected CourseDto mapToEntity(ResultSet rs) throws SQLException {
 		Course course = new Course();
 		CourseDto courseHomePageDto = new CourseDto();
-		try {
-			course.setId(rs.getInt(FIELD_ID));
-			course.setName(rs.getString(FIELD_COURSE_NAME));
-			course.setStartDate(rs.getDate(FIELD_STARTDATE).toLocalDate());
-			course.setEndDate(rs.getDate(FIELD_ENDDATE).toLocalDate());
-			course.setStatus(CourseStatusEnum.valueOf(rs.getString(FIELD_STATUS).toUpperCase()));
-			course.setLecturerId(rs.getInt(FIELD_LECTURER_ID));
-			course.setTopicId(rs.getInt(FIELD_TOPIC_ID));
+		course.setId(rs.getInt(FIELD_ID));
+		course.setName(rs.getString(FIELD_COURSE_NAME));
+		course.setStartDate(rs.getDate(FIELD_STARTDATE).toLocalDate());
+		course.setEndDate(rs.getDate(FIELD_ENDDATE).toLocalDate());
+		course.setStatus(CourseStatusEnum.valueOf(rs.getString(FIELD_STATUS).toUpperCase()));
+		course.setLecturerId(rs.getInt(FIELD_LECTURER_ID));
+		course.setTopicId(rs.getInt(FIELD_TOPIC_ID));
 
-			courseHomePageDto.setCourse(course);
+		courseHomePageDto.setCourse(course);
 
-			courseHomePageDto.setTopic(rs.getString(FIELD_TOPIC_NAME));
-			courseHomePageDto.setLecturer(rs.getString(FIELD_USER_NAME) + " " + rs.getString(FIELD_USER_SURNAME) + "  "
-					+ rs.getString(FIELD_USER_PATRONYM));
-			courseHomePageDto.setStudents(rs.getInt(FIELD_STUDENTS));
+		courseHomePageDto.setTopic(rs.getString(FIELD_TOPIC_NAME));
+		courseHomePageDto.setLecturer(rs.getString(FIELD_USER_NAME) + " " + rs.getString(FIELD_USER_SURNAME) + "  "
+				+ rs.getString(FIELD_USER_PATRONYM));
+		courseHomePageDto.setStudents(rs.getInt(FIELD_STUDENTS));
 //			courseHomePageDto.setDuration(Duration
 //					.between(course.getStartDate().atStartOfDay(), course.getEndDate().atStartOfDay()).toDays());
-			courseHomePageDto.setDuration(rs.getInt(FIELD_DURATION));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		courseHomePageDto.setDuration(rs.getInt(FIELD_DURATION));
+
 		return courseHomePageDto;
 	}
 
 	@Override
-	protected boolean mapFromEntity(PreparedStatement ps, CourseDto obj) {
+	protected void mapFromEntity(PreparedStatement ps, CourseDto obj) {
 		// TODO Auto-generated method stub
-		return false;
 	}
-
-
 
 }

@@ -17,7 +17,7 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.project.l10n.Localization;
+import com.epam.project.i18n.Localization;
 
 /**
  * Filter for capturing the language cookie and if it doesn't exist setting the

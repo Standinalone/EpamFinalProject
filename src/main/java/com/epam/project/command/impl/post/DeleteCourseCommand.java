@@ -1,5 +1,7 @@
 package com.epam.project.command.impl.post;
 
+import java.sql.SQLException;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -11,7 +13,7 @@ import com.epam.project.constants.Constants;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
-import com.epam.project.l10n.Localization;
+import com.epam.project.i18n.Localization;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.ServiceFactory;
 
@@ -30,6 +32,7 @@ public class DeleteCourseCommand implements ICommand {
 			e.printStackTrace();
 		}
 	}
+
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		localization = (Localization) request.getSession().getAttribute("localization");
@@ -42,12 +45,14 @@ public class DeleteCourseCommand implements ICommand {
 			request.getSession().setAttribute("error", localization.getResourcesParam("error.badid"));
 			return Constants.COMMAND__ERROR;
 		}
-		if (!courseService.deleteCourseById(id)) {
+		try {
+			courseService.deleteCourseById(id);
+		} catch (SQLException e) {
 			log.error("Cannot delete course");
 			request.getSession().setAttribute("error", localization.getResourcesParam("error.deleting"));
 			return Constants.COMMAND__ERROR;
 		}
-		log.info("Course {} deleted by {}", courseService.findCourseById(id).getName(), ((User) request.getSession().getAttribute("user")).getLogin());
+		log.info("Course [{}] deleted by {}", id, ((User) request.getSession().getAttribute("user")).getLogin());
 		return Constants.COMMAND__MANAGE_COURSES;
 	}
 

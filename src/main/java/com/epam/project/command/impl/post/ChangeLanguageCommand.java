@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.project.command.ICommand;
-import com.epam.project.l10n.Localization;
+import com.epam.project.i18n.Localization;
 
 public class ChangeLanguageCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(ChangeLanguageCommand.class);

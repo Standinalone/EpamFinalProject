@@ -1,4 +1,4 @@
-package com.epam.project.l10n;
+package com.epam.project.i18n;
 
 import java.io.Serializable;
 import java.util.Locale;

@@ -69,34 +69,30 @@ public class MySqlCourseProfilePageDAO extends GenericDAO<CourseProfilePageDto> 
 	}
 
 	@Override
-	protected CourseProfilePageDto mapToEntity(ResultSet rs) {
+	protected CourseProfilePageDto mapToEntity(ResultSet rs) throws SQLException {
 		Course course = new Course();
 		CourseProfilePageDto courseProfilePageDto = new CourseProfilePageDto();
-		try {
-			course.setId(rs.getInt(FIELD_ID));
-			course.setName(rs.getString(FIELD_COURSE_NAME));
-			course.setStartDate(rs.getDate(FIELD_STARTDATE).toLocalDate());
-			course.setEndDate(rs.getDate(FIELD_ENDDATE).toLocalDate());
-			course.setLecturerId(rs.getInt(FIELD_LECTURER_ID));
-			course.setTopicId(rs.getInt(FIELD_TOPIC_ID));
-			course.setStatus(CourseStatusEnum.valueOf(rs.getString(FIELD_STATUS).toUpperCase()));
+		course.setId(rs.getInt(FIELD_ID));
+		course.setName(rs.getString(FIELD_COURSE_NAME));
+		course.setStartDate(rs.getDate(FIELD_STARTDATE).toLocalDate());
+		course.setEndDate(rs.getDate(FIELD_ENDDATE).toLocalDate());
+		course.setLecturerId(rs.getInt(FIELD_LECTURER_ID));
+		course.setTopicId(rs.getInt(FIELD_TOPIC_ID));
+		course.setStatus(CourseStatusEnum.valueOf(rs.getString(FIELD_STATUS).toUpperCase()));
 
-			courseProfilePageDto.setCourse(course);
+		courseProfilePageDto.setCourse(course);
 
-			courseProfilePageDto.setTopic(rs.getString(FIELD_TOPIC_NAME));
-			courseProfilePageDto.setLecturer(rs.getString(FIELD_USER_NAME) + " " + rs.getString(FIELD_USER_SURNAME)
-					+ "  " + rs.getString(FIELD_USER_PATRONYM));
-			courseProfilePageDto.setGrade(rs.getInt(FIELD_GRADE));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		courseProfilePageDto.setTopic(rs.getString(FIELD_TOPIC_NAME));
+		courseProfilePageDto.setLecturer(rs.getString(FIELD_USER_NAME) + " " + rs.getString(FIELD_USER_SURNAME) + "  "
+				+ rs.getString(FIELD_USER_PATRONYM));
+		courseProfilePageDto.setGrade(rs.getInt(FIELD_GRADE));
+
 		return courseProfilePageDto;
 	}
 
 	@Override
-	protected boolean mapFromEntity(PreparedStatement ps, CourseProfilePageDto obj) {
+	protected void mapFromEntity(PreparedStatement ps, CourseProfilePageDto obj) {
 		// TODO Auto-generated method stub
-		return false;
 	}
 
 }

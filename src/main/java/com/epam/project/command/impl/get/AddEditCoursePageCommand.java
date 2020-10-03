@@ -12,7 +12,7 @@ import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dto.CourseDto;
 import com.epam.project.entity.CourseStatusEnum;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
-import com.epam.project.l10n.Localization;
+import com.epam.project.i18n.Localization;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.ITopicService;
 import com.epam.project.service.IUserService;

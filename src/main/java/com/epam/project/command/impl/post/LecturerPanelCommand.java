@@ -1,5 +1,6 @@
 package com.epam.project.command.impl.post;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -19,10 +20,10 @@ import com.epam.project.entity.Course;
 import com.epam.project.entity.CourseStatusEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
+import com.epam.project.i18n.Localization;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
-import com.epam.project.l10n.Localization;
 import com.epam.project.mailer.Mailer;
 
 public class LecturerPanelCommand implements ICommand {
@@ -78,7 +79,7 @@ public class LecturerPanelCommand implements ICommand {
 
 		String[] checkedIds = request.getParameterValues("users");
 		String action = request.getParameter("submit");
-		
+
 		switch (action) {
 		case "decline":
 			userService.declineRequestForIds(course.getId(), checkedIds);
@@ -103,11 +104,14 @@ public class LecturerPanelCommand implements ICommand {
 				request.getSession().setAttribute("error", localization.getResourcesParam("success.badStatus"));
 				return Constants.PAGE__ERROR;
 			}
-			if (courseService.updateCourse(course)) {
+			try {
+				courseService.updateCourse(course);
 				request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.updated"));
 				log.info("Status of course {} updated by {}", course.getName(), user.getLogin());
+			} catch (SQLException e1) {
+				log.error("Error updating course");
 			}
-			
+
 			break;
 		case "givegrades":
 			Map<String, String[]> grades = request.getParameterMap();
@@ -125,7 +129,7 @@ public class LecturerPanelCommand implements ICommand {
 			}
 
 			userService.updateGrades(course.getId(), userGrade);
-			
+
 			log.info("Grades in course {} were given by {}", course.getName(), user.getLogin());
 
 			String notify = request.getParameter("sendmail");
@@ -143,7 +147,8 @@ public class LecturerPanelCommand implements ICommand {
 					}
 				}
 			}
-			request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.gradesupdated"));
+			request.getSession().setAttribute("successMessage",
+					localization.getResourcesParam("success.gradesupdated"));
 			break;
 		default:
 			log.error("Uknown command");

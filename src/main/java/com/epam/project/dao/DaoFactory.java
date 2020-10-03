@@ -47,6 +47,10 @@ public abstract class DaoFactory {
 
 	public abstract void open();
 
-	public abstract void closeStatementAndResultSet(PreparedStatement ps, ResultSet rs);
+	public abstract void beginTransation() throws SQLException;
+
+	public abstract void endTransaction();
+	
+	public abstract void rollback();
 
 }

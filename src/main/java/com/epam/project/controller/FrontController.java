@@ -1,6 +1,8 @@
 package com.epam.project.controller;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -48,6 +50,11 @@ public class FrontController extends HttpServlet {
 	}
 
 	private String handleRequest(HttpServletRequest request, HttpServletResponse response) {
+		try {
+			request.setCharacterEncoding("UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
 		ICommand command = CommandFactory.getCommand(request);
 		return command.execute(request, response);
 	}

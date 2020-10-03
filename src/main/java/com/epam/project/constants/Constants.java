@@ -49,9 +49,9 @@ public class Constants {
 	public static final String PAGE__MY_COURSES = "/views/mycourses.jsp";
 
 	// Regex
-	public static final String REGEX__USERNAME = "\\w{4,20}";
+	public static final String REGEX__USERNAME = "\\p{L}{4,20}";
 	public static final String REGEX__PASSWORD = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{5,10}$";
 	public static final String REGEX__EMAIL = "\\S+@\\S+\\.\\S+";
-	public static final String REGEX__NAME = "\\w{4,20}";
+	public static final String REGEX__NAME = "\\p{L}{4,20}";
 
 }

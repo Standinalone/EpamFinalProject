@@ -27,7 +27,7 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 	private static final String FIELD_COURSES_ID = "Courses.id";
 	private static final String FIELD_TOPIC = "Courses.topic_id";
 	private static final String FIELD_LECTURER_ID = "Courses.lecturer_id";
-	
+
 	private static final String SQL_FIND_ALL = "SELECT * FROM Courses, Statuses WHERE Courses.status_id = Statuses.id";
 	private static final String SQL_FIND_COURSE_BY_ID = "SELECT * FROM Courses, Statuses WHERE Courses.status_id = Statuses.id AND Courses.id = ?";
 	private static final String SQL_UPDATE_COURSE_BY_ID = "UPDATE Courses SET name = ?, start_date = ?, end_date = ?, status_id = ?, topic_id = ?, lecturer_id = ? WHERE id = ?";
@@ -36,10 +36,9 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 	private static final String SQL_DELETE_COURSE_BY_ID = "DELETE FROM Courses WHERE id = ?";
 	private static final String SQL_GET_COUNT_BY_LECTURER_ID = "SELECT COUNT(*) FROM Courses WHERE lecturer_id = ?";
 
-
 	private static DaoFactory daoFactory;
 	private static MySqlCourseDAO instance;
-	
+
 	private MySqlCourseDAO() {
 	}
 
@@ -109,37 +108,29 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 		String appendix = (conditions.length() == 0 ? "" : " WHERE " + conditions);
 		return getCount(daoFactory.getConnection(), SQL_GET_COUNT + appendix);
 	}
+
 	@Override
-	protected Course mapToEntity(ResultSet rs) {
+	protected Course mapToEntity(ResultSet rs) throws SQLException {
 		Course course = new Course();
-		try {
-			course.setId(rs.getInt(FIELD_COURSES_ID));
-			course.setName(rs.getString(FIELD_NAME));
-			course.setStartDate(rs.getDate(FIELD_STARTDATE).toLocalDate());
-			course.setEndDate(rs.getDate(FIELD_ENDDATE).toLocalDate());
-			course.setStatus(CourseStatusEnum.valueOf(rs.getString(FIELD_STATUS).toUpperCase()));
-			course.setTopicId(rs.getInt(FIELD_TOPIC));
-			course.setLecturerId(rs.getInt(FIELD_LECTURER_ID));
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		course.setId(rs.getInt(FIELD_COURSES_ID));
+		course.setName(rs.getString(FIELD_NAME));
+		course.setStartDate(rs.getDate(FIELD_STARTDATE).toLocalDate());
+		course.setEndDate(rs.getDate(FIELD_ENDDATE).toLocalDate());
+		course.setStatus(CourseStatusEnum.valueOf(rs.getString(FIELD_STATUS).toUpperCase()));
+		course.setTopicId(rs.getInt(FIELD_TOPIC));
+		course.setLecturerId(rs.getInt(FIELD_LECTURER_ID));
 		return course;
+
 	}
 
 	@Override
-	protected boolean mapFromEntity(PreparedStatement ps, Course course) {
+	protected void mapFromEntity(PreparedStatement ps, Course course) throws SQLException {
 
-		try {
-			ps.setString(1, course.getName());
-			ps.setDate(2, Date.valueOf(course.getStartDate()));
-			ps.setDate(3, Date.valueOf(course.getEndDate()));
-			ps.setInt(4, course.getStatus().ordinal() + 1);
-			ps.setInt(5, course.getTopicId());
-			ps.setInt(6, course.getLecturerId());
-			return true;
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return false;
+		ps.setString(1, course.getName());
+		ps.setDate(2, Date.valueOf(course.getStartDate()));
+		ps.setDate(3, Date.valueOf(course.getEndDate()));
+		ps.setInt(4, course.getStatus().ordinal() + 1);
+		ps.setInt(5, course.getTopicId());
+		ps.setInt(6, course.getLecturerId());
 	}
 }
