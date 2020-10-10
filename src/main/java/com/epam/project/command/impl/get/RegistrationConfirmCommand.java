@@ -1,6 +1,7 @@
 package com.epam.project.command.impl.get;
 
 import java.time.LocalDate;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,10 +16,15 @@ import com.epam.project.entity.User;
 import com.epam.project.entity.VerificationToken;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ITokenService;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 
+/**
+ * ICommand implementation for getting a page with token validation
+ *
+ */
 public class RegistrationConfirmCommand implements ICommand {
 
 	private static final Logger log = LoggerFactory.getLogger(RegistrationConfirmCommand.class);
@@ -34,15 +40,14 @@ public class RegistrationConfirmCommand implements ICommand {
 			userService = serviceFactory.getUserService();
 			tokenService = serviceFactory.getTokenService();
 		} catch (DatabaseNotSupportedException e) {
-			log.error("Databae not supported - {}", db.name());
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		String token = request.getParameter("token");
-		Localization localization = (Localization) request.getSession().getAttribute("localization");
+		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		
 		if (token == null) {
 			log.error("Token wasn't provided");

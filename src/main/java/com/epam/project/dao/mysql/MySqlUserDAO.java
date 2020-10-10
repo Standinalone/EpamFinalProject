@@ -58,8 +58,7 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
-			log.trace("Database not supported");
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
@@ -106,8 +105,8 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	}
 
 	@Override
-	public boolean update(User user) throws SQLException {
-		return update(daoFactory.getConnection(), user, SQL_UPDATE_USER_BY_ID, 10, user.getId());
+	public void update(User user) throws SQLException {
+		update(daoFactory.getConnection(), user, SQL_UPDATE_USER_BY_ID, 10, user.getId());
 	}
 
 	@Override

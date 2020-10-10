@@ -1,5 +1,7 @@
 package com.epam.project.command.impl.get;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,10 +14,15 @@ import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 import com.epam.project.util.Page;
 
+/**
+ * ICommand implementation for getting a page to manage users
+ *
+ */
 public class ManageStudentsPageCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(ManageStudentsPageCommand.class);
 
@@ -28,14 +35,14 @@ public class ManageStudentsPageCommand implements ICommand {
 			serviceFactory = ServiceFactory.getServiceFactory(db);
 			userService = serviceFactory.getUserService();
 		} catch (DatabaseNotSupportedException e) {
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 
-		Localization localization = (Localization) request.getSession().getAttribute("localization");
+		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		Page<User> page = new Page<>(request, (limit, offset) -> userService.findAllUsersFromTo(limit, offset),
 				() -> userService.getUsersCount());
 

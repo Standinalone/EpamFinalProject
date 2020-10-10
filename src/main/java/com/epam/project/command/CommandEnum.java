@@ -1,42 +1,53 @@
 package com.epam.project.command;
+
 import com.epam.project.command.impl.get.*;
 import com.epam.project.command.impl.post.*;
 
+/**
+ * Stores command names and the corresponding ICommand implementations. Other
+ * commands may be added as the project grows
+ *
+ */
 public enum CommandEnum {
-	HOME_PAGE(new HomePageCommand()),
+	/**
+	 * Get commands
+	 */
+	HOME_PAGE(new HomePageCommand()), LOGIN_PAGE(new LoginPageCommand()), REGISTER_PAGE(new RegisterPageCommand()),
+	SUCCESS_PAGE(new SuccessPageCommand()), ERROR_PAGE(new ErrorPageCommand()),
+
+	// User commands
 	PROFILE_PAGE(new ProfilePageCommand()),
-	LOGIN_PAGE(new LoginPageCommand()),
-	REGISTER_PAGE(new RegisterPageCommand()),
-	MANAGE_STUDENTS_PAGE(new ManageStudentsPageCommand()),
-	MANAGE_COURSES_PAGE(new ManageCoursesPageCommand()),
-	SUCCESS_PAGE(new SuccessPageCommand()),
-	ADD_EDIT_COURSE_PAGE(new AddEditCoursePageCommand()),
-	MY_COURSES_PAGE(new MyCoursesPageCommand()),
-	ADD_LECTURER_PAGE(new AddLecturerPageCommand()),
+
+	// Admin commands
+	MANAGE_STUDENTS_PAGE(new ManageStudentsPageCommand()), MANAGE_COURSES_PAGE(new ManageCoursesPageCommand()),
+	ADD_EDIT_COURSE_PAGE(new AddEditCoursePageCommand()), ADD_LECTURER_PAGE(new AddLecturerPageCommand()),
 	EDIT_LECTURER_PAGE(new EditLecturerPageCommand()),
-	LECTURER_PANEL_PAGE(new LecturerPanelPageCommand()),
-	
-	
-	ERROR_PAGE(new ErrorPageCommand()),
-	DECLINE_OR_ADD_USERS_TO_COURSE(new LecturerPanelCommand()),
-	EDIT_LECTURER(new EditLecturerCommand()),
-	LOGIN(new LoginCommand()),
-	REGISTER(new RegisterCommand()),
-	CHANGE_LANGUAGE(new ChangeLanguageCommand()),
-	SIGNOUT(new SignoutCommand()),
-	CHANGE_USERS_STATUS(new ChangeUsersStatusCommand()),
+
+	// Lecturer commands
+	MY_COURSES_PAGE(new MyCoursesPageCommand()), LECTURER_PANEL_PAGE(new LecturerPanelPageCommand()),
+
+	/**
+	 * Post commands
+	 */
+	LOGIN(new LoginCommand()), REGISTER(new RegisterCommand()), CHANGE_LANGUAGE(new ChangeLanguageCommand()),
 	REGISTRATION_CONFIRM(new RegistrationConfirmCommand()),
-	ADD_EDIT_COURSE(new AddEditCourseCommand()),
-	DELETE_COURSE(new DeleteCourseCommand()),
-	JOIN_COURSES(new JoinCoursesCommand());
-			
+	// User commands
+	SIGNOUT(new SignoutCommand()), JOIN_COURSES(new JoinCoursesCommand()),
+
+	// Admin commands
+	EDIT_LECTURER(new EditLecturerCommand()), CHANGE_USERS_STATUS(new ChangeUsersStatusCommand()),
+	DELETE_COURSE(new DeleteCourseCommand()), ADD_EDIT_COURSE(new AddEditCourseCommand()),
+
+	// Lecturer commands
+	DECLINE_OR_ADD_USERS_TO_COURSE(new LecturerPanelCommand());
+
 	private ICommand command;
-	
+
 	CommandEnum(ICommand command) {
 		this.command = command;
 	}
-	
-	public ICommand getCommand(){
+
+	public ICommand getCommand() {
 		return command;
 	}
 }

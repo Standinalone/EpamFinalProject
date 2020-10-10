@@ -14,6 +14,10 @@ import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 
+/**
+ * ICommand implementation for a `join courses` command
+ *
+ */
 public class JoinCoursesCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(JoinCoursesCommand.class);
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
@@ -25,7 +29,7 @@ public class JoinCoursesCommand implements ICommand {
 			serviceFactory = ServiceFactory.getServiceFactory(db);
 			userService = serviceFactory.getUserService();
 		} catch (DatabaseNotSupportedException e) {
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 

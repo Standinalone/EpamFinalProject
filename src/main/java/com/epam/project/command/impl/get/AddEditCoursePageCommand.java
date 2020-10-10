@@ -1,5 +1,7 @@
 package com.epam.project.command.impl.get;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,11 +15,16 @@ import com.epam.project.dto.CourseDto;
 import com.epam.project.entity.CourseStatusEnum;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.ITopicService;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 
+/**
+ * ICommand implementation for getting a page to add and edit a course
+ *
+ */
 public class AddEditCoursePageCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(AddEditCoursePageCommand.class);
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
@@ -33,14 +40,14 @@ public class AddEditCoursePageCommand implements ICommand {
 			topicService = serviceFactory.getTopicService();
 			courseService = serviceFactory.getCourseService();
 		} catch (DatabaseNotSupportedException e) {
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		String id = request.getParameter("id");
-		Localization localization = (Localization) request.getSession().getAttribute("localization");
+		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		int courseId;
 		request.setAttribute("lecturers", userService.findAllUsersByRole(3));
 		request.setAttribute("topics", topicService.findAllTopics());

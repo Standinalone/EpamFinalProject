@@ -6,6 +6,10 @@ import javax.servlet.http.HttpServletResponse;
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 
+/**
+ * ICommand implementation for getting a login page
+ *
+ */
 public class LoginPageCommand implements ICommand{
 
 	@Override

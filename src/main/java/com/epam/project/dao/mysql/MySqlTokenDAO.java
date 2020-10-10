@@ -35,8 +35,7 @@ public class MySqlTokenDAO extends GenericDAO<VerificationToken> implements ITok
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
-			log.trace("Database not supported");
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 

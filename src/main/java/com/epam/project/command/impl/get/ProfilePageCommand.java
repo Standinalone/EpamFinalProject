@@ -1,5 +1,7 @@
 package com.epam.project.command.impl.get;
 
+import java.util.Locale;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,11 +15,16 @@ import com.epam.project.dto.CourseProfilePageDto;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 import com.epam.project.util.Page;
 
+/**
+ * ICommand implementation for getting a profile page
+ *
+ */
 public class ProfilePageCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(ProfilePageCommand.class);
 
@@ -33,14 +40,14 @@ public class ProfilePageCommand implements ICommand {
 			userService = serviceFactory.getUserService();
 			courseService = serviceFactory.getCourseService();
 		} catch (DatabaseNotSupportedException e) {
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		final User user = (User) request.getSession().getAttribute("user");
-		Localization localization = (Localization) request.getSession().getAttribute("localization");
+		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		Page<CourseProfilePageDto> page1 = new Page<>("pagenumenrolled", "startIndexEnrolled", "totalPagesEnrolled",
 				request, (limit, offset) -> courseService.findAllCoursesProfilePageFromTo(limit, offset, user, true),
 				() -> userService.getCoursesCountForUser(user.getId(), true));

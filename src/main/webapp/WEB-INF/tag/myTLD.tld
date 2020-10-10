@@ -15,13 +15,8 @@
 		<tag-class>com.epam.project.tag.CustomTag</tag-class>
 		<body-content>tagdependent</body-content>
 		<attribute>
-			<name>fontAttributes</name>
-		</attribute>
-		<attribute>
-			<name>commentColor</name>
-		</attribute>
-		<attribute>
-			<name>quoteColor</name>
+			<name>param</name>
+			<required>true</required>
 		</attribute>
 	</tag>
 </taglib>

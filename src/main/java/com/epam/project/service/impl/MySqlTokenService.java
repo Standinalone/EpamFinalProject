@@ -25,8 +25,7 @@ public class MySqlTokenService implements ITokenService {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 			tokenDao = daoFactory.getTokenDAO();
 		} catch (DatabaseNotSupportedException e) {
-			log.error("Database not supported");
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 

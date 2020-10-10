@@ -14,6 +14,10 @@ import org.slf4j.LoggerFactory;
 import com.epam.project.command.ICommand;
 import com.epam.project.command.factory.CommandFactory;
 
+/**
+ * Main controller
+ *
+ */
 public class FrontController extends HttpServlet {
 	private static final Logger log = LoggerFactory.getLogger(FrontController.class);
 	private static final long serialVersionUID = 1L;
@@ -50,11 +54,6 @@ public class FrontController extends HttpServlet {
 	}
 
 	private String handleRequest(HttpServletRequest request, HttpServletResponse response) {
-		try {
-			request.setCharacterEncoding("UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		}
 		ICommand command = CommandFactory.getCommand(request);
 		return command.execute(request, response);
 	}

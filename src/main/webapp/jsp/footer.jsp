@@ -50,6 +50,6 @@
 	</div>
 	<hr>
 	<h:languageList />
-	<div class = "text-center"><myTagLib:info /></div> 
+	<div class = "text-center"><myTagLib:info param = "info" /></div> 
 </body>
 </html>

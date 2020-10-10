@@ -21,6 +21,7 @@ import com.epam.project.entity.User;
 import com.epam.project.entity.VerificationToken;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.mailer.Mailer;
 import com.epam.project.service.ITokenService;
 import com.epam.project.service.IUserService;
@@ -29,6 +30,10 @@ import com.epam.project.service.ServiceFactory;
 import java.util.Locale;
 import java.util.UUID;
 
+/**
+ * ICommand implementation for a `register` command
+ *
+ */
 public class RegisterCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(RegisterCommand.class);
 
@@ -48,7 +53,7 @@ public class RegisterCommand implements ICommand {
 			userService = serviceFactory.getUserService();
 			tokenService = serviceFactory.getTokenService();
 		} catch (DatabaseNotSupportedException e) {
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
@@ -86,7 +91,8 @@ public class RegisterCommand implements ICommand {
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		localization = new Localization((Locale) request.getSession().getAttribute("locale"));
+//		localization = new Localization((Locale) request.getSession().getAttribute("locale"));
+		localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		user = (User) request.getSession().getAttribute("user");
 		if (request.getParameter("lecturer") != null && !request.getParameter("lecturer").isEmpty() && user != null
 				&& user.getRole() == RoleEnum.ADMIN) {
@@ -201,9 +207,4 @@ public class RegisterCommand implements ICommand {
 		Mailer.sendMail(new String[] { recipientAddress }, message + "\r\n" + confirmationUrl, subject);
 
 	}
-
-//	public static void main(String[] args) {
-//		System.out.println(Pattern.matches(Constants.REGEX__USERNAME, "asda"));
-//		System.out.println(Pattern.matches("\\p{L}{4,20}", "АвыВ"));
-//	}
 }

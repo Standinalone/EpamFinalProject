@@ -7,36 +7,31 @@ import java.util.Date;
 
 import com.epam.project.constants.Constants;
 
-
+/**
+ * Class for representing the `Tokens` table
+ *
+ */
 public class VerificationToken implements Serializable {
-    /**
-	 * 
-	 */
 	private static final long serialVersionUID = -5715244159873330908L;
 	private int id;
-    private String token;
-    private int user_id;
-     
-    private LocalDate expiryDate;
-    public VerificationToken() {}
+	private String token;
+	private int user_id;
+
+	private LocalDate expiryDate;
+
+	public VerificationToken() {
+	}
 
 	public VerificationToken(String token, User user) {
 		this.token = token;
 		this.user_id = user.getId();
 		Calendar calendar = Calendar.getInstance();
-	    calendar.setTime(new Date());
-	    calendar.add(Calendar.HOUR_OF_DAY, 10);
+		calendar.setTime(new Date());
+		calendar.add(Calendar.HOUR_OF_DAY, 10);
 		this.expiryDate = LocalDate.now().plusDays(Constants.EXPIRATION_DAYS);
 	}
-	
-//	private Date calculateExpiryDate(int expiryTimeInMinutes) {
-//        Calendar cal = Calendar.getInstance();
-//        cal.setTime(new Timestamp(cal.getTime().getTime()));
-//        cal.add(Calendar.MINUTE, expiryTimeInMinutes);
-//        return new Date(cal.getTime().getTime());
-//    }
-	
-    public int getId() {
+
+	public int getId() {
 		return id;
 	}
 

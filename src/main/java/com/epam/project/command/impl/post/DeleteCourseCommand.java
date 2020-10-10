@@ -1,6 +1,7 @@
 package com.epam.project.command.impl.post;
 
 import java.sql.SQLException;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,9 +15,14 @@ import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.ServiceFactory;
 
+/**
+ * ICommand implementation for `delete a course` command
+ *
+ */
 public class DeleteCourseCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(ChangeUsersStatusCommand.class);
 	public static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
@@ -29,13 +35,13 @@ public class DeleteCourseCommand implements ICommand {
 			serviceFactory = ServiceFactory.getServiceFactory(db);
 			courseService = serviceFactory.getCourseService();
 		} catch (DatabaseNotSupportedException e) {
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		localization = (Localization) request.getSession().getAttribute("localization");
+		localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		int id = 0;
 		try {
 			id = Integer.parseInt(request.getParameter("id"));

@@ -12,10 +12,10 @@ INSERT INTO `Roles` (`id`, `name`) VALUES(1, "USER");
 INSERT INTO `Roles` (`id`, `name`) VALUES(2, "ADMIN");
 INSERT INTO `Roles` (`id`, `name`) VALUES(3, "LECTURER");
 
-INSERT INTO `Users` VALUES(1, false, 2, "admin", "admin", "Admin", "Adminov", "Adminovich", "admin@gmail.com", true);
-INSERT INTO `Users` VALUES(2, false, 3, "lecturer", "lecturer", "Lecturer", "Lecturerov", "Lecturerovich", "lecturer@gmail.com", true);
-INSERT INTO `Users` VALUES(3, false, 3, "user", "user", "User", "Userov", "Userovich", "user@gmail.com", true);
-INSERT INTO `Users` VALUES(4, true, 3, "blocked_user", "blocked_user", "BlockedUser", "BlockedUserov", "BlockedUserovich", "blockeduser@gmail.com", true);
+INSERT INTO `Users` VALUES(1, false, 2, "admin",  md5("admin"), "Admin", "Adminov", "Adminovich", "admin@gmail.com", true);
+INSERT INTO `Users` VALUES(2, false, 3, "lecturer",  md5("lecturer"), "Lecturer", "Lecturerov", "Lecturerovich", "lecturer@gmail.com", true);
+INSERT INTO `Users` VALUES(3, false, 3, "user",  md5("user"), "User", "Userov", "Userovich", "user@gmail.com", true);
+INSERT INTO `Users` VALUES(4, true, 3, "blocked_user",  md5("blocked_user"), "BlockedUser", "BlockedUserov", "BlockedUserovich", "blockeduser@gmail.com", true);
 
 INSERT INTO `Topics` VALUES (1, "Programming");
 INSERT INTO `Topics` VALUES (2, "Computer Science");

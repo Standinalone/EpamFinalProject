@@ -2,6 +2,7 @@ package com.epam.project.command.impl.post;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,9 +16,14 @@ import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 
+/**
+ * ICommand implementation for a `login` command
+ *
+ */
 public class LoginCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(LoginCommand.class);
 	public static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
@@ -30,13 +36,13 @@ public class LoginCommand implements ICommand {
 			serviceFactory = ServiceFactory.getServiceFactory(db);
 			userService = serviceFactory.getUserService();
 		} catch (DatabaseNotSupportedException e) {
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
 	public List<String> validate(HttpServletRequest request) {
 		List<String> errors = new ArrayList<>();
-		Localization localization = (Localization) request.getSession().getAttribute("localization");
+		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 
@@ -45,7 +51,8 @@ public class LoginCommand implements ICommand {
 			errors.add(localization.getResourcesParam("login.error"));
 			return errors;
 		}
-		if (!password.equals(user.getPassword())) {
+		if (!userService.confirmPassword(user, password)) {
+//		if (!password.equals(user.getPassword())) {
 			errors.add(localization.getResourcesParam("login.error"));
 			return errors;
 		}

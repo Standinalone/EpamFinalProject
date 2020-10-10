@@ -2,7 +2,7 @@ package com.epam.project.filter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -24,31 +24,50 @@ import com.epam.project.constants.Constants;
 import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
 
+/**
+ * Filter class for managing access to all commands. This filter assures that a
+ * user requesting a command has a specific role. The roles needed to be able to
+ * use any of the commands are configured in the web.xml where for each role the
+ * corresponding list of commands is provided
+ *
+ */
 public class CommandAccessFilter implements Filter {
 
 	private static final Logger log = LoggerFactory.getLogger(CommandAccessFilter.class);
 
-	// commands access
-	private static Map<RoleEnum, List<String>> accessMap = new HashMap<RoleEnum, List<String>>();
-	private static List<String> commons = new ArrayList<String>();
-	private static List<String> outOfControl = new ArrayList<String>();
+	/**
+	 * Map where roles are the keys and lists of commands are the values. Each list
+	 * corresponds to one specific role
+	 */
+	private static Map<RoleEnum, List<String>> accessMap = new EnumMap<>(RoleEnum.class);
+
+	/**
+	 * List of commands accessible for registered users
+	 */
+	private static List<String> commons = new ArrayList<>();
+
+	/**
+	 * List of commands accessible for all users whether registered or not
+	 */
+	private static List<String> outOfControl = new ArrayList<>();
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {
 		log.trace("CommandAccessFilter starts");
 
-//		if (accessAllowed(request)) {
-//			log.debug("Filter finished");
-//			chain.doFilter(request, response);
-//		} else {
-//			try {
-//				((HttpServletResponse) response).sendRedirect(Constants.COMMAND__LOGIN);
-//			} catch (IOException e) {
-//				e.printStackTrace();
-//			}
-//		}
+		if (accessAllowed(request)) {
+			log.debug("Filter finished");
+			chain.doFilter(request, response);
+		} else {
+			try {
+				log.trace("User's not allowed to use command - {}", request.getParameter("command"));
+				((HttpServletResponse) response).sendRedirect(Constants.COMMAND__LOGIN);
+			} catch (IOException e) {
+				log.debug("Access denied for command {}", request.getParameter("command"));
+			}
+		}
 		log.trace("CommandAccessFilter finished");
-		chain.doFilter(request, response);
+//		chain.doFilter(request, response);
 	}
 
 	private boolean accessAllowed(ServletRequest request) {
@@ -76,12 +95,16 @@ public class CommandAccessFilter implements Filter {
 		return accessMap.get(userRole).contains(commandName) || commons.contains(commandName);
 	}
 
+	/**
+	 * Configures accessMap by getting filter configuration parameters from web.xml
+	 */
+	@Override
 	public void init(FilterConfig fConfig) throws ServletException {
 		log.debug("CommandAccessFilter initialization starts");
 
 		// roles
 		accessMap.put(RoleEnum.ADMIN, asList(fConfig.getInitParameter("admin")));
-		accessMap.put(RoleEnum.USER, asList(fConfig.getInitParameter("user")));
+		accessMap.put(RoleEnum.USER, asList(fConfig.getInitParameter("common")));
 		accessMap.put(RoleEnum.LECTURER, asList(fConfig.getInitParameter("lecturer")));
 		log.trace("Access map --> {}", accessMap);
 
@@ -108,12 +131,6 @@ public class CommandAccessFilter implements Filter {
 		while (st.hasMoreTokens())
 			list.add(st.nextToken());
 		return list;
-	}
-
-	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-		
 	}
 
 }

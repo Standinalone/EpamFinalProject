@@ -3,11 +3,12 @@ package com.epam.project.entity;
 import java.io.Serializable;
 import java.time.LocalDate;
 
+/**
+ * Class for representing the `Courses` table
+ *
+ */
 public class Course implements Serializable{
-	
-	/**
-	 * 
-	 */
+
 	private static final long serialVersionUID = -3174244683045225161L;
 	private int id;
 	private String name;

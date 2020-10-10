@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.mail.MessagingException;
@@ -21,11 +22,16 @@ import com.epam.project.entity.CourseStatusEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 import com.epam.project.mailer.Mailer;
 
+/**
+ * ICommand implementation for lecturers' commands
+ *
+ */
 public class LecturerPanelCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(LecturerPanelCommand.class);
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
@@ -41,7 +47,7 @@ public class LecturerPanelCommand implements ICommand {
 			userService = serviceFactory.getUserService();
 			courseService = serviceFactory.getCourseService();
 		} catch (DatabaseNotSupportedException e) {
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
@@ -58,7 +64,7 @@ public class LecturerPanelCommand implements ICommand {
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		localization = (Localization) request.getSession().getAttribute("localization");
+		localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		user = (User) request.getSession().getAttribute("user");
 		String page = request.getParameter("page");
 		int courseId = 0;

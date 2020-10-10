@@ -36,13 +36,38 @@ public class MySqlCourseService implements ICourseService {
 			courseDtoDao = daoFactory.getCourseDtoDAO();
 			courseProfilePageDAO = daoFactory.getCourseProfilePageDAO();
 		} catch (DatabaseNotSupportedException e) {
-			log.error("Database not supported");
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
-	private MySqlCourseService() {
-	}
+	private MySqlCourseService() {}
+	
+//	/**
+//	 * Constructor used in testing by Mockito
+//	 * 
+//	 * @param daoFactory           mocked DaoFactory
+//	 * @param courseDao            mocked ICourseDAO
+//	 * @param courseProfilePageDAO mocked ICourseProfilePageDAO
+//	 * @param courseDtoDao         mocked ICourseDtoDAO
+//	 */
+//	private MySqlCourseService(DaoFactory daoFactory, ICourseDAO courseDao, ICourseProfilePageDAO courseProfilePageDAO,
+//			ICourseDtoDAO courseDtoDao) {
+//		this.daoFactory = daoFactory;
+//		this.courseDao = courseDao;
+//		this.courseDtoDao = courseDtoDao;
+//		this.courseProfilePageDAO = courseProfilePageDAO;
+//	}
+
+//	private MySqlCourseService() {
+//		try {
+//			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
+//			courseDao = daoFactory.getCourseDAO();
+//			courseDtoDao = daoFactory.getCourseDtoDAO();
+//			courseProfilePageDAO = daoFactory.getCourseProfilePageDAO();
+//		} catch (DatabaseNotSupportedException e) {
+//			log.error("DatabaseNotSupportedException", e.getMessage());
+//		}
+//	}
 
 	public static ICourseService getInstance() {
 		if (instance == null) {
@@ -60,7 +85,7 @@ public class MySqlCourseService implements ICourseService {
 			return courseDao.getCountWithParameters(conditions);
 		} catch (SQLException e) {
 			log.error("Get courses count error", e.getMessage());
-			return 0;
+			return -1;
 		} finally {
 			daoFactory.close();
 		}
@@ -114,7 +139,7 @@ public class MySqlCourseService implements ICourseService {
 			return true;
 		} catch (SQLException e) {
 			log.error("Updating course error", e.getMessage());
-			daoFactory.rollback();				
+			daoFactory.rollback();
 			throw new SQLException();
 		} finally {
 			daoFactory.endTransaction();
@@ -144,25 +169,6 @@ public class MySqlCourseService implements ICourseService {
 			for (String id : checkedIds) {
 				Course course = courseDao.findById(Integer.parseInt(id));
 				course.setLecturerId(lecturerId);
-				courseDao.update(course);
-			}
-			daoFactory.getConnection().commit();
-		} catch (SQLException e) {
-			log.error("Editing courses error", e.getMessage());
-			daoFactory.rollback();
-			throw new SQLException();
-		} finally {
-			daoFactory.endTransaction();
-		}
-	}
-
-	@Override
-	public void deleteLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds) throws SQLException {
-		try {
-			daoFactory.beginTransation();
-			for (String id : checkedIds) {
-				Course course = courseDao.findById(Integer.parseInt(id));
-				course.setLecturerId(0);
 				courseDao.update(course);
 			}
 			daoFactory.getConnection().commit();

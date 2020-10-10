@@ -1,9 +1,16 @@
 package com.epam.project.dto;
 
+import java.io.Serializable;
+
 import com.epam.project.entity.Course;
 
-public class CourseDto {
+/**
+ * Class that consists of a Course object and additional fields
+ *
+ */
+public class CourseDto implements Serializable {
 
+	private static final long serialVersionUID = 5820873858515453888L;
 	private Course course;
 	private String lecturer;
 	private String topic;

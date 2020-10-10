@@ -2,6 +2,7 @@ package com.epam.project.command.impl.get;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,6 +20,7 @@ import com.epam.project.entity.Topic;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.ITopicService;
 import com.epam.project.service.IUserService;
@@ -26,6 +28,10 @@ import com.epam.project.service.ServiceFactory;
 import com.epam.project.util.Page;
 import com.epam.project.util.QueryFactory;
 
+/**
+ * ICommand implementation for getting a home page
+ *
+ */
 public class HomePageCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(HomePageCommand.class);
 
@@ -45,7 +51,7 @@ public class HomePageCommand implements ICommand {
 			userService = serviceFactory.getUserService();
 			topicService = serviceFactory.getTopicService();
 		} catch (DatabaseNotSupportedException e) {
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 		COLUMN_NAMES.put("students", "students");
 		COLUMN_NAMES.put("name", "courses.name");
@@ -61,7 +67,7 @@ public class HomePageCommand implements ICommand {
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 
-		Localization localization = (Localization) request.getSession().getAttribute("localization");
+		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 
 		int topicId = 0, lecturerId = 0, statusId = 0;
 		try {

@@ -46,8 +46,7 @@ public class MySqlCourseProfilePageDAO extends GenericDAO<CourseProfilePageDto> 
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
-			log.trace("Database not supported");
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 

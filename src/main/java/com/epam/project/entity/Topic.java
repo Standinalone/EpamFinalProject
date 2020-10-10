@@ -2,10 +2,11 @@ package com.epam.project.entity;
 
 import java.io.Serializable;
 
+/**
+ * Class for representing the `Topics` table
+ *
+ */
 public class Topic implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -3934376450445831710L;
 	private int id;
 	private String name;

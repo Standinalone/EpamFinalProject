@@ -17,11 +17,9 @@ import javax.servlet.http.HttpSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.epam.project.i18n.Localization;
-
 /**
  * Filter for capturing the language cookie and if it doesn't exist setting the
- * default Locale and Localization objects into the session
+ * default Locale object into the session
  *
  */
 public class LocaleFilter implements Filter {
@@ -84,7 +82,7 @@ public class LocaleFilter implements Filter {
 				session.setAttribute(ATTRIBUTE_LOCALE, defaultLocale);
 			}
 		}
-		session.setAttribute("localization", new Localization((Locale)session.getAttribute(ATTRIBUTE_LOCALE)));
+		//session.setAttribute("localization", new Localization((Locale) session.getAttribute(ATTRIBUTE_LOCALE)));
 	}
 
 	private Cookie findLanguageCookie(ServletRequest request) {
@@ -99,11 +97,5 @@ public class LocaleFilter implements Filter {
 			}
 		}
 		return languageCookie;
-	}
-
-	@Override
-	public void destroy() {
-		// TODO Auto-generated method stub
-		
 	}
 }

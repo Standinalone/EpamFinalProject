@@ -1,5 +1,7 @@
 package com.epam.project.service.impl;
 
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +31,16 @@ public class MySqlUserService implements IUserService {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 			userDao = daoFactory.getUserDAO();
 		} catch (DatabaseNotSupportedException e) {
-			log.error("Database not supported");
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
+	}
+
+	public static void setDaoFactory(DaoFactory daoFactory) {
+		MySqlUserService.daoFactory = daoFactory;
+	}
+
+	public static void setUserDao(IUserDAO userDao) {
+		MySqlUserService.userDao = userDao;
 	}
 
 	private MySqlUserService() {
@@ -42,6 +51,41 @@ public class MySqlUserService implements IUserService {
 			instance = new MySqlUserService();
 		}
 		return instance;
+	}
+
+	private static String hashedPwd(String pwd) throws NoSuchAlgorithmException {
+		String generatedPassword = null;
+		// Create MessageDigest instance for MD5
+		MessageDigest md = MessageDigest.getInstance("MD5");
+		// Add password bytes to digest
+		md.update(pwd.getBytes());
+		// Get the hash's bytes
+		byte[] bytes = md.digest();
+		// This bytes[] has bytes in decimal format;
+		// Convert it to hexadecimal format
+		StringBuilder sb = new StringBuilder();
+//			StringBuilder sb2 = new StringBuilder();
+		for (int i = 0; i < bytes.length; i++) {
+			int upper = (bytes[i] >> 4) & 0xF;
+			int lower = bytes[i] & 0xF;
+
+			if (upper > 9)
+				sb.append((char) ('a' + upper - 10));
+			else
+				sb.append(upper);
+
+			if (lower > 9)
+				sb.append((char) ('a' + lower - 10));
+			else
+				sb.append(lower);
+
+//				sb2.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
+//				sb2.append(Integer.toHexString(0xFF & bytes[i]));
+		}
+		// Get complete hashed password in hex format
+		generatedPassword = sb.toString();
+
+		return generatedPassword;
 	}
 
 	@Override
@@ -101,9 +145,10 @@ public class MySqlUserService implements IUserService {
 	@Override
 	public boolean addUser(User user) {
 		try {
+			user.setPassword(hashedPwd(user.getPassword()));
 			daoFactory.open();
 			return userDao.add(user);
-		} catch (SQLException e) {
+		} catch (SQLException | NoSuchAlgorithmException e) {
 			log.error("Adding user error", e);
 			return false;
 		} finally {
@@ -128,7 +173,8 @@ public class MySqlUserService implements IUserService {
 	public boolean updateUser(User user) {
 		try {
 			daoFactory.open();
-			return userDao.update(user);
+			userDao.update(user);
+			return true;
 		} catch (SQLException e) {
 			log.error("Updating user error", e);
 			return false;
@@ -302,4 +348,22 @@ public class MySqlUserService implements IUserService {
 		}
 	}
 
+	@Override
+	public boolean confirmPassword(User user, String password) {
+		String hashedPwd = "";
+		try {
+			hashedPwd = hashedPwd(password);
+		} catch (NoSuchAlgorithmException e) {
+			log.error("Hashing error", e);
+		}
+		return hashedPwd.equals(user.getPassword());
+	}
+
+//	public static void main(String[] args) throws NoSuchAlgorithmException {
+//		System.out.println("performing ");
+//		System.out.println(hashedPwd("admin"));
+//		System.out.println(hashedPwd("lecturer"));
+//		System.out.println(hashedPwd("user"));
+//		System.out.println(hashedPwd("blocked_user"));
+//	}
 }

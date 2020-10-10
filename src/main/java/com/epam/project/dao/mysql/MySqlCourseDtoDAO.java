@@ -48,8 +48,7 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
-			log.trace("Database not supported");
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 

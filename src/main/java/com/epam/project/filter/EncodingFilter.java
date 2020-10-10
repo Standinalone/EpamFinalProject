@@ -13,13 +13,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Servlet Filter implementation class EncodingFilter
+ * Servlet Filter implementation class EncodingFilter. This class is used to set
+ * the requests' character encoding to the encoding specified in the filter
+ * configuration in web.xml
  */
 public class EncodingFilter implements Filter {
 
 	private static final Logger log = LoggerFactory.getLogger(EncodingFilter.class);
 	private String encoding;
-
 
 	public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
 			throws IOException, ServletException {

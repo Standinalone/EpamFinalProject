@@ -1,6 +1,7 @@
 package com.epam.project.command.impl.post;
 
 import java.sql.SQLException;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -15,10 +16,15 @@ import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 
+/**
+ * ICommand implementation for an `edit a lecturer` command
+ *
+ */
 public class EditLecturerCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(EditLecturerCommand.class);
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
@@ -33,13 +39,13 @@ public class EditLecturerCommand implements ICommand {
 			courseService = serviceFactory.getCourseService();
 			userService = serviceFactory.getUserService();
 		} catch (DatabaseNotSupportedException e) {
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		localization = (Localization) request.getSession().getAttribute("localization");
+		localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		int lecturerId = 0;
 		try {
 			lecturerId = Integer.parseInt(request.getParameter("id"));

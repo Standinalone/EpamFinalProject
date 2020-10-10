@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,11 +22,16 @@ import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.ITopicService;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 
+/**
+ * ICommand implementation for `add or edit a course` command
+ *
+ */
 public class AddEditCourseCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(AddEditCourseCommand.class);
 	public static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
@@ -44,13 +50,13 @@ public class AddEditCourseCommand implements ICommand {
 			topicService = serviceFactory.getTopicService();
 			courseService = serviceFactory.getCourseService();
 		} catch (DatabaseNotSupportedException e) {
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		localization = (Localization) request.getSession().getAttribute("localization");
+		localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		String page = request.getParameter("page");
 
 		List<String> mappingErrors = mapToCourse(request);

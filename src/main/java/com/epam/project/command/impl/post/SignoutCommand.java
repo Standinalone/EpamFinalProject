@@ -10,6 +10,10 @@ import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 import com.epam.project.entity.User;
 
+/**
+ * ICommand implementation for a `signout` command
+ *
+ */
 public class SignoutCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(SignoutCommand.class);
 

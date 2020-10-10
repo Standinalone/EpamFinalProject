@@ -2,17 +2,18 @@ package com.epam.project.entity;
 
 import java.io.Serializable;
 
+/**
+ * Class for representing the `Users` table
+ *
+ */
 public class User implements Serializable {
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -936646206474544157L;
 	private int id;
 	private String login;
 	private String password;
 	private boolean enabled;
 	private int grade;
-	
+
 	public int getGrade() {
 		return grade;
 	}

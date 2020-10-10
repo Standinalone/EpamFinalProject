@@ -31,8 +31,7 @@ public class MySqlTopicDAO extends GenericDAO<Topic> implements ITopicDAO {
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
-			log.trace("Database not supported");
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 

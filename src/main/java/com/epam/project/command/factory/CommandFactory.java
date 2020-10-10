@@ -9,9 +9,21 @@ import com.epam.project.command.CommandEnum;
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 
-public class CommandFactory {
+/**
+ * Factory for getting an ICommand implementation based on a request `command`
+ * parameter
+ *
+ */
+public final class CommandFactory {
+	private CommandFactory() {
+	}
+
 	private static final Logger log = LoggerFactory.getLogger(CommandFactory.class);
 
+	/**
+	 * @param request incoming HttpServletRequest request
+	 * @return ICommand based on a request `command` parameter
+	 */
 	public static ICommand getCommand(HttpServletRequest request) {
 		String command = request.getParameter(Constants.PARAM_COMMAND);
 		ICommand resultCommand = null;

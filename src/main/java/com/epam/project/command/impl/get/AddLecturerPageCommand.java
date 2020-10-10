@@ -6,6 +6,10 @@ import javax.servlet.http.HttpServletResponse;
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 
+/**
+ * ICommand implementation for getting a page to add a lecturer
+ *
+ */
 public class AddLecturerPageCommand implements ICommand {
 
 	@Override

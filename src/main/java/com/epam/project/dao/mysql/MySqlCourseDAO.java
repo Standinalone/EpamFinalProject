@@ -46,8 +46,7 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
-			log.trace("Database not supported");
-			e.printStackTrace();
+			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
 
@@ -74,8 +73,8 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 	}
 
 	@Override
-	public boolean update(Course course) throws SQLException {
-		return update(daoFactory.getConnection(), course, SQL_UPDATE_COURSE_BY_ID, 7, course.getId());
+	public void update(Course course) throws SQLException {
+		update(daoFactory.getConnection(), course, SQL_UPDATE_COURSE_BY_ID, 7, course.getId());
 	}
 
 	@Override

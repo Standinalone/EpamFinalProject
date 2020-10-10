@@ -17,16 +17,24 @@ import javax.mail.internet.MimeMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Class for sending emails over an SMTP. It's configured in the app.properties
+ * file
+ *
+ */
 public class Mailer {
 	private static final Logger log = LoggerFactory.getLogger(Mailer.class);
 	private static String username;
 	private static String password;
 	private static String host;
 	private static Properties props = new Properties();
+	private static Session session = Session.getInstance(props);
+	private static Message msg = new MimeMessage(session);
 
 	private Mailer() {
 	}
 
+	// Setting up the mailer
 	static {
 		// Option 1 - app.properties
 		try {
@@ -52,11 +60,16 @@ public class Mailer {
 //			e.printStackTrace();
 //		}
 	}
-	private static Session session = Session.getInstance(props);
-	private static Message msg = new MimeMessage(session);
 
-	public static void sendMail(String[] usernames, String text, String subject)
-			throws MessagingException {
+	/**
+	 * Sends emails to the given addresses
+	 * 
+	 * @param usernames array of users' emails
+	 * @param text      text to be sent
+	 * @param subject   subject of the email
+	 * @throws MessagingException
+	 */
+	public static void sendMail(String[] usernames, String text, String subject) throws MessagingException {
 		Address[] recipients = new Address[usernames.length];
 		for (int i = 0; i < usernames.length; i++) {
 			recipients[i] = new InternetAddress(usernames[i]);

@@ -1,8 +1,14 @@
 package com.epam.project.constants;
 
+/**
+ * Class for storing all application constants
+ *
+ */
 public class Constants {
 
-	
+	/**
+	 * Settings
+	 */
 	public static final String DATABASE = "MYSQL";
 	public static final int PAGE_SIZE_COMMON = 4;
 
@@ -12,6 +18,9 @@ public class Constants {
 	// Token expiration days
 	public static final int EXPIRATION_DAYS = 15;
 
+	/**
+	 * Pages
+	 */
 	// Redirect
 	public static final String COMMAND__HOME = "?command=HOME_PAGE";
 	public static final String COMMAND__LOGIN = "?command=LOGIN_PAGE";
@@ -36,6 +45,7 @@ public class Constants {
 
 	// Paths for lecturers
 	public static final String PAGE__MANAGE_JOURNAL = "/views/manageJournal.jsp";
+	public static final String PAGE__MY_COURSES = "/views/mycourses.jsp";
 
 	// Pages for admins
 	public static final String PAGE__ADD_LECTURER = "/views/addLecturer.jsp";
@@ -46,7 +56,6 @@ public class Constants {
 	public static final String PAGE__SUCCESS = "/views/success.jsp";
 	public static final String PAGE__ADD_EDIT_COURSE = "/views/register.jsp";
 	public static final String PAGE__EDIT_USER = "/views/editUser.jsp";
-	public static final String PAGE__MY_COURSES = "/views/mycourses.jsp";
 
 	// Regex
 	public static final String REGEX__USERNAME = "\\p{L}{4,20}";
