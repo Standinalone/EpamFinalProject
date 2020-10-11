@@ -1,5 +1,6 @@
 package com.epam.project.command.impl.get;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -82,7 +83,7 @@ public class ManageCoursesPageCommand implements ICommand {
 		} catch (IllegalArgumentException | NullPointerException e) {
 			log.trace("Cannot parse status");
 		}
-		Map<String, Object> map = new HashMap<>();
+		Map<String, Integer> map = new HashMap<>();
 		map.put("lecturer_id", lecturerId);
 		map.put("topic_id", topicId);
 		map.put("status_id", statusId);
@@ -91,7 +92,7 @@ public class ManageCoursesPageCommand implements ICommand {
 		String orderBy = QueryFactory.formOrderByQuery(COLUMN_NAMES, request);
 
 		Page<CourseDto> page = new Page<>(request, (limit, offset) -> courseService
-				.findAllCoursesDtoFromToWithParameters(limit, offset, conditions, orderBy),
+				.findAllCoursesDtoWithParametersFromTo(limit, offset, conditions, orderBy),
 				() -> courseService.getCoursesWithParametersCount(conditions));
 
 		if (page.getList() == null) {
@@ -101,7 +102,14 @@ public class ManageCoursesPageCommand implements ICommand {
 			return Constants.PAGE__ERROR;
 		}
 
-		List<User> lecturers = userService.findAllUsersByRole(3);
+		List<User> lecturers;
+		try {
+			lecturers = userService.findAllUsersByRole(3);
+		} catch (SQLException e) {
+			log.error("Finding users error", e);
+			request.setAttribute("error", localization.getResourcesParam("dberror.findusers"));
+			return Constants.PAGE__ERROR;
+		}
 		List<Topic> topics = topicService.findAllTopics();
 		request.setAttribute("lecturers", lecturers);
 		request.setAttribute("topics", topics);

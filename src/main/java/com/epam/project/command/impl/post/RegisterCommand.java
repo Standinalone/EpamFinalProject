@@ -39,15 +39,30 @@ public class RegisterCommand implements ICommand {
 
 	public static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
 
-	private static ServiceFactory serviceFactory;
-	private static IUserService userService;
-	private static ITokenService tokenService;
+	private ServiceFactory serviceFactory;
+
+	private IUserService userService;
+	private ITokenService tokenService;
 	private User user;
 	private Localization localization;
 
 	public boolean isLecturer = false;
 
-	static {
+	/**
+	 * Constructor used in testing by Mockito
+	 * 
+	 * @param serviceFactory mocked ServiceFactory
+	 * @param userService    mocked IUserService
+	 * @param tokenService   mocked ITokenService
+	 */
+	private RegisterCommand(ServiceFactory serviceFactory, IUserService userService, ITokenService tokenService) {
+		super();
+		this.serviceFactory = serviceFactory;
+		this.userService = userService;
+		this.tokenService = tokenService;
+	}
+
+	public RegisterCommand() {
 		try {
 			serviceFactory = ServiceFactory.getServiceFactory(db);
 			userService = serviceFactory.getUserService();
@@ -56,13 +71,29 @@ public class RegisterCommand implements ICommand {
 			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
+//	static {
+//		try {
+//			serviceFactory = ServiceFactory.getServiceFactory(db);
+//			userService = serviceFactory.getUserService();
+//			tokenService = serviceFactory.getTokenService();
+//		} catch (DatabaseNotSupportedException e) {
+//			log.error("DatabaseNotSupportedException", e.getMessage());
+//		}
+//	}
 
 	public List<String> validate(User user) {
 		List<String> errors = new ArrayList<>();
 		if (!Pattern.matches(Constants.REGEX__USERNAME, user.getLogin())) {
 			errors.add(localization.getResourcesParam("register.invalidUsername"));
 		}
-		if (userService.findUserByLogin(user.getLogin()) != null) {
+		User existingUser = null;
+		try {
+			existingUser = userService.findUserByLogin(user.getLogin());
+		} catch (SQLException e) {
+			log.error("Finding user error", e);
+			errors.add(localization.getResourcesParam("dberror.finduser"));
+		}
+		if (existingUser != null) {
 			errors.add(localization.getResourcesParam("register.userExists"));
 		}
 //		if (userDao.findUserByEmail(user.getEmail()) != null) {

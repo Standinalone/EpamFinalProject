@@ -1,5 +1,6 @@
 package com.epam.project.command.impl.post;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -46,7 +47,13 @@ public class LoginCommand implements ICommand {
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");
 
-		User user = userService.findUserByLogin(username);
+		User user = null;
+		try {
+			user = userService.findUserByLogin(username);
+		} catch (SQLException e) {
+			log.error("Finding user error", e);
+			errors.add(localization.getResourcesParam("dberror.finduser"));
+		}
 		if (user == null) {
 			errors.add(localization.getResourcesParam("login.error"));
 			return errors;

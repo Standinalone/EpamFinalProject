@@ -54,7 +54,14 @@ public class EditLecturerCommand implements ICommand {
 			request.getSession().setAttribute("error", localization.getResourcesParam("error.badid"));
 			return Constants.COMMAND__ERROR;
 		}
-		User user = userService.findUserById(lecturerId);
+		User user;
+		try {
+			user = userService.findUserById(lecturerId);
+		} catch (SQLException e) {
+			log.error("Finding user error", e);
+			request.getSession().setAttribute("error", localization.getResourcesParam("dberror.finduser"));
+			return Constants.COMMAND__ERROR;
+		}
 		if (user == null) {
 			log.error("Cannot find user");
 			request.getSession().setAttribute("error", localization.getResourcesParam("error.cannotfind"));
@@ -67,12 +74,12 @@ public class EditLecturerCommand implements ICommand {
 		}
 		String[] checkedIds = request.getParameterValues("courses");
 
-		try {
-			courseService.setLecturerForCoursesByLecturerId(lecturerId, checkedIds);
-			log.info("Courses were set to lecturer {}", user.getLogin());
-		} catch (SQLException e) {
-			log.error("Error setting lecturer", e);
-		}
+		if(!courseService.setLecturerForCoursesByLecturerId(lecturerId, checkedIds)) {
+			log.error("Error setting lecturer");
+			localization.getResourcesParam("dberror.setlecturer");
+			return Constants.COMMAND__ERROR;
+		} 
+		log.info("Courses were set to lecturer {}", user.getLogin());
 		return Constants.COMMAND__EDIT_LECTURER + "&id=" + lecturerId;
 	}
 

@@ -3,7 +3,6 @@ package com.epam.project.service.impl;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,13 +19,22 @@ import com.epam.project.service.IUserService;
 public class MySqlUserService implements IUserService {
 	private static final Logger log = LoggerFactory.getLogger(MySqlUserService.class);
 
-	private static DaoFactory daoFactory;
+	private DaoFactory daoFactory;
 
-	private static IUserDAO userDao;
+	private IUserDAO userDao;
 
 	private static MySqlUserService instance;
 
-	static {
+//	static {
+//		try {
+//			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
+//			userDao = daoFactory.getUserDAO();
+//		} catch (DatabaseNotSupportedException e) {
+//			log.error("DatabaseNotSupportedException", e.getMessage().getMessage());
+//		}
+//	}
+
+	private MySqlUserService() {
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 			userDao = daoFactory.getUserDAO();
@@ -35,15 +43,15 @@ public class MySqlUserService implements IUserService {
 		}
 	}
 
-	public static void setDaoFactory(DaoFactory daoFactory) {
-		MySqlUserService.daoFactory = daoFactory;
-	}
-
-	public static void setUserDao(IUserDAO userDao) {
-		MySqlUserService.userDao = userDao;
-	}
-
-	private MySqlUserService() {
+	/**
+	 * Constructor used in testing by Mockito
+	 * 
+	 * @param daoFactory mocked DaoFactory
+	 * @param userDao    mocked IUserDAO
+	 */
+	public MySqlUserService(DaoFactory daoFactory, IUserDAO userDao) {
+		this.daoFactory = daoFactory;
+		this.userDao = userDao;
 	}
 
 	public static IUserService getInstance() {
@@ -64,7 +72,6 @@ public class MySqlUserService implements IUserService {
 		// This bytes[] has bytes in decimal format;
 		// Convert it to hexadecimal format
 		StringBuilder sb = new StringBuilder();
-//			StringBuilder sb2 = new StringBuilder();
 		for (int i = 0; i < bytes.length; i++) {
 			int upper = (bytes[i] >> 4) & 0xF;
 			int lower = bytes[i] & 0xF;
@@ -78,9 +85,6 @@ public class MySqlUserService implements IUserService {
 				sb.append((char) ('a' + lower - 10));
 			else
 				sb.append(lower);
-
-//				sb2.append(Integer.toString((bytes[i] & 0xff) + 0x100, 16).substring(1));
-//				sb2.append(Integer.toHexString(0xFF & bytes[i]));
 		}
 		// Get complete hashed password in hex format
 		generatedPassword = sb.toString();
@@ -91,11 +95,11 @@ public class MySqlUserService implements IUserService {
 	@Override
 	public int getCoursesCountForUser(int userId, boolean enrolled) {
 
-		daoFactory.open();
 		try {
+			daoFactory.open();
 			return userDao.getCoursesCountByUser(userId, enrolled);
 		} catch (SQLException e) {
-			log.error("Getting count error", e);
+			log.error("Getting count error", e.getMessage());
 			return -1;
 		} finally {
 			daoFactory.close();
@@ -103,40 +107,43 @@ public class MySqlUserService implements IUserService {
 	}
 
 	@Override
-	public void enrollToCourse(String[] courseIds, int userId) {
+	public boolean enrollToCourse(String[] courseIds, int userId) {
 		try {
-			daoFactory.open();
+			daoFactory.beginTransation();
 			for (String id : courseIds) {
 				userDao.addToManyToMany(Integer.parseInt(id), userId);
 			}
+			return true;
 		} catch (SQLException | NumberFormatException e) {
-			log.error("Enrolling error", e);
+			log.error("Enrolling error", e.getMessage());
+			daoFactory.rollback();
+			return false;
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public User findUserByLogin(String login) {
+	public User findUserByLogin(String login) throws SQLException{
 		try {
 			daoFactory.open();
 			return userDao.findByLogin(login);
 		} catch (SQLException e) {
-			log.error("Getting user error", e);
-			return null;
+			log.error("Getting user error", e.getMessage());
+			throw new SQLException();
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public User findUserById(int userId) {
+	public User findUserById(int userId) throws SQLException{
 		try {
 			daoFactory.open();
 			return userDao.findById(userId);
 		} catch (SQLException e) {
-			log.error("Getting user error", e);
-			return null;
+			log.error("Getting user error", e.getMessage());
+			throw new SQLException();
 		} finally {
 			daoFactory.close();
 		}
@@ -146,24 +153,25 @@ public class MySqlUserService implements IUserService {
 	public boolean addUser(User user) {
 		try {
 			user.setPassword(hashedPwd(user.getPassword()));
-			daoFactory.open();
+			daoFactory.beginTransation();
 			return userDao.add(user);
 		} catch (SQLException | NoSuchAlgorithmException e) {
-			log.error("Adding user error", e);
+			log.error("Adding user error", e.getMessage());
+			daoFactory.rollback();
 			return false;
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public List<User> findAllUsers() {
+	public List<User> findAllUsers() throws SQLException{
 		try {
 			daoFactory.open();
 			return userDao.findAll();
 		} catch (SQLException e) {
-			log.error("Getting users error", e);
-			return new ArrayList<>();
+			log.error("Getting users error", e.getMessage());
+			throw new SQLException();
 		} finally {
 			daoFactory.close();
 		}
@@ -172,85 +180,94 @@ public class MySqlUserService implements IUserService {
 	@Override
 	public boolean updateUser(User user) {
 		try {
-			daoFactory.open();
+			daoFactory.beginTransation();
 			userDao.update(user);
 			return true;
 		} catch (SQLException e) {
-			log.error("Updating user error", e);
+			log.error("Updating user error", e.getMessage());
+			daoFactory.rollback();
 			return false;
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public User findUserByEmail(String email) {
+	public User findUserByEmail(String email) throws SQLException{
 		try {
 			daoFactory.open();
 			return userDao.findByEmail(email);
 		} catch (SQLException e) {
-			log.error("Getting user error", e);
-			return null;
+			log.error("Getting user error", e.getMessage());
+			throw new SQLException();
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public List<User> findAllUsersByRole(int roleId) {
+	public List<User> findAllUsersByRole(int roleId) throws SQLException{
 		try {
 			daoFactory.open();
 			return userDao.findAllByRole(roleId);
 		} catch (SQLException e) {
-			log.error("Getting users error", e);
-			return new ArrayList<>();
+			log.error("Getting users error", e.getMessage());
+			throw new SQLException();
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public void blockUsersById(String[] userIds) {
+	public boolean blockUsersById(String[] userIds) {
 		try {
-			daoFactory.open();
+			daoFactory.beginTransation();
 			for (String id : userIds) {
 				User user = userDao.findById(Integer.parseInt(id));
 				user.setBlocked(true);
 				userDao.update(user);
 			}
+			return true;
 		} catch (SQLException e) {
-			log.error("Blocking users error", e);
+			log.error("Blocking users error", e.getMessage());
+			daoFactory.rollback();
+			return false;
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 
 	}
 
 	@Override
-	public void unblockUsersById(String[] userIds) {
+	public boolean unblockUsersById(String[] userIds) {
 		try {
-			daoFactory.open();
+			daoFactory.beginTransation();
 			for (String id : userIds) {
 				User user = userDao.findById(Integer.parseInt(id));
 				user.setBlocked(false);
 				userDao.update(user);
 			}
+			return true;
 		} catch (SQLException e) {
-			log.error("Unblocking users error", e);
+			log.error("Unblocking users error", e.getMessage());
+			daoFactory.rollback();
+			return false;
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public void deleteUserById(int userId) {
+	public boolean deleteUserById(int userId) {
 		try {
-			daoFactory.open();
-			userDao.delete(userId);
+			daoFactory.beginTransation();
+			return userDao.delete(userId);
 		} catch (SQLException e) {
-			log.error("Deleting user error", e);
+			log.error("Deleting user error", e.getMessage());
+			daoFactory.rollback();
+			return false;
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
@@ -260,8 +277,8 @@ public class MySqlUserService implements IUserService {
 			daoFactory.open();
 			return userDao.findAllFromTo(limit, offset);
 		} catch (SQLException e) {
-			log.error("Getting users error", e);
-			return new ArrayList<>();
+			log.error("Getting users error", e.getMessage());
+			return null;
 		} finally {
 			daoFactory.close();
 		}
@@ -269,12 +286,12 @@ public class MySqlUserService implements IUserService {
 
 	@Override
 	public int getUsersCount() {
-		daoFactory.open();
 		try {
+			daoFactory.open();
 			return userDao.getCount();
 		} catch (SQLException e) {
-			log.error("Getting count error", e);
-			return 0;
+			log.error("Getting count error", e.getMessage());
+			return -1;
 		} finally {
 			daoFactory.close();
 		}
@@ -286,8 +303,8 @@ public class MySqlUserService implements IUserService {
 			daoFactory.open();
 			return userDao.findAllByCourseIdFromTo(courseId, limit, offset, enrolled);
 		} catch (SQLException e) {
-			log.error("Getting users error", e);
-			return new ArrayList<>();
+			log.error("Getting users error", e.getMessage());
+			return null;
 		} finally {
 			daoFactory.close();
 		}
@@ -295,56 +312,65 @@ public class MySqlUserService implements IUserService {
 
 	@Override
 	public int getUsersWithCourseCount(int courseId, boolean enrolled) {
-		daoFactory.open();
 		try {
+			daoFactory.open();
 			return userDao.getUsersWithCourseCount(courseId, enrolled);
 		} catch (SQLException e) {
-			log.error("Getting users error", e);
-			return 0;
+			log.error("Getting users error", e.getMessage());
+			return -1;
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public void declineRequestForIds(int courseId, String[] userIds) {
+	public boolean declineRequestForIds(int courseId, String[] userIds) {
 		try {
-			daoFactory.open();
+			daoFactory.beginTransation();
 			for (String userId : userIds) {
 				userDao.deleteUserFromCourse(Integer.parseInt(userId), courseId);
 			}
+			return true;
 		} catch (SQLException e) {
-			log.error("Declining users error", e);
+			log.error("Declining users error", e.getMessage());
+			daoFactory.rollback();
+			return false;
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public void registerInCourseByUsersIds(int courseId, String[] userIds, boolean registered) {
+	public boolean registerInCourseByUsersIds(int courseId, String[] userIds, boolean registered) {
 		try {
-			daoFactory.open();
+			daoFactory.beginTransation();
 			for (String userId : userIds) {
 				userDao.registerInCourse(Integer.parseInt(userId), courseId, registered);
 			}
+			return true;
 		} catch (SQLException e) {
-			log.error("Registering in course error", e);
+			log.error("Registering in course error", e.getMessage());
+			daoFactory.rollback();
+			return false;
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public void updateGrades(int courseId, Map<Integer, Integer> userGrade) {
+	public boolean updateGrades(int courseId, Map<Integer, Integer> userGrade) {
 		try {
-			daoFactory.open();
+			daoFactory.beginTransation();
 			for (Map.Entry<Integer, Integer> entry : userGrade.entrySet()) {
 				userDao.updateGradeForUser(courseId, entry.getKey(), entry.getValue());
 			}
+			return true;
 		} catch (SQLException e) {
-			log.error("Updating grades error", e);
+			log.error("Updating grades error", e.getMessage());
+			daoFactory.rollback();
+			return false;
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
@@ -354,16 +380,8 @@ public class MySqlUserService implements IUserService {
 		try {
 			hashedPwd = hashedPwd(password);
 		} catch (NoSuchAlgorithmException e) {
-			log.error("Hashing error", e);
+			log.error("Hashing error", e.getMessage());
 		}
 		return hashedPwd.equals(user.getPassword());
 	}
-
-//	public static void main(String[] args) throws NoSuchAlgorithmException {
-//		System.out.println("performing ");
-//		System.out.println(hashedPwd("admin"));
-//		System.out.println(hashedPwd("lecturer"));
-//		System.out.println(hashedPwd("user"));
-//		System.out.println(hashedPwd("blocked_user"));
-//	}
 }

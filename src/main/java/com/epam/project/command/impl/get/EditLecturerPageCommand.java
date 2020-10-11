@@ -1,5 +1,6 @@
 package com.epam.project.command.impl.get;
 
+import java.sql.SQLException;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,7 +59,13 @@ public class EditLecturerPageCommand implements ICommand {
 			request.setAttribute("error", localization.getResourcesParam("error.badid"));
 			return Constants.PAGE__ERROR;
 		}
-		user = userService.findUserById(userId);
+		try {
+			user = userService.findUserById(userId);
+		} catch (SQLException e) {
+			log.error("Finding user error", e);
+			request.setAttribute("error", localization.getResourcesParam("dberror.finduser"));
+			return Constants.PAGE__ERROR;
+		}
 		if (user == null) {
 			log.debug("Cannot find user");
 			request.setAttribute("error", localization.getResourcesParam("error.usernotfound"));

@@ -1,6 +1,5 @@
 package com.epam.project.command.impl.post;
 
-import java.sql.SQLException;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -51,9 +50,7 @@ public class DeleteCourseCommand implements ICommand {
 			request.getSession().setAttribute("error", localization.getResourcesParam("error.badid"));
 			return Constants.COMMAND__ERROR;
 		}
-		try {
-			courseService.deleteCourseById(id);
-		} catch (SQLException e) {
+		if(!courseService.deleteCourseById(id)){
 			log.error("Cannot delete course");
 			request.getSession().setAttribute("error", localization.getResourcesParam("error.deleting"));
 			return Constants.COMMAND__ERROR;

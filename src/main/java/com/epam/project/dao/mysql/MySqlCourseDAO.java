@@ -36,19 +36,33 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 	private static final String SQL_DELETE_COURSE_BY_ID = "DELETE FROM Courses WHERE id = ?";
 	private static final String SQL_GET_COUNT_BY_LECTURER_ID = "SELECT COUNT(*) FROM Courses WHERE lecturer_id = ?";
 
-	private static DaoFactory daoFactory;
+	private  DaoFactory daoFactory;
 	private static MySqlCourseDAO instance;
 
 	private MySqlCourseDAO() {
-	}
-
-	static {
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
 			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
+	
+	/**
+	 * Constructor for Mockito testing
+	 * 
+	 * @param daoFactory
+	 */
+	private MySqlCourseDAO(DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
+
+//	static {
+//		try {
+//			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
+//		} catch (DatabaseNotSupportedException e) {
+//			log.error("DatabaseNotSupportedException", e.getMessage());
+//		}
+//	}
 
 	public static ICourseDAO getInstance() {
 		if (instance == null) {
@@ -59,9 +73,7 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 
 	@Override
 	public List<Course> findAll() throws SQLException {
-		List<Course> courses = new ArrayList<>();
-		courses = findAll(daoFactory.getConnection(), SQL_FIND_ALL);
-		return courses;
+		return findAll(daoFactory.getConnection(), SQL_FIND_ALL);
 	}
 
 	@Override

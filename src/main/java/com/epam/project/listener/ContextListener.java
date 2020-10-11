@@ -1,5 +1,6 @@
 package com.epam.project.listener;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringTokenizer;
@@ -45,13 +46,15 @@ public class ContextListener implements ServletContextListener {
 		log.debug("DB initialization starts");
 		// Tries to get connection
 		DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
-		DaoFactory dao;
+		DaoFactory dao = null;
 		try {
 			dao = DaoFactory.getDaoFactory(db);
 			dao.open();
-			dao.close();
-		} catch (DatabaseNotSupportedException e) {
+		} catch (SQLException | DatabaseNotSupportedException e) {
 			log.error("Initializing db problem", e.getMessage());
+		} finally {
+			if (dao != null)
+				dao.close();
 		}
 		log.debug("DB initialization finished");
 	}

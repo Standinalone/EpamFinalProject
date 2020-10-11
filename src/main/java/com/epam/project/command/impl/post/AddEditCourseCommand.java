@@ -75,18 +75,13 @@ public class AddEditCourseCommand implements ICommand {
 		}
 
 		if (courseId != null && !courseId.isEmpty()) {
-			try {
-				courseService.updateCourse(course);
-			} catch (SQLException e) {
+			if (!courseService.updateCourse(course)) {
 				log.error("Error updating course");
 				request.getSession().setAttribute("error", localization.getResourcesParam("error.updating"));
 				return Constants.COMMAND__ERROR;
 			}
 		} else {
-			try {
-				courseService.addCourse(course);
-
-			} catch (SQLException e) {
+			if (!courseService.addCourse(course)) {
 				log.error("Error adding course");
 				request.getSession().setAttribute("error", localization.getResourcesParam("error.adding"));
 				return Constants.COMMAND__ERROR;
@@ -149,7 +144,13 @@ public class AddEditCourseCommand implements ICommand {
 		if (topicService.findTopicById(course.getTopicId()) == null) {
 			errors.add(localization.getResourcesParam("error.topicnotfound"));
 		}
-		User user = userService.findUserById(course.getLecturerId());
+		User user = null;
+		try {
+			user = userService.findUserById(course.getLecturerId());
+		} catch (SQLException e) {
+			log.error("Finding user error", e);
+			errors.add(localization.getResourcesParam("dberror.finduser"));
+		}
 		if (user == null) {
 			errors.add(localization.getResourcesParam("error.lecturernotfound"));
 		}

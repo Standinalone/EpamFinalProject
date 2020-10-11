@@ -30,11 +30,11 @@ public final class QueryFactory {
 	 * @param map map of keys - column names and values - DB values
 	 * @return newly formed condition query from a map
 	 */
-	public static String formExtraConditionQuery(Map<String, Object> map) {
+	public static String formExtraConditionQuery(Map<String, Integer> map) {
 		StringBuilder sb = new StringBuilder();
 		String prefix = "";
-		for (Map.Entry<String, Object> entry : map.entrySet()) {
-			if ((Integer) entry.getValue() != 0) {
+		for (Map.Entry<String, Integer> entry : map.entrySet()) {
+			if (entry.getValue() != 0) {
 				sb.append(prefix).append(entry.getKey()).append('=').append(entry.getValue());
 				prefix = " AND ";
 			}

@@ -40,9 +40,6 @@ public class MySqlCourseProfilePageDAO extends GenericDAO<CourseProfilePageDto> 
 	private static MySqlCourseProfilePageDAO instance;
 
 	private MySqlCourseProfilePageDAO() {
-	}
-
-	static {
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
@@ -50,13 +47,30 @@ public class MySqlCourseProfilePageDAO extends GenericDAO<CourseProfilePageDto> 
 		}
 	}
 
+//	static {
+//		try {
+//			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
+//		} catch (DatabaseNotSupportedException e) {
+//			log.error("DatabaseNotSupportedException", e.getMessage());
+//		}
+//	}
+
 	public static ICourseProfilePageDAO getInstance() {
 		if (instance == null) {
 			instance = new MySqlCourseProfilePageDAO();
 		}
 		return instance;
 	}
-
+	/**
+	 * Constructor for Mockito testing
+	 * 
+	 * @param daoFactory
+	 */
+	private MySqlCourseProfilePageDAO(DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
+	
+	
 	@Override
 	public List<CourseProfilePageDto> findAllFromTo(int limit, int offset, User user, boolean enrolled)
 			throws SQLException {

@@ -76,12 +76,13 @@ public final class MySqlDAOFactory extends DaoFactory {
 	}
 
 	@Override
-	public void open() {
+	public void open() throws SQLException {
 		try {
 			connection = ds.getConnection();
 		} catch (SQLException e) {
 			log.error("Error getting connection");
 			e.printStackTrace();
+			throw e;
 		}
 	}
 

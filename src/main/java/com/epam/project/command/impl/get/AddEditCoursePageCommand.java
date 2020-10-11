@@ -1,5 +1,6 @@
 package com.epam.project.command.impl.get;
 
+import java.sql.SQLException;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,9 +48,16 @@ public class AddEditCoursePageCommand implements ICommand {
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) {
 		String id = request.getParameter("id");
-		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
+		Localization localization = LocalizationFactory
+				.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		int courseId;
-		request.setAttribute("lecturers", userService.findAllUsersByRole(3));
+		try {
+			request.setAttribute("lecturers", userService.findAllUsersByRole(3));
+		} catch (SQLException e) {
+			log.error("Finding users error", e);
+			request.setAttribute("error", localization.getResourcesParam("dberror.findusers"));
+			return Constants.PAGE__ERROR;
+		}
 		request.setAttribute("topics", topicService.findAllTopics());
 		request.setAttribute("statuses", CourseStatusEnum.values());
 		if (id == null || id.isEmpty()) {
@@ -57,20 +65,28 @@ public class AddEditCoursePageCommand implements ICommand {
 		}
 		try {
 			courseId = Integer.parseInt(id);
-			CourseDto courseDto = courseService.getCourseDtoByCourseId(courseId);
-			if (courseDto != null) {
-				request.setAttribute("course", courseDto);
-				return Constants.PAGE__ADD_COURSE;
-			} else {
-				log.debug("Course not found");
-				request.setAttribute("error", localization.getResourcesParam("error.coursenotfound"));
-				return Constants.PAGE__ERROR;
-			}
 		} catch (NumberFormatException e) {
 			log.debug("Cannot parse id");
-			request.setAttribute("error",  localization.getResourcesParam("error.badid"));
+			request.setAttribute("error", localization.getResourcesParam("error.badid"));
 			return Constants.PAGE__ERROR;
 		}
+		CourseDto courseDto = null;
+		try {
+			courseDto = courseService.getCourseDtoByCourseId(courseId);
+		} catch (SQLException e) {
+			log.error("Finding course error", e);
+			request.setAttribute("error", localization.getResourcesParam("dberror.getcourse"));
+			return Constants.PAGE__ERROR;
+		}
+		if (courseDto != null) {
+			request.setAttribute("course", courseDto);
+			return Constants.PAGE__ADD_COURSE;
+		} else {
+			log.debug("Course not found");
+			request.setAttribute("error", localization.getResourcesParam("error.coursenotfound"));
+			return Constants.PAGE__ERROR;
+		}
+
 	}
 
 }

@@ -75,7 +75,15 @@ public class LecturerPanelCommand implements ICommand {
 			request.getSession().setAttribute("error", localization.getResourcesParam("error.badid"));
 			return Constants.COMMAND__ERROR;
 		}
-		Course course = courseService.findCourseById(courseId);
+		Course course = null;
+		try {
+			course = courseService.findCourseById(courseId);
+		} catch (SQLException e) {
+			log.error("Finding course error", e);
+			request.getSession().setAttribute("error", localization.getResourcesParam("dberror.getcourse"));
+			return Constants.COMMAND__ERROR;
+		}
+
 		List<String> validateErrors = validate(course);
 		if (!validateErrors.isEmpty()) {
 			log.error("Error validating course");
@@ -110,13 +118,12 @@ public class LecturerPanelCommand implements ICommand {
 				request.getSession().setAttribute("error", localization.getResourcesParam("success.badStatus"));
 				return Constants.PAGE__ERROR;
 			}
-			try {
-				courseService.updateCourse(course);
-				request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.updated"));
-				log.info("Status of course {} updated by {}", course.getName(), user.getLogin());
-			} catch (SQLException e1) {
+			if (!courseService.updateCourse(course)) {
 				log.error("Error updating course");
+				request.getSession().setAttribute("error", localization.getResourcesParam("dberror.updatecourse"));
 			}
+			request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.updated"));
+			log.info("Status of course {} updated by {}", course.getName(), user.getLogin());
 
 			break;
 		case "givegrades":
@@ -141,7 +148,13 @@ public class LecturerPanelCommand implements ICommand {
 			String notify = request.getParameter("sendmail");
 			if (notify != null && "on".equals(notify)) {
 				for (Map.Entry<Integer, Integer> entry : userGrade.entrySet()) {
-					user = userService.findUserById(entry.getKey());
+					try {
+						user = userService.findUserById(entry.getKey());
+					} catch (SQLException e) {
+						log.error("Finding user error", e);
+						request.getSession().setAttribute("error", localization.getResourcesParam("dberror.finduser"));
+						return Constants.COMMAND__ERROR;
+					}
 					if (user != null) {
 						try {
 							Mailer.sendMail(new String[] { user.getEmail() },

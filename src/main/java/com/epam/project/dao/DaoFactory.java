@@ -80,8 +80,9 @@ public abstract class DaoFactory {
 
 	/**
 	 * Opens a new connection
+	 * @throws SQLException 
 	 */
-	public abstract void open();
+	public abstract void open() throws SQLException;
 
 	/**
 	 * Sets up the connection for starting a new transaction

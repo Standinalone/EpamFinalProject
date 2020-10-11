@@ -51,10 +51,18 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	private static final String SQL_UPDATE_COURSES_HAS_USERS = "UPDATE Courses_has_users SET registered = ? WHERE course_id = ? AND user_id = ?";
 	private static final String SQL_UPDATE_GRADE_FOR_USER = "UPDATE Courses_has_users SET grade = ? WHERE course_id = ? AND user_id = ?";
 
-	private static DaoFactory daoFactory;
+	private DaoFactory daoFactory;
 	private static MySqlUserDAO instance;
 
-	static {
+//	static {
+//		try {
+//			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
+//		} catch (DatabaseNotSupportedException e) {
+//			log.error("DatabaseNotSupportedException", e.getMessage());
+//		}
+//	}
+
+	private MySqlUserDAO() {
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
@@ -62,7 +70,13 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 		}
 	}
 
-	private MySqlUserDAO() {
+	/**
+	 * Constructor for Mockito testing
+	 * 
+	 * @param daoFactory
+	 */
+	private MySqlUserDAO(DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
 	}
 
 	public static IUserDAO getInstance() {
@@ -193,8 +207,7 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 		user.setRole(RoleEnum.valueOf(rs.getString(FIELD_ROLE_NAME).toUpperCase()));
 		try {
 			user.setGrade(rs.getInt(FIELD_GRADE));
-		}
-		catch(SQLException e) {
+		} catch (SQLException e) {
 			log.trace("`Grade` column was omitted");
 		}
 

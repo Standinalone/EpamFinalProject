@@ -42,9 +42,6 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 	private static MySqlCourseDtoDAO instance;
 
 	private MySqlCourseDtoDAO() {
-	}
-
-	static {
 		try {
 			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
 		} catch (DatabaseNotSupportedException e) {
@@ -52,6 +49,23 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 		}
 	}
 
+//	static {
+//		try {
+//			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
+//		} catch (DatabaseNotSupportedException e) {
+//			log.error("DatabaseNotSupportedException", e.getMessage());
+//		}
+//	}
+	
+	/**
+	 * Constructor for Mockito testing
+	 * 
+	 * @param daoFactory
+	 */
+	private MySqlCourseDtoDAO(DaoFactory daoFactory) {
+		this.daoFactory = daoFactory;
+	}
+	
 	public static ICourseDtoDAO getInstance() {
 		if (instance == null) {
 			instance = new MySqlCourseDtoDAO();

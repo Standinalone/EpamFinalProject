@@ -1,4 +1,5 @@
 package com.epam.project.command.impl.get;
+import java.sql.SQLException;
 import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +56,14 @@ public class LecturerPanelPageCommand implements ICommand {
 			request.setAttribute("error", localization.getResourcesParam("error.badid"));
 			return Constants.PAGE__ERROR;
 		}
-		Course course = courseService.findCourseById(courseId);
+		Course course = null;
+		try {
+			course = courseService.findCourseById(courseId);
+		} catch (SQLException e) {
+			log.debug("Finding course error", e);
+			request.setAttribute("error", localization.getResourcesParam("dberror.getcourse"));
+			return Constants.PAGE__ERROR;
+		}
 		if (course == null) {
 			log.debug("Cannot find course");
 			request.setAttribute("error", localization.getResourcesParam("error.coursenotfound"));
@@ -66,11 +74,11 @@ public class LecturerPanelPageCommand implements ICommand {
 			request.setAttribute("error", localization.getResourcesParam("error.notyourcourse"));
 			return Constants.PAGE__ERROR;
 		}
-
-		Page<User> page1 = new Page<>("pagenumEnrolled", "startIndexEnrolled", "totalPagesEnrolled", request, (limit, offset) -> userService.findAllUsersWithCourseFromTo(course.getId(), limit, offset, true),
-				() -> userService.getUsersWithCourseCount(course.getId(), true));
-		Page<User> page2 = new Page<>("pagenumNotEnrolled", "startIndexNotEnrolled", "totalPagesNotEnrolled", request, (limit, offset) -> userService.findAllUsersWithCourseFromTo(course.getId(), limit, offset, false),
-				() -> userService.getUsersWithCourseCount(course.getId(), false));
+		final int id = course.getId();
+		Page<User> page1 = new Page<>("pagenumEnrolled", "startIndexEnrolled", "totalPagesEnrolled", request, (limit, offset) -> userService.findAllUsersWithCourseFromTo(id, limit, offset, true),
+				() -> userService.getUsersWithCourseCount(id, true));
+		Page<User> page2 = new Page<>("pagenumNotEnrolled", "startIndexNotEnrolled", "totalPagesNotEnrolled", request, (limit, offset) -> userService.findAllUsersWithCourseFromTo(id, limit, offset, false),
+				() -> userService.getUsersWithCourseCount(id, false));
 		
 		if (page1.getList() == null || page2.getList() == null) {
 			log.error("Page cannot be formed");

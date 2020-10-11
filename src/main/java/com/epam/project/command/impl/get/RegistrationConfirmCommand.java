@@ -1,5 +1,6 @@
 package com.epam.project.command.impl.get;
 
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Locale;
 
@@ -61,7 +62,14 @@ public class RegistrationConfirmCommand implements ICommand {
 			return Constants.PAGE__ERROR;
 		}
 		
-		User user = userService.findUserById(verificationToken.getUserId());
+		User user;
+		try {
+			user = userService.findUserById(verificationToken.getUserId());
+		} catch (SQLException e) {
+			log.error("Finding user error", e);
+			request.setAttribute("error", localization.getResourcesParam("dberror.finduser"));
+			return Constants.PAGE__ERROR;
+		}
 		if (verificationToken.getExpiryDate().isBefore(LocalDate.now())) {
 			request.getSession().setAttribute("error", localization.getResourcesParam("register.tokenexpired"));
 			return Constants.PAGE__ERROR;
