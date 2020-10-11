@@ -5,13 +5,13 @@
 <c:set value="Success" var="title" />
 
 <!-- Header -->
-<%@include file='../jsp/header.jsp'%>
+<%@include file='/WEB-INF/jspf/header.jspf'%>
 
 <!-- Body -->
 
 <c:if test="${not empty successMessage }">
-	<div class="alert alert-info">${ successMessage }</div>
+	<div class="alert alert-info"><c:out value = "${ successMessage }"/></div>
 </c:if>
 
 <!-- Footer -->
-<%@include file='../jsp/footer.jsp'%>
+<%@include file='/WEB-INF/jspf/footer.jspf'%>

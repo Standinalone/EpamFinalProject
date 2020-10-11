@@ -6,7 +6,7 @@
 <c:set value="${pageContext.request.locale.language}" var="language"
 	scope="page" />
 <!-- Header -->
-<%@include file='../jsp/header.jsp'%>
+<%@include file='/WEB-INF/jspf/header.jspf'%>
 
 <!-- Body -->
 <fmt:bundle basename="tables">
@@ -38,7 +38,7 @@
 									<tr
 										<c:if test = "${ course.course.lecturerId == param.id }">class = "table-success"</c:if>>
 
-										<td class="nopadding">${ requestScope.startIndex + loop.index}</td>
+										<td class="nopadding"><c:out value = "${ requestScope.startIndex + loop.index}"/></td>
 										<c:if test="${ not empty user }">
 											<td class="nopadding">
 												<div class="form-check">
@@ -49,13 +49,13 @@
 												</div>
 											</td>
 										</c:if>
-										<td class="nopadding">${ course.students }</td>
-										<td class="nopadding">${ course.course.name }</td>
-										<td class="nopadding">${ course.topic }</td>
-										<td class="nopadding">${ course.lecturer }</td>
-										<td class="nopadding">${ course.course.startDate }</td>
-										<td class="nopadding">${ course.course.endDate }</td>
-										<td class="nopadding">${ course.duration }</td>
+										<td class="nopadding"><c:out value = "${ course.students }"/></td>
+										<td class="nopadding"><c:out value = "${ course.course.name }"/></td>
+										<td class="nopadding"><c:out value = "${ course.topic }"/></td>
+										<td class="nopadding"><c:out value = "${ course.lecturer }"/></td>
+										<td class="nopadding"><c:out value = "${ course.course.startDate }"/></td>
+										<td class="nopadding"><c:out value = "${ course.course.endDate }"/></td>
+										<td class="nopadding"><c:out value = "${ course.duration }"/></td>
 									</tr>
 								</c:forEach>
 						</table>
@@ -85,4 +85,4 @@
 	</div>
 </fmt:bundle>
 <!-- Footer -->
-<%@include file='../jsp/footer.jsp'%>
+<%@include file='/WEB-INF/jspf/footer.jspf'%>

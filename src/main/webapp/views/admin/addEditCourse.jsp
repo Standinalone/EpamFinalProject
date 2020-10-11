@@ -10,7 +10,7 @@
 <c:set value="${ sessionScope.get(\"successMessage\") }"
 	var="successMessage" scope="page" />
 <!-- Header -->
-<%@include file='../jsp/header.jsp'%>
+<%@include file='/WEB-INF/jspf/header.jspf'%>
 <script src="${pageContext.servletContext.contextPath}/duration.js"></script>
 
 <!-- Body -->
@@ -41,7 +41,7 @@
 								var="topic">
 								<option
 									<c:if test = "${ topic.name == course.topic }">selected</c:if>
-									value="${ topic.id }">${ topic.name }</option>
+									value="${ topic.id }"><c:out value = "${ topic.name }"/></option>
 							</c:forEach>
 						</select>
 					</div>
@@ -54,8 +54,7 @@
 								var="lecturer">
 								<option
 									<c:if test = "${ lecturer.id == course.course.lecturerId }">selected</c:if>
-									value="${ lecturer.id }">${ lecturer.name }&nbsp;${ lecturer.surname }
-									&nbsp;${ lecturer.patronym }</option>
+									value="${ lecturer.id }"><c:out value = "${ lecturer.name } ${ lecturer.surname } ${ lecturer.patronym }"/></option>
 
 							</c:forEach>
 						</select>
@@ -83,7 +82,7 @@
 								var="status">
 								<option
 									<c:if test = "${ status == course.course.status }">selected</c:if>
-									value="${ status }">${ status }</option>
+									value="${ status }"><c:out value = "${ status }"/></option>
 
 							</c:forEach>
 						</select>
@@ -142,4 +141,4 @@
 	</div>
 </fmt:bundle>
 <!-- Footer -->
-<%@include file='../jsp/footer.jsp'%>
+<%@include file='/WEB-INF/jspf/footer.jspf'%>

@@ -39,26 +39,27 @@ public class Constants {
 	public static final String PAGE__ERROR = "/views/error.jsp";
 	public static final String PAGE__HOME = "/views/home.jsp";
 	public static final String PAGE__COURSES = "/views/courses.jsp";
-	public static final String PAGE__PROFILE = "/views/profile.jsp";
 	public static final String PAGE__LOGIN = "/views/login.jsp";
 	public static final String PAGE__REGISTER = "/views/register.jsp";
+	public static final String PAGE__SUCCESS = "/views/success.jsp";
+	
+	// Paths for registered users
+	public static final String PAGE__PROFILE = "/views/user/profile.jsp";
 
 	// Paths for lecturers
-	public static final String PAGE__MANAGE_JOURNAL = "/views/manageJournal.jsp";
-	public static final String PAGE__MY_COURSES = "/views/mycourses.jsp";
+	public static final String PAGE__MANAGE_JOURNAL = "/views/lecturer/manageJournal.jsp";
+	public static final String PAGE__MY_COURSES = "/views/lecturer/mycourses.jsp";
 
 	// Pages for admins
-	public static final String PAGE__ADD_LECTURER = "/views/addLecturer.jsp";
-	public static final String PAGE__ADD_COURSE = "/views/addEditCourse.jsp";
-	public static final String PAGE__MANAGE_COURSES = "/views/manageCourses.jsp";
-	public static final String PAGE__MANAGE_STUDENTS = "/views/manageStudents.jsp";
-	public static final String PAGE__ADMINISTRATION = "/views/administration.jsp";
-	public static final String PAGE__SUCCESS = "/views/success.jsp";
-	public static final String PAGE__ADD_EDIT_COURSE = "/views/register.jsp";
-	public static final String PAGE__EDIT_USER = "/views/editUser.jsp";
+	public static final String PAGE__ADD_LECTURER = "/views/admin/addLecturer.jsp";
+	public static final String PAGE__ADD_COURSE = "/views/admin/addEditCourse.jsp";
+	public static final String PAGE__MANAGE_COURSES = "/views/admin/manageCourses.jsp";
+	public static final String PAGE__MANAGE_STUDENTS = "/views/admin/manageStudents.jsp";
+	public static final String PAGE__EDIT_USER = "/views/admin/editUser.jsp";
 
 	// Regex
 	public static final String REGEX__USERNAME = "\\p{L}{4,20}";
+	// Between 5 and 10 characters, at least one letter and one number
 	public static final String REGEX__PASSWORD = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{5,10}$";
 	public static final String REGEX__EMAIL = "\\S+@\\S+\\.\\S+";
 	public static final String REGEX__NAME = "\\p{L}{4,20}";

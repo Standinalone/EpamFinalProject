@@ -3,7 +3,7 @@
 <c:set value="Sign IN" var="title" />
 
 <!-- Header -->
-<%@include file='../jsp/header.jsp'%>
+<%@include file='/WEB-INF/jspf/header.jspf'%>
 
 <!-- Body -->
 
@@ -22,12 +22,14 @@
 							<div class="form-group">
 								<label for="username" class="text-info"><fmt:message
 										key="login.username" />:</label><br> <input type="text"
-									name="username" id="username" class="form-control">
+									name="username" id="username" class="form-control"
+									">
 							</div>
 							<div class="form-group">
 								<label for="password" class="text-info"><fmt:message
 										key="login.password" />:</label><br> <input type="password"
-									name="password" id="password" class="form-control">
+									name="password" id="password" class="form-control"
+									>
 							</div>
 							<div class="form-group">
 								<br> <input type="submit" name="submit"
@@ -60,4 +62,4 @@
 	</div>
 </fmt:bundle>
 <!-- Footer -->
-<%@include file='../jsp/footer.jsp'%>
+<%@include file='/WEB-INF/jspf/footer.jspf'%>

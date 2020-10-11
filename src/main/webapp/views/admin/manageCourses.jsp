@@ -6,7 +6,7 @@
 <c:set value="${pageContext.request.locale.language}" var="language"
 	scope="page" />
 <!-- Header -->
-<%@include file='../jsp/header.jsp'%>
+<%@include file='/WEB-INF/jspf/header.jspf'%>
 <script src="${pageContext.servletContext.contextPath}/home.js"></script>
 <style>
 table th {
@@ -33,7 +33,7 @@ table th {
 									<%-- 									<option <c:if test = "${ lecturer.id == param.lecturer }">selected</c:if> value="${ pageContext.request.contextPath }/controller?command=HOME_PAGE&lecturer=${ lecturer.id }&topic=${ param.topic }&status=${ param.status }&sort=${ param.sort }&order=${ param.order }">${ lecturer.name }</option> --%>
 									<option
 										<c:if test = "${ lecturer.id == param.lecturer }">selected</c:if>
-										value="${ lecturer.id }">${ lecturer.name }</option>
+										value="${ lecturer.id }"><c:out value = "${ lecturer.name }"/></option>
 
 								</c:forEach>
 							</select>
@@ -49,7 +49,7 @@ table th {
 									<%-- 									<option <c:if test = "${ topic.id == param.topic }">selected</c:if> value="${ pageContext.request.contextPath }/controller?command=HOME_PAGE&lecturer=${ param.lecturer }&topic=${ topic.id }&status=${ param.status }&sort=${ param.sort }&order=${ param.order }">${ topic.name }</option> --%>
 									<option
 										<c:if test = "${ topic.id == param.topic }">selected</c:if>
-										value="${ topic.id }">${ topic.name }</option>
+										value="${ topic.id }"><c:out value = "${ topic.name }"/></option>
 
 								</c:forEach>
 							</select>
@@ -65,7 +65,7 @@ table th {
 									<%-- 									<option <c:if test = "${ status == param.status }">selected</c:if> value="${ pageContext.request.contextPath }/controller?command=HOME_PAGE&lecturer=${ param.lecturer }&topic=${ param.topic }&status=${ status }&sort=${ param.sort }&order=${ param.order }">${ status }</option> --%>
 									<option
 										<c:if test = "${ status == param.status }">selected</c:if>
-										value="${ status }">${ status }</option>
+										value="${ status }"><c:out value = "${ status }"/></option>
 
 								</c:forEach>
 							</select>
@@ -88,7 +88,7 @@ table th {
 						<c:forEach items="${ requestScope.page.list }" var="course"
 							varStatus="loop">
 							<tr>
-								<td>${ requestScope.startIndex + loop.index}</td>
+								<td><c:out value = "${ requestScope.startIndex + loop.index}"/></td>
 								<td><div class="row">
 										<div class="col p-1">
 											<a title="<fmt:message key="users.edit" />"
@@ -114,13 +114,13 @@ table th {
 											</form>
 										</div>
 									</div></td>
-								<td>${ course.students }</td>
-								<td>${ course.course.name }</td>
-								<td>${ course.topic }</td>
-								<td>${ course.lecturer }</td>
-								<td>${ course.course.startDate }</td>
-								<td>${ course.course.endDate }</td>
-								<td>${ course.duration }</td>
+								<td><c:out value = "${ course.students }"/></td>
+								<td><c:out value = "${ course.course.name }"/></td>
+								<td><c:out value = "${ course.topic }"/></td>
+								<td><c:out value = "${ course.lecturer }"/></td>
+								<td><c:out value = "${ course.course.startDate }"/></td>
+								<td><c:out value = "${ course.course.endDate }"/></td>
+								<td><c:out value = "${ course.duration }"/></td>
 							</tr>
 						</c:forEach>
 					</table>
@@ -147,4 +147,4 @@ table th {
 	</div>
 </fmt:bundle>
 <!-- Footer -->
-<%@include file='../jsp/footer.jsp'%>
+<%@include file='/WEB-INF/jspf/footer.jspf'%>

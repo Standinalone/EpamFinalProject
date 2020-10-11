@@ -50,11 +50,14 @@ public class ContextListener implements ServletContextListener {
 		try {
 			dao = DaoFactory.getDaoFactory(db);
 			dao.open();
+			log.info("Test connection established");
 		} catch (SQLException | DatabaseNotSupportedException e) {
 			log.error("Initializing db problem", e.getMessage());
 		} finally {
-			if (dao != null)
+			if (dao != null) {
 				dao.close();
+				log.info("Test connection closed");
+			}
 		}
 		log.debug("DB initialization finished");
 	}

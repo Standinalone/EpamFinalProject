@@ -6,7 +6,7 @@
 <c:set value="${pageContext.request.locale.language}" var="language"
 	scope="page" />
 <!-- Header -->
-<%@include file='../jsp/header.jsp'%>
+<%@include file='/WEB-INF/jspf/header.jspf'%>
 
 <!-- Body -->
 <fmt:bundle basename="tables">
@@ -50,14 +50,14 @@
 									</c:if>
 								</div>
 							</td>
-							<td>${ user.id }</td>
-							<td>${ user.login }</td>
-							<td>${ user.role }</td>
-							<td>${ user.blocked }</td>
-							<td>${ user.name }</td>
-							<td>${ user.surname }</td>
-							<td>${ user.patronym }</td>
-							<td>${ user.email }</td>
+							<td><c:out value = "${ user.id }"/></td>
+							<td><c:out value = "${ user.login }"/></td>
+							<td><c:out value = "${ user.role }"/></td>
+							<td><c:out value = "${ user.blocked }"/></td>
+							<td><c:out value = "${ user.name }"/></td>
+							<td><c:out value = "${ user.surname }"/></td>
+							<td><c:out value = "${ user.patronym }"/></td>
+							<td><c:out value = "${ user.email }"/></td>
 						</tr>
 					</c:forEach>
 				</table>
@@ -90,4 +90,4 @@
 	</div>
 </fmt:bundle>
 <!-- Footer -->
-<%@include file='../jsp/footer.jsp'%>
+<%@include file='/WEB-INF/jspf/footer.jspf'%>

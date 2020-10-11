@@ -8,7 +8,7 @@
 <c:set value="${ sessionScope.get(\"successMessage\") }"
 	var="successMessage" scope="page" />
 <!-- Header -->
-<%@include file='../jsp/header.jsp'%>
+<%@include file='/WEB-INF/jspf/header.jspf'%>
 <script src="${pageContext.servletContext.contextPath}/js/grades.js"></script>
 
 <!-- Body -->
@@ -25,7 +25,7 @@
 							var="status">
 							<option
 								<c:if test = "${ status == course.status }">selected</c:if>
-								value="${ status }">${ status }</option>
+								value="${ status }"><c:out value = "${ status }"/></option>
 
 						</c:forEach>
 					</select>
@@ -79,11 +79,11 @@
 									</c:if>
 								</div>
 							</td>
-							<td>${ user.login }</td>
-							<td>${ user.name }</td>
-							<td>${ user.surname }</td>
-							<td>${ user.patronym }</td>
-							<td>${ user.email }</td>
+							<td><c:out value = "${ user.login }"/></td>
+							<td><c:out value = "${ user.name }"/></td>
+							<td><c:out value = "${ user.surname }"/></td>
+							<td><c:out value = "${ user.patronym }"/></td>
+							<td><c:out value = "${ user.email }"/></td>
 							<td><input value="${ user.grade }" name="grade-${ user.id }"
 								type="number" min="0" max="100" class="form-control grade" /> <%-- 								<input name = "userId" type = "hidden" value = "${ user.id }" /> --%>
 							</td>
@@ -203,4 +203,4 @@
 		</div>
 </fmt:bundle>
 <!-- Footer -->
-<%@include file='../jsp/footer.jsp'%>
+<%@include file='/WEB-INF/jspf/footer.jspf'%>

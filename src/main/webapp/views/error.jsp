@@ -5,18 +5,18 @@
 <c:set value="Error" var="title" />
 
 <!-- Header -->
-<%@include file='../jsp/header.jsp'%>
+<%@include file='/WEB-INF/jspf/header.jspf'%>
 
 <!-- Body -->
 
 <c:if test="${not empty errorForward }">
-	<div class="alert alert-danger">Forward error: ${ errorForward }</div>
+	<div class="alert alert-danger"><c:out value = "Forward error: ${ errorForward }"/></div>
 </c:if>
 <c:if test="${not empty errorRedirect }">
-	<div class="alert alert-danger">Redirect error: ${ errorRedirect }</div>
+	<div class="alert alert-danger"><c:out value = "Redirect error: ${ errorRedirect }"/></div>
 </c:if>
 <c:if test="${empty errorForward && empty errorRedirect}">
-	<div class="alert alert-danger">404</div>
+	<div class="alert alert-danger"><c:out value = "404"/></div>
 </c:if>
 <!-- Footer -->
-<%@include file='../jsp/footer.jsp'%>
+<%@include file='/WEB-INF/jspf/footer.jspf'%>

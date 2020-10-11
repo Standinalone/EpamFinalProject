@@ -6,7 +6,7 @@
 <c:set value="${pageContext.request.locale.language}" var="language"
 	scope="page" />
 <!-- Header -->
-<%@include file='../jsp/header.jsp'%>
+<%@include file='/WEB-INF/jspf/header.jspf'%>
 
 <!-- Body -->
 <fmt:bundle basename="tables">
@@ -60,14 +60,14 @@
 								<c:if test="${ course.course.status == 'FINISHED' }">class="table-success"</c:if>
 								<c:if test="${ course.course.status == 'NOT_STARTED' }">class="table-danger"</c:if>
 								<c:if test="${ course.course.status == 'IN_PROGRESS' }">class="table-warning"</c:if>>
-								<td>${ requestScope.startIndexEnrolled + loop.index }</td>
-								<td>${ course.course.name }</td>
-								<td>${ course.topic }</td>
-								<td>${ course.lecturer }</td>
-								<td>${ course.course.startDate }</td>
-								<td>${ course.course.endDate }</td>
-								<td>${ course.course.status }</td>
-								<td>${ course.grade }</td>
+								<td><c:out value = "${ requestScope.startIndexEnrolled + loop.index }"/></td>
+								<td><c:out value = "${ course.course.name }"/></td>
+								<td><c:out value = "${ course.topic }"/></td>
+								<td><c:out value = "${ course.lecturer }"/></td>
+								<td><c:out value = "${ course.course.startDate }"/></td>
+								<td><c:out value = "${ course.course.endDate }"/></td>
+								<td><c:out value = "${ course.course.status }"/></td>
+								<td><c:out value = "${ course.grade }"/></td>
 							</tr>
 						</c:forEach>
 					</table>
@@ -103,13 +103,13 @@
 						<c:forEach items="${ requestScope.page2.list }"
 							var="course" varStatus="loop">
 							<tr>
-								<td>${ requestScope.startIndexNotEnrolled + loop.index }</td>
-								<td>${ course.course.name }</td>
-								<td>${ course.topic }</td>
-								<td>${ course.lecturer }</td>
-								<td>${ course.course.startDate }</td>
-								<td>${ course.course.endDate }</td>
-								<td>${ course.course.status }</td>
+								<td><c:out value = "${ requestScope.startIndexNotEnrolled + loop.index }"/></td>
+								<td><c:out value = "${ course.course.name }"/></td>
+								<td><c:out value = "${ course.topic }"/></td>
+								<td><c:out value = "${ course.lecturer }"/></td>
+								<td><c:out value = "${ course.course.startDate }"/></td>
+								<td><c:out value = "${ course.course.endDate }"/></td>
+								<td><c:out value = "${ course.course.status }"/></td>
 							</tr>
 						</c:forEach>
 					</table>
@@ -131,4 +131,4 @@
 	</div>
 </fmt:bundle>
 <!-- Footer -->
-<%@include file='../jsp/footer.jsp'%>
+<%@include file='/WEB-INF/jspf/footer.jspf'%>
