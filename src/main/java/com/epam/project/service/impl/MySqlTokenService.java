@@ -42,24 +42,25 @@ public class MySqlTokenService implements ITokenService {
 	@Override
 	public boolean addToken(VerificationToken token) {
 		try {
-			daoFactory.open();
+			daoFactory.beginTransation();
 			return tokenDao.add(token);
 		} catch (SQLException e) {
 			log.error("Adding token error", e);
+			daoFactory.rollback();
 			return false;
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public VerificationToken findTokenByToken(String token) {
+	public VerificationToken findTokenByToken(String token) throws SQLException {
 		try {
 			daoFactory.open();
 			return tokenDao.findByToken(token);
 		} catch (SQLException e) {
 			log.error("Getting token error", e);
-			return null;
+			throw new SQLException();
 		} finally {
 			daoFactory.close();
 		}

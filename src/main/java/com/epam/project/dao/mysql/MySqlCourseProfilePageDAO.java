@@ -36,7 +36,7 @@ public class MySqlCourseProfilePageDAO extends GenericDAO<CourseProfilePageDto> 
 
 	private static final String SQL_FIND_COURSES_FROM_TO = "SELECT * FROM Courses_has_users, Courses, Topics, Users, Statuses WHERE course_id = Courses.id AND user_id = ? AND Topics.id = Courses.topic_id AND Users.id = Courses.lecturer_id AND Statuses.id = Courses.status_id";
 
-	private static DaoFactory daoFactory;
+	private  DaoFactory daoFactory;
 	private static MySqlCourseProfilePageDAO instance;
 
 	private MySqlCourseProfilePageDAO() {

@@ -9,6 +9,7 @@
 
 <fmt:setLocale value="${ sessionScope.get(\"locale\").language }" />
 <%-- <fmt:setLocale value="ru_RU"/> --%>
+<c:set var="context" value="${pageContext.request.contextPath}" />
 <c:set value="${ sessionScope.get(\"user\") }" var="user" scope="page" />
 <c:set value="${ sessionScope.get(\"locale\") }" var="locale"
 	scope="page" />

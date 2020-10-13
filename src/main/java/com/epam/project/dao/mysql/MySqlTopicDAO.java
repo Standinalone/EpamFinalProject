@@ -67,6 +67,7 @@ public class MySqlTopicDAO extends GenericDAO<Topic> implements ITopicDAO {
 
 	@Override
 	protected void mapFromEntity(PreparedStatement ps, Topic topic) {
+		throw new UnsupportedOperationException();
 	}
 
 }

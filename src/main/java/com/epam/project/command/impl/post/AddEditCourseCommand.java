@@ -141,8 +141,13 @@ public class AddEditCourseCommand implements ICommand {
 
 	private List<String> validate(Course course) {
 		List<String> errors = new ArrayList<>();
-		if (topicService.findTopicById(course.getTopicId()) == null) {
-			errors.add(localization.getResourcesParam("error.topicnotfound"));
+		try {
+			if (topicService.findTopicById(course.getTopicId()) == null) {
+				errors.add(localization.getResourcesParam("error.topicnotfound"));
+			}
+		} catch (SQLException e) {
+			log.error("Finding topic error", e);
+			errors.add(localization.getResourcesParam("dberror.findtopic"));
 		}
 		User user = null;
 		try {

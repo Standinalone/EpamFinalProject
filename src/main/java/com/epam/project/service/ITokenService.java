@@ -1,5 +1,7 @@
 package com.epam.project.service;
 
+import java.sql.SQLException;
+
 import com.epam.project.entity.VerificationToken;
 
 /**
@@ -21,6 +23,7 @@ public interface ITokenService {
 	 * 
 	 * @param token token string
 	 * @return VerificationToken if it was found or null otherwise
+	 * @throws SQLException 
 	 */
-	VerificationToken findTokenByToken(String token);
+	VerificationToken findTokenByToken(String token) throws SQLException;
 }

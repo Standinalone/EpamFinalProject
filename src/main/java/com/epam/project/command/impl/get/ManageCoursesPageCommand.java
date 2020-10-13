@@ -110,9 +110,14 @@ public class ManageCoursesPageCommand implements ICommand {
 			request.setAttribute("error", localization.getResourcesParam("dberror.findusers"));
 			return Constants.PAGE__ERROR;
 		}
-		List<Topic> topics = topicService.findAllTopics();
+		try {
+			request.setAttribute("topics", topicService.findAllTopics());
+		} catch (SQLException e) {
+			log.error("Finding topics error", e);
+			request.setAttribute("error", localization.getResourcesParam("dberror.findtopics"));
+			return Constants.PAGE__ERROR;
+		}
 		request.setAttribute("lecturers", lecturers);
-		request.setAttribute("topics", topics);
 		request.setAttribute("statuses", CourseStatusEnum.values());
 		request.setAttribute("page", page);
 

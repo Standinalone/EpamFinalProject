@@ -1,7 +1,6 @@
 package com.epam.project.service.impl;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 import org.slf4j.Logger;
@@ -43,26 +42,27 @@ public class MySqlTopicService implements ITopicService{
 	}
 	
 	@Override
-	public Topic findTopicById(int topicId) {
+	public Topic findTopicById(int topicId) throws SQLException {
 		try {
-			daoFactory.open();
+			daoFactory.beginTransation();
 			return topicDao.findById(topicId);
 		} catch (SQLException e) {
 			log.error("Getting topic error", e);
-			return null;
+			daoFactory.rollback();
+			throw new SQLException();
 		} finally {
-			daoFactory.close();
+			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public List<Topic> findAllTopics() {
+	public List<Topic> findAllTopics() throws SQLException {
 		try {
 			daoFactory.open();
 			return topicDao.findAll();
 		} catch (SQLException e) {
 			log.error("Getting topics error", e);
-			return new ArrayList<>();
+			throw new SQLException();
 		} finally {
 			daoFactory.close();
 		}

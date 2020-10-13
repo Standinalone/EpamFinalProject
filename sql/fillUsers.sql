@@ -14,8 +14,8 @@ INSERT INTO `Roles` (`id`, `name`) VALUES(3, "LECTURER");
 
 INSERT INTO `Users` VALUES(1, false, 2, "admin",  md5("admin"), "Admin", "Adminov", "Adminovich", "admin@gmail.com", true);
 INSERT INTO `Users` VALUES(2, false, 3, "lecturer",  md5("lecturer"), "Lecturer", "Lecturerov", "Lecturerovich", "lecturer@gmail.com", true);
-INSERT INTO `Users` VALUES(3, false, 3, "user",  md5("user"), "User", "Userov", "Userovich", "user@gmail.com", true);
-INSERT INTO `Users` VALUES(4, true, 3, "blocked_user",  md5("blocked_user"), "BlockedUser", "BlockedUserov", "BlockedUserovich", "blockeduser@gmail.com", true);
+INSERT INTO `Users` VALUES(3, false, 1, "user",  md5("user"), "User", "Userov", "Userovich", "user@gmail.com", true);
+INSERT INTO `Users` VALUES(4, true, 1, "blocked_user",  md5("blocked_user"), "BlockedUser", "BlockedUserov", "BlockedUserovich", "blockeduser@gmail.com", true);
 
 INSERT INTO `Topics` VALUES (1, "Programming");
 INSERT INTO `Topics` VALUES (2, "Computer Science");
@@ -43,6 +43,5 @@ INSERT INTO `Courses_has_Users` VALUES (5, 1, 0, false);
 INSERT INTO `Courses_has_Users` VALUES (6, 1, 0, false);
 INSERT INTO `Courses_has_Users` VALUES (7, 1, 0, false);
 
-INSERT INTO `Users` VALUES(15, false, 3, "john", "john", "BlockedUser", "BlockedUserov", "BlockedUserovich", "standinalone96@gmail.com", false);
-INSERT INTO `Tokens` VALUES (1, 15,  "fcc6678c-2a0b-49b8-a28d-e74f7cc256a7", "2020.10.01");
+#INSERT INTO `Tokens` VALUES (1, 15,  "fcc6678c-2a0b-49b8-a28d-e74f7cc256a7", "2020.10.01");
 

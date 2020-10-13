@@ -69,15 +69,23 @@ public abstract class DaoFactory {
 
 	/**
 	 * @return pooled connection
-	 * @throws SQLException
 	 */
-	public abstract Connection getConnection() throws SQLException;
+	public abstract Connection getConnection();
 
 	/**
 	 * Closes the connection
 	 */
+//	public static void close(Connection connection){
+//		if (connection != null) {
+//			try {
+//				connection.daoFactory.close();
+//			} catch (SQLException e) {
+//				log.error("Error closing connection");
+//				e.printStackTrace();
+//			}
+//		}
+//	}
 	public abstract void close();
-
 	/**
 	 * Opens a new connection
 	 * @throws SQLException 

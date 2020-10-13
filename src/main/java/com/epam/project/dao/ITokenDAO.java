@@ -22,7 +22,7 @@ public interface ITokenDAO {
 	 * Finds a token by token string
 	 * 
 	 * @param token token string
-	 * @return VerificationToken object
+	 * @return VerificationToken object or null if it wasn't found
 	 * @throws SQLException
 	 */
 	VerificationToken findByToken(String token) throws SQLException;

@@ -1,5 +1,6 @@
 package com.epam.project.service;
 
+import java.sql.SQLException;
 import java.util.List;
 
 import com.epam.project.entity.Topic;
@@ -15,13 +16,15 @@ public interface ITopicService {
 	 * 
 	 * @param topicId Topic id
 	 * @return Topic object if it was found or null otherwise
+	 * @throws SQLException 
 	 */
-	Topic findTopicById(int topicId);
+	Topic findTopicById(int topicId) throws SQLException;
 
 	/**
 	 * Finds all topics
 	 * 
-	 * @return list of topics or an empty list if exception occurred
+	 * @return list of topics
+	 * @throws SQLException 
 	 */
-	List<Topic> findAllTopics();
+	List<Topic> findAllTopics() throws SQLException;
 }

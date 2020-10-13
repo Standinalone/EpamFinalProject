@@ -56,7 +56,14 @@ public class RegistrationConfirmCommand implements ICommand {
 			return Constants.PAGE__ERROR;
 		}
 		
-		VerificationToken verificationToken = tokenService.findTokenByToken(token);
+		VerificationToken verificationToken;
+		try {
+			verificationToken = tokenService.findTokenByToken(token);
+		} catch (SQLException e) {
+			log.error("Finding tokens error", e);
+			request.setAttribute("error", localization.getResourcesParam("dberror.findtokens"));
+			return Constants.PAGE__ERROR;
+		}
 		if (verificationToken == null) {
 			request.getSession().setAttribute("error", localization.getResourcesParam("register.badtoken"));
 			return Constants.PAGE__ERROR;

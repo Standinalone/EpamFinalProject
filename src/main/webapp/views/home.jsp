@@ -16,7 +16,7 @@ table th {
 }
 </style>
 <%-- <script src="${pageContext.servletContext.contextPath}/home.js"></script> --%>
-<script src="${pageContext.servletContext.contextPath}/js/home.js"></script>
+<script src="${ context }/js/home.js"></script>
 <!-- Body -->
 
 

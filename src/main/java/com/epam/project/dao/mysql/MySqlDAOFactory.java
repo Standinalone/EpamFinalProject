@@ -66,7 +66,7 @@ public final class MySqlDAOFactory extends DaoFactory {
 		return instance;
 	}
 
-	public Connection getConnection() throws SQLException {
+	public Connection getConnection() {
 		return connection;
 	}
 

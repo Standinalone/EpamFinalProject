@@ -14,7 +14,7 @@ public interface ITopicDAO {
 	 * Finds token by id
 	 * 
 	 * @param id Topic id
-	 * @return Topic object
+	 * @return Topic object or null if it wasn't found
 	 * @throws SQLException
 	 */
 	Topic findById(int id) throws SQLException;
@@ -22,7 +22,7 @@ public interface ITopicDAO {
 	/**
 	 * Finds all tokens
 	 * 
-	 * @return list of tokens
+	 * @return list of tokens or an empty list if nothing was found
 	 * @throws SQLException
 	 */
 	List<Topic> findAll() throws SQLException;

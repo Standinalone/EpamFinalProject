@@ -365,7 +365,7 @@ public abstract class GenericDAO<T> {
 	 * 
 	 * @param connection Connection object
 	 * @param sql        SQL string
-	 * @return list of <T> entries obtained by executing an SQL query
+	 * @return list of <T> entries obtained by executing an SQL query or an empty list of nothing as found
 	 * @throws SQLException
 	 */
 	protected List<T> findAll(Connection connection, String sql) throws SQLException {
