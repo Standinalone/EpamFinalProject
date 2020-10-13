@@ -72,13 +72,20 @@
 2. Установить Tomcat 9.0
 3. Настроить соединение к базе данных (*/EpamFinalProject/src/main/webapp/META-INF/context.xml*)
 4. Настроить провайдера SMTP (*/EpamFinalProject/src/main/resources/app.properties*)
+5. Создать базу данных "epam" используя MYSQL server
+6. Запустить последовательно sql скрипты
+
+
+  - /EpamFinalProject/sql/createTables.sql
+  - /EpamFinalProject/sql/fillUsers.sql
+
 
 А также при необходимости:
 
-5. Изменить настройки проекта (*/EpamFinalProject/src/main/java/com/epam/project/constants/Constants.java*)
-6. Изменить настройки логгирования (*/EpamFinalProject/src/main/resources/log4j.properties*)
+7. Изменить настройки проекта (*/EpamFinalProject/src/main/java/com/epam/project/constants/Constants.java*)
+8. Изменить настройки логгирования (*/EpamFinalProject/src/main/resources/log4j.properties*)
 
-*После запуска перейти по адресу http://localhost:8080/EpamFinalProject/controller?command=HOME_PAGE
+*После запуска перейти по адресу http://localhost:8080/EpamFinalProject/controller?command=HOME_PAGE*
 
 ### Todos
 
