@@ -2,7 +2,7 @@
 
 *Основные технологии: Tomcat 9.0, MYSQL, JSTL*
 
-##Требования к проекту
+## Требования к проекту
 
 1. На основі сутностей предметної області створити класи, які їм відповідають.  
 2. Класи і методи повинні мати назви, що відображають їх функціональність, і повинні бути  рознесені по пакетам.  
@@ -78,6 +78,7 @@
 5. Изменить настройки проекта (*/EpamFinalProject/src/main/java/com/epam/project/constants/Constants.java*)
 6. Изменить настройки логгирования (*/EpamFinalProject/src/main/resources/log4j.properties*)
 
+*После запуска перейти по адресу http://localhost:8080/EpamFinalProject/controller?command=HOME_PAGE
 
 ### Todos
 
