@@ -213,9 +213,15 @@ public class MySqlCourseService implements ICourseService {
 	@Override
 	public List<CourseDto> findAllCoursesDtoWithParametersFromTo(int limit, int offset, String conditions,
 			String orderBy) {
+		return findAllCoursesDtoWithParametersFromTo(limit, offset, conditions, orderBy, 0);
+	}
+	
+	@Override
+	public List<CourseDto> findAllCoursesDtoWithParametersFromTo(int limit, int offset, String conditions,
+			String orderBy, int userId) {
 		try {
 			daoFactory.open();
-			return courseDtoDao.findAllFromToWithParameters(limit, offset, conditions, orderBy);
+			return courseDtoDao.findAllFromToWithParameters(limit, offset, conditions, orderBy, userId);
 		} catch (SQLException e) {
 			log.error("Getting courses error", e.getMessage());
 			return null;
@@ -288,6 +294,8 @@ public class MySqlCourseService implements ICourseService {
 			daoFactory.close();
 		}
 	}
+	
+
 
 	@Override
 	public List<CourseProfilePageDto> findAllCoursesProfilePageFromTo(int limit, int offset, User user,
@@ -302,5 +310,7 @@ public class MySqlCourseService implements ICourseService {
 			daoFactory.close();
 		}
 	}
+
+
 
 }

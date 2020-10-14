@@ -16,6 +16,19 @@ public class CourseDto implements Serializable {
 	private String topic;
 	private int students;
 	private long duration;
+	
+	/**
+	 * Fields for determining whether a user is in course
+	 */
+	private boolean inCourse;
+
+	public boolean isInCourse() {
+		return inCourse;
+	}
+
+	public void setInCourse(boolean inCourse) {
+		this.inCourse = inCourse;
+	}
 
 	public Course getCourse() {
 		return course;

@@ -124,9 +124,9 @@ public class HomePageCommand implements ICommand {
 
 		String conditions = QueryFactory.formExtraConditionQuery(map);
 		String orderBy = QueryFactory.formOrderByQuery(COLUMN_NAMES, request);
-		
+		User user = (User) request.getSession().getAttribute("user");
 		Page<CourseDto> page = new Page<>(request,
-				(limit, offset) -> courseService.findAllCoursesDtoWithParametersFromTo(limit, offset, conditions, orderBy),
+				(limit, offset) -> courseService.findAllCoursesDtoWithParametersFromTo(limit, offset, conditions, orderBy, user == null ? 0 : user.getId()),
 				() -> courseService.getCoursesWithParametersCount(conditions));
 
 

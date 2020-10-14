@@ -122,8 +122,8 @@ CREATE TABLE IF NOT EXISTS `epam`.`Tokens` (
   CONSTRAINT `fk_Tokens_users1`
     FOREIGN KEY (`user_id`)
     REFERENCES `epam`.`users` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 -- -----------------------------------------------------

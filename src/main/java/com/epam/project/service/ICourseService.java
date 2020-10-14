@@ -152,6 +152,21 @@ public interface ICourseService {
 	 *                   lecturer_id = 2 AND topic_id = 1`
 	 * @param orderBy    extra order by query string e.g. `ORDER BY lecturer_id
 	 *                   DESC`
+	 * @param userId     User id used when setting the `inCourse` boolean field
+	 * @return list of all found courses in a range or null if exception occurred
+	 */
+	List<CourseDto> findAllCoursesDtoWithParametersFromTo(int limit, int offset, String conditions, String orderBy,
+			int userId);
+
+	/**
+	 * Finds all courses in a range with additional condition parameters
+	 * 
+	 * @param limit      LIMIT parameter or how many records to retrieve
+	 * @param offset     OFFSET parameter or from what record to retrieve
+	 * @param conditions condition parameters (extra query string) e.g. `WHERE
+	 *                   lecturer_id = 2 AND topic_id = 1`
+	 * @param orderBy    extra order by query string e.g. `ORDER BY lecturer_id
+	 *                   DESC`
 	 * @return list of all found courses in a range or null if exception occurred
 	 */
 	List<CourseDto> findAllCoursesDtoWithParametersFromTo(int limit, int offset, String conditions, String orderBy);

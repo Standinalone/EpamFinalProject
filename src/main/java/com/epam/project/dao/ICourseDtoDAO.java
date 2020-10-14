@@ -59,6 +59,6 @@ public interface ICourseDtoDAO {
 	 */
 	List<CourseDto> findByLecturerIdFromTo(int lecturerId, int limit, int offset) throws SQLException;
 
-	List<CourseDto> findAllFromToWithParameters(int limit, int offset, String conditions, String orderBy)
+	List<CourseDto> findAllFromToWithParameters(int limit, int offset, String conditions, String orderBy, int userId)
 			throws SQLException;
 }

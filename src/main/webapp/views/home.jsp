@@ -96,16 +96,20 @@ table th {
 							</tr>
 							<c:forEach items="${ requestScope.page.list }" var="course"
 								varStatus="loop">
-								<tr>
+								<tr
+									<c:if test="${ course.inCourse == true }">class="table-success"</c:if>
+								>
 									<td><c:out value = "${ requestScope.startIndex + loop.index}" /></td>
 									<c:if test="${ not empty user }">
 										<td>
-											<div class="form-check">
-												<input name="courses"
-													class="form-check-input position-static" type="checkbox"
-													id="blankCheckbox${ loop.index }"
-													value="${ course.course.id }">
-											</div>
+											<c:if test = "${ course.inCourse == false }">
+												<div class="form-check">
+													<input name="courses"
+														class="form-check-input position-static" type="checkbox"
+														id="blankCheckbox${ loop.index }"
+														value="${ course.course.id }">
+												</div>
+											</c:if>
 										</td>
 									</c:if>
 									<td><c:out value = "${ course.students }" /></td>
