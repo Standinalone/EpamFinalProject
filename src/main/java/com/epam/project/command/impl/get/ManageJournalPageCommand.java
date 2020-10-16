@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
+import com.epam.project.exceptions.DBException;
 
 /**
  * ICommand implementation for getting a page to manage a journal
@@ -13,7 +14,7 @@ import com.epam.project.constants.Constants;
 public class ManageJournalPageCommand implements ICommand {
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
 		return Constants.PAGE__MANAGE_JOURNAL;
 	}
 

@@ -1,6 +1,5 @@
 package com.epam.project.command.impl.get;
 
-import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -13,9 +12,8 @@ import com.epam.project.constants.Constants;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dto.CourseDto;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
-import com.epam.project.i18n.Localization;
-import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.ServiceFactory;
 import com.epam.project.util.Page;
@@ -41,18 +39,11 @@ public class MyCoursesPageCommand implements ICommand {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
 		final User user = (User) request.getSession().getAttribute("user");
-		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		Page<CourseDto> page = new Page<>(request,
 				(limit, offset) -> courseService.findAllCoursesDtoByLecturerIdFromTo(user.getId(), limit, offset),
 				() -> courseService.getCoursesWithLecturerCount(user.getId()));
-
-		if (page.getList() == null) {
-			log.error("Page cannot be formed");
-			request.setAttribute("error", localization.getResourcesParam("error.badid"));
-			return Constants.PAGE__ERROR;
-		}
 
 		request.setAttribute("page", page);
 		return Constants.PAGE__MY_COURSES;

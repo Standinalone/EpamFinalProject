@@ -1,7 +1,5 @@
 package com.epam.project.command.impl.post;
 
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -12,9 +10,8 @@ import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
-import com.epam.project.i18n.Localization;
-import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 
@@ -38,15 +35,11 @@ public class JoinCoursesCommand implements ICommand {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
 		User user = (User) request.getSession().getAttribute("user");
 		String[] checkedIds = request.getParameterValues("courses");
-		if (!userService.enrollToCourse(checkedIds, user.getId())) {
-			log.error("Enrolling error");
-			request.getSession().setAttribute("error", localization.getResourcesParam("dberror.enrolling"));
-			return Constants.COMMAND__ERROR;
-		}
+		userService.enrollToCourse(checkedIds, user.getId());
+
 		log.info("User {} was enrolled to courses", user.getLogin());
 		return Constants.COMMAND__HOME;
 	}

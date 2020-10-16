@@ -10,6 +10,7 @@ import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
@@ -34,7 +35,7 @@ public class ChangeUsersStatusCommand implements ICommand {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
 		String page = request.getParameter("page");
 		String[] checkedIds = request.getParameterValues("users");
 		String action = request.getParameter("submit");

@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.BiFunction;
-import java.util.function.IntSupplier;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -17,6 +15,9 @@ import org.junit.Before;
 import org.junit.Test;
 
 import com.epam.project.entity.Course;
+import com.epam.project.exceptions.DBException;
+import com.epam.project.util.IGetCountSupplier;
+import com.epam.project.util.IGetListFunction;
 import com.epam.project.util.Page;
 import com.epam.project.util.QueryFactory;
 
@@ -32,12 +33,12 @@ public class UtilTest {
 	}
 
 	@Mock
-	BiFunction<Integer, Integer, List<Course>> getList;
+	IGetListFunction<Integer, Integer, List<Course>> getList;
 	@Mock
-	IntSupplier getCount;
+	IGetCountSupplier getCount;
 
 	@Test
-	public void getCoursesPage() {
+	public void getCoursesPage() throws DBException {
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(getList.apply(anyInt(), anyInt())).thenReturn(new ArrayList<>());
 		when(getCount.getAsInt()).thenReturn(3);
@@ -46,7 +47,7 @@ public class UtilTest {
 	}
 
 	@Test
-	public void getCoursesPageWithParameters() {
+	public void getCoursesPageWithParameters() throws DBException {
 		Page<Course> page;
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(getList.apply(anyInt(), anyInt())).thenReturn(new ArrayList<>());
@@ -57,7 +58,7 @@ public class UtilTest {
 	}
 
 	@Test
-	public void getCoursesPageWithBadIndex() {
+	public void getCoursesPageWithBadIndex() throws DBException {
 		Page<Course> page;
 		HttpServletRequest request = mock(HttpServletRequest.class);
 		when(getList.apply(anyInt(), anyInt())).thenReturn(new ArrayList<>());

@@ -1,6 +1,5 @@
 package com.epam.project.command.impl.post;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +19,9 @@ import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.Course;
 import com.epam.project.entity.CourseStatusEnum;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
+import com.epam.project.exceptions.ValidatingRequestException;
 import com.epam.project.i18n.Localization;
 import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ICourseService;
@@ -53,9 +54,6 @@ public class LecturerPanelCommand implements ICommand {
 
 	public List<String> validate(Course course) {
 		List<String> errors = new ArrayList<>();
-		if (course == null) {
-			errors.add(localization.getResourcesParam("error.cannotfind"));
-		}
 		if (course.getLecturerId() != user.getId()) {
 			errors.add(localization.getResourcesParam("error.notyourcourse"));
 		}
@@ -63,7 +61,7 @@ public class LecturerPanelCommand implements ICommand {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException, ValidatingRequestException {
 		localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		user = (User) request.getSession().getAttribute("user");
 		String page = request.getParameter("page");
@@ -71,18 +69,9 @@ public class LecturerPanelCommand implements ICommand {
 		try {
 			courseId = Integer.parseInt(request.getParameter("id"));
 		} catch (NumberFormatException e) {
-			log.error("Cannot parse id");
-			request.getSession().setAttribute("error", localization.getResourcesParam("error.badid"));
-			return Constants.COMMAND__ERROR;
+			throw new ValidatingRequestException("error.badid", e);
 		}
-		Course course = null;
-		try {
-			course = courseService.findCourseById(courseId);
-		} catch (SQLException e) {
-			log.error("Finding course error", e);
-			request.getSession().setAttribute("error", localization.getResourcesParam("dberror.getcourse"));
-			return Constants.COMMAND__ERROR;
-		}
+		Course course = courseService.findCourseById(courseId);
 
 		List<String> validateErrors = validate(course);
 		if (!validateErrors.isEmpty()) {
@@ -114,14 +103,10 @@ public class LecturerPanelCommand implements ICommand {
 			try {
 				course.setStatus(CourseStatusEnum.valueOf(request.getParameter("status")));
 			} catch (IllegalArgumentException e) {
-				log.error("Cannot parse status");
-				request.getSession().setAttribute("error", localization.getResourcesParam("success.badStatus"));
-				return Constants.PAGE__ERROR;
+				throw new ValidatingRequestException("success.badStatus", e);
 			}
-			if (!courseService.updateCourse(course)) {
-				log.error("Error updating course");
-				request.getSession().setAttribute("error", localization.getResourcesParam("dberror.updatecourse"));
-			}
+			courseService.updateCourse(course);
+
 			request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.updated"));
 			log.info("Status of course {} updated by {}", course.getName(), user.getLogin());
 
@@ -134,8 +119,7 @@ public class LecturerPanelCommand implements ICommand {
 					int userId = Integer.parseInt(entry.getKey().split("-")[1]);
 					int grade = Integer.parseInt(entry.getValue()[0]);
 					if (grade < 0 || grade > 100) {
-						request.getSession().setAttribute("error", localization.getResourcesParam("error.badGrade"));
-						return Constants.COMMAND__ERROR;
+						throw new ValidatingRequestException("error.badGrade");
 					}
 					userGrade.put(userId, grade);
 				}
@@ -148,20 +132,14 @@ public class LecturerPanelCommand implements ICommand {
 			String notify = request.getParameter("sendmail");
 			if (notify != null && "on".equals(notify)) {
 				for (Map.Entry<Integer, Integer> entry : userGrade.entrySet()) {
-					try {
-						user = userService.findUserById(entry.getKey());
-					} catch (SQLException e) {
-						log.error("Finding user error", e);
-						request.getSession().setAttribute("error", localization.getResourcesParam("dberror.finduser"));
-						return Constants.COMMAND__ERROR;
-					}
+					user = userService.findUserById(entry.getKey());
+
 					if (user != null) {
 						try {
 							Mailer.sendMail(new String[] { user.getEmail() },
 									"Your grade was updated - " + entry.getValue(), "Grade info");
 						} catch (MessagingException e) {
 							log.error("Error sending message to {}", user.getLogin());
-							e.printStackTrace();
 						}
 					}
 				}

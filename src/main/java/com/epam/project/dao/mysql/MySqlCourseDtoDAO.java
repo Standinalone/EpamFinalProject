@@ -34,7 +34,8 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 	private static final String FIELD_DURATION = "duration";
 	private static final String FIELD_IN_COURSE = "in_course";
 
-	private static final String SQL_FIND_COURSES_FROM_TO = "SELECT *, IF(? in (SELECT user_id FROM Courses_has_users WHERE course_id = Courses.id), true, false) AS in_course, datediff(end_date, start_date) as duration FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students'  FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id";
+	private static final String SQL_FIND_COURSES_FROM_TO = "SELECT *, datediff(end_date, start_date) as duration FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students'  FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id";
+	private static final String SQL_FIND_COURSES_WITH_INCOURSE_COLUMN_FROM_TO = "SELECT *, IF(? in (SELECT user_id FROM Courses_has_users WHERE course_id = Courses.id), true, false) AS in_course, datediff(end_date, start_date) as duration FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students'  FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id";
 	private static final String SQL_FIND_COURSE_BY_ID = "SELECT *, datediff(end_date, start_date) as duration  FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id AND Courses.id = ?";
 	private static final String SQL_FIND_COURSES_BY_LECTURER_ID = "SELECT *, datediff(end_date, start_date) as duration  FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id AND Courses.lecturer_id = ?";
 	private static final String SQL_FIND_ALL = "SELECT *, datediff(end_date, start_date) as duration  FROM Courses, (SELECT Courses.id, COALESCE(students, 0) AS `students` FROM Courses LEFT JOIN (SELECT course_id, COUNT(*) AS 'students' FROM Courses_has_users GROUP BY course_id) AS t1 ON Courses.id = t1.course_id) AS t, Statuses, Users, Topics WHERE Courses.id = t.id AND Courses.lecturer_id = Users.id AND Courses.topic_id = Topics.id AND Courses.status_id = Statuses.id";
@@ -83,9 +84,9 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 	@Override
 	public CourseDto findById(int id) throws SQLException {
 		List<CourseDto> list = findByField(daoFactory.getConnection(), SQL_FIND_COURSE_BY_ID, 1, id);
-		if (!list.isEmpty())
-			return list.get(0);
-		return null;
+		if (list.isEmpty())
+			throw new SQLException();
+		return list.get(0);
 	}
 
 	@Override
@@ -108,7 +109,7 @@ public class MySqlCourseDtoDAO extends GenericDAO<CourseDto> implements ICourseD
 	public List<CourseDto> findAllFromToWithParameters(int limit, int offset, String conditions, String orderBy, int userId)
 			throws SQLException {
 		String appendix = (conditions.length() == 0 ? "" : " AND " + conditions);
-		return findByFieldFromTo(daoFactory.getConnection(), SQL_FIND_COURSES_FROM_TO + appendix + " " + orderBy, limit, offset, 1, userId);
+		return findByFieldFromTo(daoFactory.getConnection(), SQL_FIND_COURSES_WITH_INCOURSE_COLUMN_FROM_TO + appendix + " " + orderBy, limit, offset, 1, userId);
 //		return findFromTo(daoFactory.getConnection(), SQL_FIND_COURSES_FROM_TO + appendix + " " + orderBy, limit,
 //				offset);
 	}

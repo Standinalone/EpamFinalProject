@@ -1,9 +1,9 @@
 package com.epam.project.service;
 
-import java.sql.SQLException;
 import java.util.List;
 
 import com.epam.project.entity.Topic;
+import com.epam.project.exceptions.DBTopicException;
 
 /**
  * Interface for Topic service
@@ -15,16 +15,16 @@ public interface ITopicService {
 	 * Finds a topic by id
 	 * 
 	 * @param topicId Topic id
-	 * @return Topic object if it was found or null otherwise
-	 * @throws SQLException 
+	 * @return Topic object if it was found
+	 * @throws DBTopicException if SQLException occurred or nothing found
 	 */
-	Topic findTopicById(int topicId) throws SQLException;
+	Topic findTopicById(int topicId) throws DBTopicException;
 
 	/**
 	 * Finds all topics
 	 * 
 	 * @return list of topics
-	 * @throws SQLException 
+	 * @throws DBTopicException if SQLException occurred
 	 */
-	List<Topic> findAllTopics() throws SQLException;
+	List<Topic> findAllTopics() throws DBTopicException;
 }

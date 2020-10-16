@@ -45,10 +45,9 @@ public class MySqlTopicDAO extends GenericDAO<Topic> implements ITopicDAO {
 	@Override
 	public Topic findById(int id) throws SQLException {
 		List<Topic> list = findByField(daoFactory.getConnection(), SQL_FIND_TOPIC_BY_ID, 1, id);
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-		return null;
+		if (list.isEmpty())
+			throw new SQLException();
+		return list.get(0);
 	}
 
 	@Override

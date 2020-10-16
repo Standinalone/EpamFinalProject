@@ -1,7 +1,5 @@
 package com.epam.project.command.impl.get;
 
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,9 +11,8 @@ import com.epam.project.constants.Constants;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dto.CourseProfilePageDto;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
-import com.epam.project.i18n.Localization;
-import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
@@ -45,9 +42,8 @@ public class ProfilePageCommand implements ICommand {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
 		final User user = (User) request.getSession().getAttribute("user");
-		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		Page<CourseProfilePageDto> page1 = new Page<>("pagenumenrolled", "startIndexEnrolled", "totalPagesEnrolled",
 				request, (limit, offset) -> courseService.findAllCoursesProfilePageFromTo(limit, offset, user, true),
 				() -> userService.getCoursesCountForUser(user.getId(), true));
@@ -56,12 +52,6 @@ public class ProfilePageCommand implements ICommand {
 				"totalPagesNotEnrolled", request,
 				(limit, offset) -> courseService.findAllCoursesProfilePageFromTo(limit, offset, user, false),
 				() -> userService.getCoursesCountForUser(user.getId(), false));
-
-		if (page1.getList() == null || page2.getList() == null) {
-			log.error("Page cannot be formed");
-			request.setAttribute("error", localization.getResourcesParam("error.badid"));
-			return Constants.PAGE__ERROR;
-		}
 
 		request.setAttribute("page1", page1);
 		request.setAttribute("page2", page2);

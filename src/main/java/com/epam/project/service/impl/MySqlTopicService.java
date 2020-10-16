@@ -10,6 +10,7 @@ import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dao.ITopicDAO;
 import com.epam.project.entity.Topic;
+import com.epam.project.exceptions.DBTopicException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.service.ITopicService;
 
@@ -42,27 +43,26 @@ public class MySqlTopicService implements ITopicService{
 	}
 	
 	@Override
-	public Topic findTopicById(int topicId) throws SQLException {
+	public Topic findTopicById(int topicId) throws DBTopicException {
 		try {
 			daoFactory.beginTransation();
 			return topicDao.findById(topicId);
 		} catch (SQLException e) {
-			log.error("Getting topic error", e);
 			daoFactory.rollback();
-			throw new SQLException();
+			throw new DBTopicException("dberror.topic.get", e);
 		} finally {
 			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public List<Topic> findAllTopics() throws SQLException {
+	public List<Topic> findAllTopics() throws DBTopicException {
 		try {
 			daoFactory.open();
 			return topicDao.findAll();
 		} catch (SQLException e) {
 			log.error("Getting topics error", e);
-			throw new SQLException();
+			throw new DBTopicException("dberror.topic.findAll", e);
 		} finally {
 			daoFactory.close();
 		}

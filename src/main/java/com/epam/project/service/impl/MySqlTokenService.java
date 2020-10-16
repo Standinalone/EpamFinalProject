@@ -9,6 +9,7 @@ import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dao.ITokenDAO;
 import com.epam.project.entity.VerificationToken;
+import com.epam.project.exceptions.DBTokenException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.service.ITokenService;
 
@@ -40,27 +41,25 @@ public class MySqlTokenService implements ITokenService {
 	}
 
 	@Override
-	public boolean addToken(VerificationToken token) {
+	public void addToken(VerificationToken token) throws DBTokenException{
 		try {
 			daoFactory.beginTransation();
-			return tokenDao.add(token);
+			tokenDao.add(token);
 		} catch (SQLException e) {
-			log.error("Adding token error", e);
 			daoFactory.rollback();
-			return false;
+			throw new DBTokenException("dberror.token.add", e);
 		} finally {
 			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public VerificationToken findTokenByToken(String token) throws SQLException {
+	public VerificationToken findTokenByToken(String token) throws DBTokenException{
 		try {
 			daoFactory.open();
 			return tokenDao.findByToken(token);
 		} catch (SQLException e) {
-			log.error("Getting token error", e);
-			throw new SQLException();
+			throw new DBTokenException("dberror.token.get", e);
 		} finally {
 			daoFactory.close();
 		}

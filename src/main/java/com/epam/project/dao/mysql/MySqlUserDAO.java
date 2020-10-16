@@ -89,9 +89,9 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	@Override
 	public User findByLogin(String login) throws SQLException {
 		List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_LOGIN, 1, login);
-		if (!list.isEmpty())
-			return list.get(0);
-		return null;
+		if (list.isEmpty())
+			throw new SQLException();
+		return list.get(0);
 	}
 
 	@Override
@@ -107,10 +107,9 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	@Override
 	public User findById(int id) throws SQLException {
 		List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_ID, 1, id);
-		if (!list.isEmpty()) {
-			return list.get(0);
-		}
-		return null;
+		if (list.isEmpty())
+			throw new SQLException();
+		return list.get(0);
 	}
 
 	@Override
@@ -126,9 +125,9 @@ public final class MySqlUserDAO extends GenericDAO<User> implements IUserDAO {
 	@Override
 	public User findByEmail(String email) throws SQLException {
 		List<User> list = findByField(daoFactory.getConnection(), SQL_FIND_USER_BY_EMAIL, 1, email);
-		if (!list.isEmpty())
-			return list.get(0);
-		return null;
+		if (list.isEmpty())
+			throw new SQLException();
+		return list.get(0);
 	}
 
 	@Override

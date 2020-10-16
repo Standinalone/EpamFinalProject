@@ -58,12 +58,10 @@ public class MySqlTokenDAO extends GenericDAO<VerificationToken> implements ITok
 
 	@Override
 	public VerificationToken findByToken(String token) throws SQLException {
-		VerificationToken verificationToken = null;
 		List<VerificationToken> list = findByField(daoFactory.getConnection(), SQL_FIND_TOKEN_BY_TOKEN, 1, token);
-		if (!list.isEmpty()) {
-			verificationToken = list.get(0);
-		}
-		return verificationToken;
+		if (list.isEmpty())
+			throw new SQLException();
+		return list.get(0);
 	}
 
 	@Override

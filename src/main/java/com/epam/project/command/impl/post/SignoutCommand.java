@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
 
 /**
  * ICommand implementation for a `signout` command
@@ -18,7 +19,7 @@ public class SignoutCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(SignoutCommand.class);
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
 		if (request.getSession() != null) {
 			log.info("User {} was signed out", ((User) request.getSession().getAttribute("user")).getLogin());
 			request.getSession().invalidate();

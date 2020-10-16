@@ -1,6 +1,5 @@
 package com.epam.project.command.impl.get;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Locale;
 
@@ -15,7 +14,9 @@ import com.epam.project.constants.Constants;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.User;
 import com.epam.project.entity.VerificationToken;
+import com.epam.project.exceptions.DBException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
+import com.epam.project.exceptions.ValidatingRequestException;
 import com.epam.project.i18n.Localization;
 import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ITokenService;
@@ -46,48 +47,25 @@ public class RegistrationConfirmCommand implements ICommand {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response)
+			throws DBException, ValidatingRequestException {
 		String token = request.getParameter("token");
-		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
-		
-		if (token == null) {
-			log.error("Token wasn't provided");
-			request.getSession().setAttribute("error", localization.getResourcesParam("register.token"));
-			return Constants.PAGE__ERROR;
-		}
-		
-		VerificationToken verificationToken;
-		try {
-			verificationToken = tokenService.findTokenByToken(token);
-		} catch (SQLException e) {
-			log.error("Finding tokens error", e);
-			request.setAttribute("error", localization.getResourcesParam("dberror.findtokens"));
-			return Constants.PAGE__ERROR;
-		}
-		if (verificationToken == null) {
-			request.getSession().setAttribute("error", localization.getResourcesParam("register.badtoken"));
-			return Constants.PAGE__ERROR;
-		}
-		
-		User user;
-		try {
-			user = userService.findUserById(verificationToken.getUserId());
-		} catch (SQLException e) {
-			log.error("Finding user error", e);
-			request.setAttribute("error", localization.getResourcesParam("dberror.finduser"));
-			return Constants.PAGE__ERROR;
-		}
-		if (verificationToken.getExpiryDate().isBefore(LocalDate.now())) {
-			request.getSession().setAttribute("error", localization.getResourcesParam("register.tokenexpired"));
-			return Constants.PAGE__ERROR;
-		} 
-		
+		Localization localization = LocalizationFactory
+				.getLocalization((Locale) request.getSession().getAttribute("locale"));
+
+		if (token == null)
+			throw new ValidatingRequestException("register.token");
+
+		VerificationToken verificationToken = tokenService.findTokenByToken(token);
+
+		User user = userService.findUserById(verificationToken.getUserId());
+
+		if (verificationToken.getExpiryDate().isBefore(LocalDate.now()))
+			throw new ValidatingRequestException("register.tokenexpired");
+
 		user.setEnabled(true);
-		if (!userService.updateUser(user)) {
-			request.getSession().setAttribute("error", localization.getResourcesParam("error.updating"));
-			return Constants.PAGE__ERROR;
-		}
-		
+		userService.updateUser(user);
+
 		request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.registration"));
 		return Constants.PAGE__SUCCESS;
 	}

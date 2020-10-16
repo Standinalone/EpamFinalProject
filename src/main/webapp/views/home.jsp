@@ -8,6 +8,8 @@
 <c:set value="${pageContext.request.locale.language}" var="language"
 	scope="page" />
 <c:set value="${ pageContext.request.queryString }" var="queryString" />
+
+
 <!-- Header -->
 <%@include file='/WEB-INF/jspf/header.jspf'%>
 <style>
@@ -24,6 +26,8 @@ table th {
 
 
 <fmt:bundle basename="tables">
+	<fmt:parseNumber var = "lecturerId" type = "number" value = "${lecturer}" />
+	<fmt:parseNumber var = "topicId" type = "number" value = "${topic}" />
 	<div class="container-fluid">
 		<div class="panel panel-default">
 			<div class="panel-body">
@@ -41,7 +45,7 @@ table th {
 								<c:forEach items="${  requestScope.get(\"lecturers\")  }"
 									var="lecturer">
 <%-- 									<option <c:if test = "${ lecturer.id == param.lecturer }">selected</c:if> value="${ pageContext.request.contextPath }/controller?command=HOME_PAGE&lecturer=${ lecturer.id }&topic=${ param.topic }&status=${ param.status }&sort=${ param.sort }&order=${ param.order }">${ lecturer.name }</option> --%>
-									<option <c:if test = "${ lecturer.id == param.lecturer }">selected</c:if> value="${ lecturer.id }"><c:out value = "${ lecturer.name } "/></option>
+									<option <c:if test = "${ lecturer.id == lecturerId }">selected</c:if> value="${ lecturer.id }"><c:out value = "${ lecturer.name } "/></option>
 
 								</c:forEach>
 							</select>
@@ -55,7 +59,7 @@ table th {
 								<c:forEach items="${  requestScope.get(\"topics\")  }"
 									var="topic">
 <%-- 									<option <c:if test = "${ topic.id == param.topic }">selected</c:if> value="${ pageContext.request.contextPath }/controller?command=HOME_PAGE&lecturer=${ param.lecturer }&topic=${ topic.id }&status=${ param.status }&sort=${ param.sort }&order=${ param.order }">${ topic.name }</option> --%>
-										<option <c:if test = "${ topic.id == param.topic }">selected</c:if> value="${ topic.id }"><c:out value = "${ topic.name }"/></option>
+										<option <c:if test = "${ topic.id == topicId }">selected</c:if> value="${ topic.id }"><c:out value = "${ topic.name }"/></option>
 
 								</c:forEach>
 							</select>

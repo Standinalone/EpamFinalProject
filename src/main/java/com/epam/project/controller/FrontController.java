@@ -1,7 +1,7 @@
 package com.epam.project.controller;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import java.util.Locale;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -13,6 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.project.command.ICommand;
 import com.epam.project.command.factory.CommandFactory;
+import com.epam.project.constants.Constants;
+import com.epam.project.exceptions.DBException;
+import com.epam.project.exceptions.ValidatingRequestException;
+import com.epam.project.i18n.Localization;
+import com.epam.project.i18n.LocalizationFactory;
 
 /**
  * Main controller
@@ -23,7 +28,7 @@ public class FrontController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 
 	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response) {
+	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String forward = handleRequest(request, response);
 		if (forward != null) {
 			try {
@@ -53,8 +58,24 @@ public class FrontController extends HttpServlet {
 		}
 	}
 
-	private String handleRequest(HttpServletRequest request, HttpServletResponse response) {
+	private String handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+		Locale locale = (Locale) request.getSession().getAttribute("locale");
+		Localization localization = LocalizationFactory.getLocalization(locale);
 		ICommand command = CommandFactory.getCommand(request);
-		return command.execute(request, response);
+		try {
+			return command.execute(request, response);
+		} catch (DBException e) {
+			e.printStackTrace();
+			log.error("DBException ({}): {}", e.getClass().getSimpleName(), localization.getResourcesParam(e.getMessage()));
+			request.getSession().setAttribute("error", "DBException: " + localization.getResourcesParam(e.getMessage()));
+			
+		} catch (ValidatingRequestException e) {
+			e.printStackTrace();
+			log.error("ValidatingRequestException: {}", localization.getResourcesParam(e.getMessage()));
+			request.getSession().setAttribute("error", "ValidatingRequestException: " + localization.getResourcesParam(e.getMessage()));
+		}
+		response.sendRedirect(request.getRequestURL().append(Constants.COMMAND__ERROR).toString());
+		log.trace("Redirecting to {}", Constants.COMMAND__ERROR);
+		return null;
 	}
 }

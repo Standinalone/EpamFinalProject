@@ -1,6 +1,5 @@
 package com.epam.project.command.impl.post;
 
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
@@ -20,6 +19,9 @@ import com.epam.project.entity.Course;
 import com.epam.project.entity.CourseStatusEnum;
 import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
+import com.epam.project.exceptions.DBTopicException;
+import com.epam.project.exceptions.DBUserException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
 import com.epam.project.i18n.LocalizationFactory;
@@ -55,7 +57,7 @@ public class AddEditCourseCommand implements ICommand {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
 		localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		String page = request.getParameter("page");
 
@@ -75,17 +77,9 @@ public class AddEditCourseCommand implements ICommand {
 		}
 
 		if (courseId != null && !courseId.isEmpty()) {
-			if (!courseService.updateCourse(course)) {
-				log.error("Error updating course");
-				request.getSession().setAttribute("error", localization.getResourcesParam("error.updating"));
-				return Constants.COMMAND__ERROR;
-			}
+			courseService.updateCourse(course);
 		} else {
-			if (!courseService.addCourse(course)) {
-				log.error("Error adding course");
-				request.getSession().setAttribute("error", localization.getResourcesParam("error.adding"));
-				return Constants.COMMAND__ERROR;
-			}
+			courseService.addCourse(course);
 		}
 		request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.updated"));
 
@@ -145,16 +139,16 @@ public class AddEditCourseCommand implements ICommand {
 			if (topicService.findTopicById(course.getTopicId()) == null) {
 				errors.add(localization.getResourcesParam("error.topicnotfound"));
 			}
-		} catch (SQLException e) {
-			log.error("Finding topic error", e);
-			errors.add(localization.getResourcesParam("dberror.findtopic"));
+		} catch (DBTopicException e) {
+			log.error("Finding topic error", localization.getResourcesParam(e.getMessage()));
+			errors.add(localization.getResourcesParam(e.getMessage()));
 		}
 		User user = null;
 		try {
 			user = userService.findUserById(course.getLecturerId());
-		} catch (SQLException e) {
-			log.error("Finding user error", e);
-			errors.add(localization.getResourcesParam("dberror.finduser"));
+		} catch (DBUserException e) {
+			log.error("Finding user error", localization.getResourcesParam(e.getMessage()));
+			errors.add(localization.getResourcesParam(e.getMessage()));
 		}
 		if (user == null) {
 			errors.add(localization.getResourcesParam("error.lecturernotfound"));

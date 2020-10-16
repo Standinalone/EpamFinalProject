@@ -27,6 +27,8 @@ import com.epam.project.dao.DaoFactory;
 import com.epam.project.dao.mysql.MySqlUserDAO;
 import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
+import com.epam.project.exceptions.DBUserException;
 import com.epam.project.service.impl.MySqlUserService;
 
 public class UserServiceMockito {
@@ -85,20 +87,20 @@ public class UserServiceMockito {
 	}
 
 	@Test
-	public void userServiceTransactions() throws SQLException {
+	public void userServiceTransactions() throws SQLException, DBUserException {
 		Map<Integer, Integer> userGrades = new HashMap<>();
 		userGrades.put(0, 0);
 		doReturn(connection).when(daoFactory).getConnection();
-		Assert.assertTrue(userService.addUser(user));
-		Assert.assertTrue(userService.deleteUserById(0));
-		Assert.assertTrue(userService.updateUser(user));
+		userService.addUser(user);
+		userService.deleteUserById(0);
+		userService.updateUser(user);
 
-		Assert.assertTrue(userService.declineRequestForIds(0, new String[] { "1" }));
-		Assert.assertTrue(userService.registerInCourseByUsersIds(0, new String[] { "1" }, true));
-		Assert.assertTrue(userService.updateGrades(0, userGrades));
-		Assert.assertTrue(userService.enrollToCourse(new String[] { "1" }, 0));
-		Assert.assertTrue(userService.blockUsersById(new String[] {}));
-		Assert.assertTrue(userService.unblockUsersById(new String[] {}));
+		userService.declineRequestForIds(0, new String[] { "1" });
+		userService.registerInCourseByUsersIds(0, new String[] { "1" }, true);
+		userService.updateGrades(0, userGrades);
+		userService.enrollToCourse(new String[] { "1" }, 0);
+		userService.blockUsersById(new String[] {});
+		userService.unblockUsersById(new String[] {});
 
 		Mockito.verify(daoFactory, times(9)).beginTransation();
 		Mockito.verify(daoFactory, times(9)).endTransaction();
@@ -109,16 +111,52 @@ public class UserServiceMockito {
 	@Test
 	public void testCourseServiceTransactionsWithError() throws SQLException {
 		doThrow(new SQLException()).when(daoFactory).beginTransation();
-		Assert.assertFalse(userService.addUser(user));
-		Assert.assertFalse(userService.deleteUserById(0));
-		Assert.assertFalse(userService.updateUser(user));
+		try {
+			userService.addUser(user);
+		} catch (DBException e) {
 
-		Assert.assertFalse(userService.declineRequestForIds(0, new String[] {}));
-		Assert.assertFalse(userService.registerInCourseByUsersIds(0, new String[] {}, true));
-		Assert.assertFalse(userService.updateGrades(0, new HashMap<>()));
-		Assert.assertFalse(userService.enrollToCourse(new String[] {}, 0));
-		Assert.assertFalse(userService.blockUsersById(new String[] {}));
-		Assert.assertFalse(userService.unblockUsersById(new String[] {}));
+		}
+		try {
+			userService.deleteUserById(0);
+		} catch (DBException e) {
+
+		}
+		try {
+			userService.updateUser(user);
+		} catch (DBException e) {
+
+		}
+
+		try {
+			userService.declineRequestForIds(0, new String[] {});
+		} catch (DBException e) {
+
+		}
+		try {
+			userService.registerInCourseByUsersIds(0, new String[] {}, true);
+		} catch (DBException e) {
+
+		}
+		try {
+			userService.updateGrades(0, new HashMap<>());
+		} catch (DBException e) {
+
+		}
+		try {
+			userService.enrollToCourse(new String[] {}, 0);
+		} catch (DBException e) {
+
+		}
+		try {
+			userService.blockUsersById(new String[] {});
+		} catch (DBException e) {
+
+		}
+		try {
+			userService.unblockUsersById(new String[] {});
+		} catch (DBException e) {
+
+		}
 
 		Mockito.verify(daoFactory, times(9)).beginTransation();
 		Mockito.verify(daoFactory, times(9)).endTransaction();
@@ -126,15 +164,27 @@ public class UserServiceMockito {
 	}
 
 	@Test
-	public void testCourseService() throws SQLException {
+	public void testCourseService() throws SQLException, DBUserException {
 		doReturn(connection).when(daoFactory).getConnection();
 		Assert.assertEquals(1, userService.getCoursesCountForUser(0, true));
 		Assert.assertEquals(1, userService.getUsersCount());
 		Assert.assertEquals(1, userService.getUsersWithCourseCount(0, true));
 
-		Assert.assertEquals(null, userService.findUserByEmail(""));
-		Assert.assertEquals(null, userService.findUserById(0));
-		Assert.assertEquals(null, userService.findUserByLogin(""));
+		try {
+			userService.findUserByEmail("");
+		} catch (DBUserException e) {
+
+		}
+		try {
+			userService.findUserById(0);
+		} catch (DBUserException e) {
+
+		}
+		try {
+			userService.findUserByLogin("");
+		} catch (DBUserException e) {
+
+		}
 
 		Assert.assertEquals(0, userService.findAllUsers().size());
 		Assert.assertEquals(0, userService.findAllUsersByRole(0).size());
@@ -153,36 +203,55 @@ public class UserServiceMockito {
 		doThrow(new SQLException()).when(daoFactory).open();
 		doReturn(connection).when(daoFactory).getConnection();
 
-		Assert.assertEquals(-1, userService.getCoursesCountForUser(0, true));
-		Assert.assertEquals(-1, userService.getUsersCount());
-		Assert.assertEquals(-1, userService.getUsersWithCourseCount(0, true));
+		try {
+			userService.getCoursesCountForUser(0, true);
+		} catch (DBException e) {
 
-		Assert.assertEquals(null, userService.findAllUsersFromTo(0, 0));
-		Assert.assertEquals(null, userService.findAllUsersWithCourseFromTo(0, 0, 0, true));
+		}
+		try {
+			userService.getUsersCount();
+		} catch (DBException e) {
+
+		}
+		try {
+			userService.getUsersWithCourseCount(0, true);
+		} catch (DBException e) {
+
+		}
+		try {
+			userService.findAllUsersFromTo(0, 0);
+		} catch (DBException e) {
+
+		}
+		try {
+			userService.findAllUsersWithCourseFromTo(0, 0, 0, true);
+		} catch (DBException e) {
+
+		}
 
 		try {
 			userService.findAllUsers();
-		} catch (SQLException e) {
+		} catch (DBException e) {
 
 		}
 		try {
 			userService.findAllUsersByRole(0);
-		} catch (SQLException e) {
+		} catch (DBException e) {
 
 		}
 		try {
 			userService.findUserByEmail("");
-		} catch (SQLException e) {
+		} catch (DBException e) {
 
 		}
 		try {
 			userService.findUserById(0);
-		} catch (SQLException e) {
+		} catch (DBException e) {
 
 		}
 		try {
 			userService.findUserByLogin("");
-		} catch (SQLException e) {
+		} catch (DBException e) {
 
 		}
 

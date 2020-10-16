@@ -11,7 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.epam.project.command.ICommand;
-import com.epam.project.i18n.Localization;
+import com.epam.project.exceptions.DBException;
 
 /**
  * ICommand implementation for `change language` command
@@ -21,7 +21,7 @@ public class ChangeLanguageCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(ChangeLanguageCommand.class);
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
 		String newLanguage = request.getParameter("newLanguage");
 		String page = request.getParameter("page");
 		String localesValues = request.getServletContext().getInitParameter("locales");
@@ -36,7 +36,6 @@ public class ChangeLanguageCommand implements ICommand {
 				Cookie cookie = new Cookie("language", newLanguage);
 				response.addCookie(cookie);
 				request.getSession().setAttribute("locale", new Locale(newLanguage));
-				//request.getSession().setAttribute("localization", new Localization(new Locale(newLanguage)));
 				log.info("Language changed to {}",newLanguage);
 				break;
 			}

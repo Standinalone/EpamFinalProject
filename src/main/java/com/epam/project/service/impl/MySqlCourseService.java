@@ -11,11 +11,11 @@ import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dao.ICourseDAO;
 import com.epam.project.dao.ICourseDtoDAO;
 import com.epam.project.dao.ICourseProfilePageDAO;
-import com.epam.project.dao.mysql.MySqlDAOFactory;
 import com.epam.project.dto.CourseDto;
 import com.epam.project.dto.CourseProfilePageDto;
 import com.epam.project.entity.Course;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBCourseException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.service.ICourseService;
 
@@ -28,32 +28,6 @@ public class MySqlCourseService implements ICourseService {
 	private ICourseProfilePageDAO courseProfilePageDAO;
 
 	private static MySqlCourseService instance;
-
-//	static {
-//		try {
-//			daoFactory = DaoFactory.getDaoFactory(DatabaseEnum.MYSQL);
-//			courseDao = daoFactory.getCourseDAO();
-//			courseDtoDao = daoFactory.getCourseDtoDAO();
-//			courseProfilePageDAO = daoFactory.getCourseProfilePageDAO();
-//		} catch (DatabaseNotSupportedException e) {
-//			log.error("DatabaseNotSupportedException", e.getMessage());
-//		}
-//	}
-
-	// Course Methods
-
-	@Override
-	public int getCoursesWithParametersCount(String conditions) {
-		try {
-			daoFactory.open();
-			return courseDao.getCountWithParameters(conditions);
-		} catch (SQLException e) {
-			log.error("Get courses count error", e.getMessage());
-			return -1;
-		} finally {
-			daoFactory.close();
-		}
-	}
 
 	/**
 	 * Constructor used in testing by Mockito
@@ -69,7 +43,6 @@ public class MySqlCourseService implements ICourseService {
 		this.courseDao = courseDao;
 		this.courseDtoDao = courseDtoDao;
 		this.courseProfilePageDAO = courseProfilePageDAO;
-//		log.debug(String.valueOf(this.hashCode()));
 	}
 
 	private MySqlCourseService() {
@@ -91,78 +64,84 @@ public class MySqlCourseService implements ICourseService {
 	}
 
 	@Override
-	public int getCoursesCount() {
+	public int findAllCoursesWithParametersCount(String conditions) throws DBCourseException {
 		try {
 			daoFactory.open();
-			return courseDao.getCount();
+			return courseDao.getCountWithParameters(conditions);
 		} catch (SQLException e) {
-			log.error("Get courses count error", e.getMessage());
-			return -1;
+			throw new DBCourseException("dberror.course.findAll", e);
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public List<Course> findAllCourses() throws SQLException {
+	public int getCoursesCount() throws DBCourseException {
+		try {
+//			throw new SQLException();
+			daoFactory.open();
+			return courseDao.getCount();
+		} catch (SQLException e) {
+			throw new DBCourseException("dberror.course.getCount", e);
+		} finally {
+			daoFactory.close();
+		}
+	}
+
+	@Override
+	public List<Course> findAllCourses() throws DBCourseException {
 		try {
 			daoFactory.open();
 			return courseDao.findAll();
 		} catch (SQLException e) {
-			log.error("Getting courses error", e.getMessage());
-			throw new SQLException("asd");
+			throw new DBCourseException("dberror.course.findAll", e);
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public Course findCourseById(int courseId) throws SQLException {
+	public Course findCourseById(int courseId) throws DBCourseException {
 		try {
 			daoFactory.open();
 			return courseDao.findById(courseId);
 		} catch (SQLException e) {
-			log.error("Getting course error", e.getMessage());
-			throw new SQLException();
+			throw new DBCourseException("dberror.course.get", e);
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public boolean updateCourse(Course courseId) {
+	public void updateCourse(Course courseId) throws DBCourseException {
 		try {
 			daoFactory.beginTransation();
 			courseDao.update(courseId);
 			daoFactory.getConnection().commit();
-			return true;
 		} catch (SQLException e) {
-			log.error("Updating course error", e.getMessage());
 			daoFactory.rollback();
-			return false;
+			throw new DBCourseException("dberror.course.update", e);
 		} finally {
 			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public boolean deleteCourseById(int courseId) {
+	public void deleteCourseById(int courseId) throws DBCourseException {
 		try {
 			daoFactory.beginTransation();
 			courseDao.delete(courseId);
 			daoFactory.getConnection().commit();
-			return true;
 		} catch (SQLException e) {
-			log.error("Deleting course error", e.getMessage());
 			daoFactory.rollback();
-			return false;
+			throw new DBCourseException("dberror.course.delete", e);
 		} finally {
 			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public boolean setLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds) {
+	public void setLecturerForCoursesByLecturerId(int lecturerId, String[] checkedIds) throws DBCourseException {
 		try {
 			daoFactory.beginTransation();
 			for (String id : checkedIds) {
@@ -171,40 +150,35 @@ public class MySqlCourseService implements ICourseService {
 				courseDao.update(course);
 			}
 			daoFactory.getConnection().commit();
-			return true;
 		} catch (SQLException e) {
-			log.error("Editing courses error", e.getMessage());
 			daoFactory.rollback();
-			return false;
+			throw new DBCourseException("dberror.course.update", e);
 		} finally {
 			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public boolean addCourse(Course course) {
+	public void addCourse(Course course) throws DBCourseException {
 		try {
 			daoFactory.beginTransation();
 			courseDao.add(course);
 			daoFactory.getConnection().commit();
-			return true;
 		} catch (SQLException e) {
-			log.error("Adding course error", e.getMessage());
 			daoFactory.rollback();
-			return false;
+			throw new DBCourseException("dberror.course.add", e);
 		} finally {
 			daoFactory.endTransaction();
 		}
 	}
 
 	@Override
-	public int getCoursesWithLecturerCount(int lecturerId) {
+	public int getCoursesWithLecturerCount(int lecturerId) throws DBCourseException {
 		try {
 			daoFactory.open();
 			return courseDao.getCountByLecturerId(lecturerId);
 		} catch (SQLException e) {
-			log.error("Get courses count error", e.getMessage());
-			return -1;
+			throw new DBCourseException("dberror.course.getCount", e);
 		} finally {
 			daoFactory.close();
 		}
@@ -212,105 +186,95 @@ public class MySqlCourseService implements ICourseService {
 
 	@Override
 	public List<CourseDto> findAllCoursesDtoWithParametersFromTo(int limit, int offset, String conditions,
-			String orderBy) {
+			String orderBy) throws DBCourseException {
 		return findAllCoursesDtoWithParametersFromTo(limit, offset, conditions, orderBy, 0);
 	}
-	
+
 	@Override
 	public List<CourseDto> findAllCoursesDtoWithParametersFromTo(int limit, int offset, String conditions,
-			String orderBy, int userId) {
+			String orderBy, int userId) throws DBCourseException {
 		try {
 			daoFactory.open();
 			return courseDtoDao.findAllFromToWithParameters(limit, offset, conditions, orderBy, userId);
 		} catch (SQLException e) {
-			log.error("Getting courses error", e.getMessage());
-			return null;
+			throw new DBCourseException("dberror.course.findAll", e);
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public List<CourseDto> findAllCoursesDtoByLecturerIdFromTo(int lecturerId, int limit, int offset) {
+	public List<CourseDto> findAllCoursesDtoByLecturerIdFromTo(int lecturerId, int limit, int offset)
+			throws DBCourseException {
 		try {
 			daoFactory.open();
 			return courseDtoDao.findByLecturerIdFromTo(lecturerId, limit, offset);
 		} catch (SQLException e) {
-			log.error("Getting courses error", e.getMessage());
-			return null;
+			throw new DBCourseException("dberror.course.findAll", e);
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public List<CourseDto> findAllCoursesDto() throws SQLException {
+	public List<CourseDto> findAllCoursesDto() throws DBCourseException {
 		try {
 			daoFactory.open();
 			return courseDtoDao.findAll();
 		} catch (SQLException e) {
-			log.error("Getting courses dto error", e.getMessage());
-			throw new SQLException();
+			throw new DBCourseException("dberror.course.findAll", e);
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public List<CourseDto> findAllCoursesDtoByLecturerId(int userId) throws SQLException {
+	public List<CourseDto> findAllCoursesDtoByLecturerId(int userId) throws DBCourseException {
 		try {
 			daoFactory.open();
 			return courseDtoDao.findByLecturerId(userId);
 		} catch (SQLException e) {
-			log.error("Getting courses dto error", e.getMessage());
-			throw new SQLException();
+			throw new DBCourseException("dberror.course.findAll", e);
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public CourseDto getCourseDtoByCourseId(int courseId) throws SQLException {
+	public CourseDto getCourseDtoByCourseId(int courseId) throws DBCourseException {
 		try {
 			daoFactory.open();
 			return courseDtoDao.findById(courseId);
 		} catch (SQLException e) {
-			log.error("Getting courses dto error", e.getMessage());
-			throw new SQLException();
+			throw new DBCourseException("dberror.course.get", e);
 		} finally {
 			daoFactory.close();
 		}
 	}
 
 	@Override
-	public List<CourseDto> findAllCoursesDtoFromTo(int limit, int offset) {
+	public List<CourseDto> findAllCoursesDtoFromTo(int limit, int offset) throws DBCourseException {
 		try {
 			daoFactory.open();
 			return courseDtoDao.findAllFromTo(limit, offset);
 		} catch (SQLException e) {
-			log.error("Getting courses dto error", e.getMessage());
-			return null;
+			throw new DBCourseException("dberror.course.findAll", e);
 		} finally {
 			daoFactory.close();
 		}
 	}
-	
-
 
 	@Override
 	public List<CourseProfilePageDto> findAllCoursesProfilePageFromTo(int limit, int offset, User user,
-			boolean enrolled) {
+			boolean enrolled) throws DBCourseException {
 		try {
 			daoFactory.open();
 			return courseProfilePageDAO.findAllFromTo(limit, offset, user, enrolled);
 		} catch (SQLException e) {
-			log.error("Getting courses error", e.getMessage());
-			return null;
+			throw new DBCourseException("dberror.course.findAll", e);
 		} finally {
 			daoFactory.close();
 		}
 	}
-
-
 
 }

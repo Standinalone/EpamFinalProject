@@ -1,12 +1,10 @@
 package com.epam.project.command.impl.post;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.AddressException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -19,7 +17,11 @@ import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
 import com.epam.project.entity.VerificationToken;
+import com.epam.project.exceptions.DBException;
+import com.epam.project.exceptions.DBTokenException;
+import com.epam.project.exceptions.DBUserException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
+import com.epam.project.exceptions.ValidatingRequestException;
 import com.epam.project.i18n.Localization;
 import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.mailer.Mailer;
@@ -71,15 +73,6 @@ public class RegisterCommand implements ICommand {
 			log.error("DatabaseNotSupportedException", e.getMessage());
 		}
 	}
-//	static {
-//		try {
-//			serviceFactory = ServiceFactory.getServiceFactory(db);
-//			userService = serviceFactory.getUserService();
-//			tokenService = serviceFactory.getTokenService();
-//		} catch (DatabaseNotSupportedException e) {
-//			log.error("DatabaseNotSupportedException", e.getMessage());
-//		}
-//	}
 
 	public List<String> validate(User user) {
 		List<String> errors = new ArrayList<>();
@@ -89,7 +82,7 @@ public class RegisterCommand implements ICommand {
 		User existingUser = null;
 		try {
 			existingUser = userService.findUserByLogin(user.getLogin());
-		} catch (SQLException e) {
+		} catch (DBUserException e) {
 			log.error("Finding user error", e);
 			errors.add(localization.getResourcesParam("dberror.finduser"));
 		}
@@ -121,8 +114,7 @@ public class RegisterCommand implements ICommand {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
-//		localization = new Localization((Locale) request.getSession().getAttribute("locale"));
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException, ValidatingRequestException {
 		localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		user = (User) request.getSession().getAttribute("user");
 		if (request.getParameter("lecturer") != null && !request.getParameter("lecturer").isEmpty() && user != null
@@ -148,25 +140,15 @@ public class RegisterCommand implements ICommand {
 			return Constants.COMMAND__REGISTER;
 		}
 
-		if (!userService.addUser(user)) {
-			log.error("Error adding user");
-			request.getSession().setAttribute("error", localization.getResourcesParam("error.adding"));
-			return Constants.COMMAND__ERROR;
-		}
+		userService.addUser(user);
 
 		if (!isLecturer) {
 			try {
 				sendConfirmationEmail(user, request);
 			} catch (MessagingException e) {
 				log.error("Error sending mail to user");
-				request.getSession().setAttribute("error", localization.getResourcesParam("error.email"));
 				userService.deleteUserById(user.getId());
-				return Constants.COMMAND__ERROR;
-			} catch (SQLException e) {
-				log.error("Error finding token");
-				request.getSession().setAttribute("error", localization.getResourcesParam("error.token"));
-				userService.deleteUserById(user.getId());
-				return Constants.COMMAND__ERROR;
+				throw new ValidatingRequestException("error.mail", e);
 			}
 			log.info("User {} was registered", user.getLogin());
 			String successMessage = localization.getResourcesParam("success.email");
@@ -221,19 +203,17 @@ public class RegisterCommand implements ICommand {
 	}
 
 	private void sendConfirmationEmail(User user, HttpServletRequest request)
-			throws AddressException, MessagingException, SQLException {
+			throws MessagingException, DBTokenException {
 		String token = UUID.randomUUID().toString();
 
 		VerificationToken myToken = new VerificationToken(token, user);
-		if (!tokenService.addToken(myToken)) {
-			throw new SQLException();
-		}
+		tokenService.addToken(myToken);
 
 		String recipientAddress = user.getEmail();
 		String subject = "Registration Confirmation";
 		String confirmationUrl = request.getRequestURL() + "?command=REGISTRATION_CONFIRM&token=" + token;
 
-		String message = "Привет, " + user.getName();
+		String message = "Hi " + user.getName();
 
 		Mailer.sendMail(new String[] { recipientAddress }, message + "\r\n" + confirmationUrl, subject);
 

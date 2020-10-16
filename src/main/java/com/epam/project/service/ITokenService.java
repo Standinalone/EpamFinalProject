@@ -1,8 +1,7 @@
 package com.epam.project.service;
 
-import java.sql.SQLException;
-
 import com.epam.project.entity.VerificationToken;
+import com.epam.project.exceptions.DBTokenException;
 
 /**
  * Interface for VerificationToken service
@@ -14,16 +13,16 @@ public interface ITokenService {
 	 * Adds new VerificationToken
 	 * 
 	 * @param token VerificationToken object
-	 * @return true if the VerificationToken was added or false otherwise
+	 * @throws DBTokenException if SQLException occurred
 	 */
-	boolean addToken(VerificationToken token);
+	void addToken(VerificationToken token) throws DBTokenException;
 
 	/**
 	 * Finds a token by a token string
 	 * 
 	 * @param token token string
-	 * @return VerificationToken if it was found or null otherwise
-	 * @throws SQLException 
+	 * @return VerificationToken if it was found
+	 * @throws DBTokenException if SQLException occurred or nothing found
 	 */
-	VerificationToken findTokenByToken(String token) throws SQLException;
+	VerificationToken findTokenByToken(String token) throws DBTokenException;
 }

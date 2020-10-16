@@ -1,6 +1,5 @@
 package com.epam.project.command.impl.post;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -15,6 +14,8 @@ import com.epam.project.command.ICommand;
 import com.epam.project.constants.Constants;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
+import com.epam.project.exceptions.DBUserException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
 import com.epam.project.i18n.Localization;
 import com.epam.project.i18n.LocalizationFactory;
@@ -50,16 +51,15 @@ public class LoginCommand implements ICommand {
 		User user = null;
 		try {
 			user = userService.findUserByLogin(username);
-		} catch (SQLException e) {
-			log.error("Finding user error", e);
-			errors.add(localization.getResourcesParam("dberror.finduser"));
+		} catch (DBUserException e) {
+			log.error(e.getMessage());
+			errors.add(localization.getResourcesParam(e.getMessage()));
 		}
 		if (user == null) {
 			errors.add(localization.getResourcesParam("login.error"));
 			return errors;
 		}
 		if (!userService.confirmPassword(user, password)) {
-//		if (!password.equals(user.getPassword())) {
 			errors.add(localization.getResourcesParam("login.error"));
 			return errors;
 		}
@@ -76,7 +76,7 @@ public class LoginCommand implements ICommand {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
 		List<String> errors = validate(request);
 		if (!errors.isEmpty()) {
 			log.error("Error validating user");

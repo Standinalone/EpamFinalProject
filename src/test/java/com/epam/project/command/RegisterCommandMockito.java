@@ -2,7 +2,6 @@ package com.epam.project.command;
 
 import static org.mockito.Mockito.when;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
 
 import java.sql.SQLException;
 
@@ -15,6 +14,8 @@ import com.epam.project.command.impl.post.RegisterCommand;
 import com.epam.project.constants.Constants;
 import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
+import com.epam.project.exceptions.ValidatingRequestException;
 
 public class RegisterCommandMockito extends BaseCommandMockito{
 
@@ -54,9 +55,7 @@ public class RegisterCommandMockito extends BaseCommandMockito{
 	}
 	
 	@Test
-	public void testRegistration() {
-		Mockito.when(userService.addUser(any())).thenReturn(true);
-		Mockito.when(tokenService.addToken(any())).thenReturn(true);
+	public void testRegistration() throws DBException, ValidatingRequestException {
 		String redirect = registerCommand.execute(request, response);
 		assertEquals(Constants.COMMAND__SUCCESS, redirect);
 		

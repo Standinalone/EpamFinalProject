@@ -28,6 +28,8 @@ import com.epam.project.dto.CourseDto;
 import com.epam.project.entity.Course;
 import com.epam.project.entity.CourseStatusEnum;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBCourseException;
+import com.epam.project.exceptions.DBException;
 import com.epam.project.service.impl.MySqlCourseService;
 
 public class CourseServiceMockito {
@@ -90,11 +92,23 @@ public class CourseServiceMockito {
 	}
 
 	@Test
-	public void test() throws SQLException {
+	public void test1() throws SQLException {
+		doThrow(new SQLException()).when(daoFactory).beginTransation();
+//		doReturn(connection).when(daoFactory).getConnection();
+		try {
+			courseService.addCourse(course);
+			System.out.println("added");
+		} catch (DBException e) {
+			System.out.println(e.getMessage() + " " + e.getClass().getSimpleName());
+		}
+	}
+
+	@Test
+	public void test() throws SQLException, DBCourseException {
 		doReturn(connection).when(daoFactory).getConnection();
-		Assert.assertTrue(courseService.addCourse(course));
-		Assert.assertTrue(courseService.deleteCourseById(0));
-		Assert.assertTrue(courseService.updateCourse(course));
+		courseService.addCourse(course);
+		courseService.deleteCourseById(0);
+		courseService.updateCourse(course);
 		courseService.setLecturerForCoursesByLecturerId(0, new String[] {});
 
 		Mockito.verify(daoFactory, times(4)).beginTransation();
@@ -104,12 +118,28 @@ public class CourseServiceMockito {
 	}
 
 	@Test
-	public void testCourseServiceTransactionsWithError() throws SQLException {
+	public void testCourseServiceTransactionsWithError() throws SQLException, DBCourseException {
 		doThrow(new SQLException()).when(daoFactory).beginTransation();
-		Assert.assertFalse(courseService.addCourse(course));
-		Assert.assertFalse(courseService.deleteCourseById(0));
-		courseService.setLecturerForCoursesByLecturerId(0, new String[] {});
-		Assert.assertFalse(courseService.updateCourse(course));
+		try {
+			courseService.addCourse(course);
+		} catch (DBException e) {
+
+		}
+		try {
+			courseService.deleteCourseById(0);
+		} catch (DBException e) {
+
+		}
+		try {
+			courseService.setLecturerForCoursesByLecturerId(0, new String[] {});
+		} catch (DBException e) {
+
+		}
+		try {
+			courseService.updateCourse(course);
+		} catch (DBException e) {
+
+		}
 
 		Mockito.verify(daoFactory, times(4)).beginTransation();
 		Mockito.verify(daoFactory, times(4)).endTransaction();
@@ -117,22 +147,58 @@ public class CourseServiceMockito {
 	}
 
 	@Test
-	public void testCourseService() throws SQLException {
+	public void testCourseService() throws DBCourseException, SQLException {
 		doReturn(connection).when(daoFactory).getConnection();
-		Assert.assertEquals(1, courseService.getCoursesWithParametersCount(""));
+		Assert.assertEquals(1, courseService.findAllCoursesWithParametersCount(""));
 		Assert.assertEquals(1, courseService.getCoursesCount());
 		Assert.assertEquals(1, courseService.getCoursesWithLecturerCount(0));
 
-		Assert.assertEquals(null, courseService.findCourseById(0));
-		Assert.assertEquals(null, courseService.getCourseDtoByCourseId(0));
+		try {
+			courseService.findCourseById(0);
+		} catch (DBCourseException e) {
 
-		Assert.assertEquals(0, courseService.findAllCourses().size());
-		Assert.assertEquals(0, courseService.findAllCoursesDtoWithParametersFromTo(0, 0, "", "").size());
-		Assert.assertEquals(0, courseService.findAllCoursesDtoByLecturerIdFromTo(0, 0, 0).size());
-		Assert.assertEquals(0, courseService.findAllCoursesDto().size());
-		Assert.assertEquals(0, courseService.findAllCoursesDtoByLecturerId(0).size());
-		Assert.assertEquals(0, courseService.findAllCoursesDtoFromTo(0, 0).size());
-		Assert.assertEquals(0, courseService.findAllCoursesProfilePageFromTo(0, 0, new User(), false).size());
+		}
+		try {
+			courseService.getCourseDtoByCourseId(0);
+		} catch (DBCourseException e) {
+
+		}
+
+		try {
+			courseService.findAllCourses().size();
+		} catch (DBCourseException e) {
+
+		}
+		try {
+			courseService.findAllCoursesDtoWithParametersFromTo(0, 0, "", "").size();
+		} catch (DBCourseException e) {
+
+		}
+		try {
+			courseService.findAllCoursesDtoByLecturerIdFromTo(0, 0, 0).size();
+		} catch (DBCourseException e) {
+
+		}
+		try {
+			courseService.findAllCoursesDto().size();
+		} catch (DBCourseException e) {
+
+		}
+		try {
+			courseService.findAllCoursesDtoByLecturerId(0).size();
+		} catch (DBCourseException e) {
+
+		}
+		try {
+			courseService.findAllCoursesDtoFromTo(0, 0).size();
+		} catch (DBCourseException e) {
+
+		}
+		try {
+			courseService.findAllCoursesProfilePageFromTo(0, 0, new User(), false).size();
+		} catch (DBCourseException e) {
+
+		}
 
 		Mockito.verify(daoFactory, times(12)).open();
 //		Mockito.verify(daoFactory, times(12)).daoFactory.close();
@@ -141,46 +207,73 @@ public class CourseServiceMockito {
 	}
 
 	@Test
-	public void testCourseServiceWithError() throws SQLException {
+	public void testCourseServiceWithError() throws SQLException, DBCourseException {
 		doThrow(new SQLException()).when(daoFactory).open();
 		doReturn(connection).when(daoFactory).getConnection();
 
-		Assert.assertEquals(-1, courseService.getCoursesWithParametersCount(""));
-		Assert.assertEquals(-1, courseService.getCoursesCount());
-		Assert.assertEquals(-1, courseService.getCoursesWithLecturerCount(0));
-		
-		Assert.assertEquals(null, courseService.findAllCoursesDtoWithParametersFromTo(0, 0, "", ""));
-		Assert.assertEquals(null, courseService.findAllCoursesDtoByLecturerIdFromTo(0, 0, 0));
-		Assert.assertEquals(null, courseService.findAllCoursesDtoFromTo(0, 0));
-		Assert.assertEquals(null, courseService.findAllCoursesProfilePageFromTo(0, 0, new User(), false));
+		try {
+			Assert.assertEquals(-1, courseService.findAllCoursesWithParametersCount(""));
+		} catch (DBException e) {
+
+		}
+		try {
+			Assert.assertEquals(-1, courseService.getCoursesCount());
+		} catch (DBException e) {
+
+		}
+		try {
+			Assert.assertEquals(-1, courseService.getCoursesWithLecturerCount(0));
+		} catch (DBException e) {
+
+		}
+		try {
+			Assert.assertEquals(null, courseService.findAllCoursesDtoWithParametersFromTo(0, 0, "", ""));
+		} catch (DBException e) {
+
+		}
+		try {
+			Assert.assertEquals(null, courseService.findAllCoursesDtoByLecturerIdFromTo(0, 0, 0));
+		} catch (DBException e) {
+
+		}
+		try {
+			Assert.assertEquals(null, courseService.findAllCoursesDtoFromTo(0, 0));
+		} catch (DBException e) {
+
+		}
+		try {
+			Assert.assertEquals(null, courseService.findAllCoursesProfilePageFromTo(0, 0, new User(), false));
+		} catch (DBException e) {
+
+		}
 
 		try {
 			courseService.findAllCoursesDto();
-		} catch (SQLException e) {
+		} catch (DBCourseException e) {
 
 		}
 		try {
 			courseService.findCourseById(0);
-		} catch (SQLException e) {
+		} catch (DBCourseException e) {
 
 		}
 		try {
 			courseService.getCourseDtoByCourseId(0);
-		} catch (SQLException e) {
+		} catch (DBCourseException e) {
 
 		}
 		try {
 			courseService.findAllCourses();
-		} catch (SQLException e) {
+		} catch (DBCourseException e) {
 
 		}
 		try {
 			courseService.findAllCoursesDtoByLecturerId(0);
-		} catch (SQLException e) {
+		} catch (DBCourseException e) {
 
 		}
 
 		Mockito.verify(daoFactory, times(12)).open();
-//		Mockito.verify(daoFactory, times(12)).daoFactory.close();
+		Mockito.verify(daoFactory, times(12)).close();
 	}
 }

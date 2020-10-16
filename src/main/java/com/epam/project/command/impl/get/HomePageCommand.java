@@ -1,10 +1,11 @@
 package com.epam.project.command.impl.get;
 
-import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -17,11 +18,9 @@ import com.epam.project.constants.Constants;
 import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dto.CourseDto;
 import com.epam.project.entity.CourseStatusEnum;
-import com.epam.project.entity.Topic;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
-import com.epam.project.i18n.Localization;
-import com.epam.project.i18n.LocalizationFactory;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.ITopicService;
 import com.epam.project.service.IUserService;
@@ -37,12 +36,11 @@ public class HomePageCommand implements ICommand {
 	private static final Logger log = LoggerFactory.getLogger(HomePageCommand.class);
 
 	private static DatabaseEnum db = DatabaseEnum.valueOf(Constants.DATABASE);
-	private  ServiceFactory serviceFactory;
+	private ServiceFactory serviceFactory;
 
-
-	private  ICourseService courseService;
-	private  IUserService userService;
-	private  ITopicService topicService;
+	private ICourseService courseService;
+	private IUserService userService;
+	private ITopicService topicService;
 	// Field for storing column names to prevent sql injection when using order by
 	// `columnName`
 	private static final Map<String, String> COLUMN_NAMES = new HashMap<>();
@@ -51,9 +49,9 @@ public class HomePageCommand implements ICommand {
 	 * Constructor used in testing by Mockito
 	 * 
 	 * @param serviceFactory mocked ServiceFactory
-	 * @param courseService mocked ICourseService
-	 * @param userService mocked IUserService
-	 * @param topicService mocked ITopicService
+	 * @param courseService  mocked ICourseService
+	 * @param userService    mocked IUserService
+	 * @param topicService   mocked ITopicService
 	 */
 	private HomePageCommand(ServiceFactory serviceFactory, ICourseService courseService, IUserService userService,
 			ITopicService topicService) {
@@ -63,7 +61,7 @@ public class HomePageCommand implements ICommand {
 		this.userService = userService;
 		this.topicService = topicService;
 	}
-	
+
 	public HomePageCommand() {
 		try {
 			serviceFactory = ServiceFactory.getServiceFactory(db);
@@ -75,16 +73,8 @@ public class HomePageCommand implements ICommand {
 		}
 		log.debug(String.valueOf(this.hashCode()));
 	}
-	
+
 	static {
-//		try {
-//			serviceFactory = ServiceFactory.getServiceFactory(db);
-//			courseService = serviceFactory.getCourseService();
-//			userService = serviceFactory.getUserService();
-//			topicService = serviceFactory.getTopicService();
-//		} catch (DatabaseNotSupportedException e) {
-//			log.error("DatabaseNotSupportedException", e.getMessage());
-//		}
 		COLUMN_NAMES.put("students", "students");
 		COLUMN_NAMES.put("name", "courses.name");
 		COLUMN_NAMES.put("name", "courses.name");
@@ -97,9 +87,7 @@ public class HomePageCommand implements ICommand {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
-
-		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
+	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
 
 		int topicId = 0, lecturerId = 0, statusId = 0;
 		try {
@@ -126,34 +114,21 @@ public class HomePageCommand implements ICommand {
 		String orderBy = QueryFactory.formOrderByQuery(COLUMN_NAMES, request);
 		User user = (User) request.getSession().getAttribute("user");
 		Page<CourseDto> page = new Page<>(request,
-				(limit, offset) -> courseService.findAllCoursesDtoWithParametersFromTo(limit, offset, conditions, orderBy, user == null ? 0 : user.getId()),
-				() -> courseService.getCoursesWithParametersCount(conditions));
-
-
-		if (page.getList() == null) {
-			log.error("Page cannot be formed");
-			request.setAttribute("error", localization.getResourcesParam("error.badid"));
-			return Constants.PAGE__ERROR;
-		}
+				(limit, offset) -> courseService.findAllCoursesDtoWithParametersFromTo(limit, offset, conditions,
+						orderBy, user == null ? 0 : user.getId()),
+				() -> courseService.findAllCoursesWithParametersCount(conditions));
 
 		List<User> lecturers;
-		try {
-			lecturers = userService.findAllUsersByRole(3);
-		} catch (SQLException e) {
-			log.error("Finding users error", e);
-			request.setAttribute("error", localization.getResourcesParam("dberror.findusers"));
-			return Constants.PAGE__ERROR;
-		}
-		try {
-			request.setAttribute("topics", topicService.findAllTopics());
-		} catch (SQLException e) {
-			log.error("Finding topics error", e);
-			request.setAttribute("error", localization.getResourcesParam("dberror.findtopics"));
-			return Constants.PAGE__ERROR;
-		}
+		lecturers = userService.findAllUsersByRole(3);
+
+		request.setAttribute("topics", topicService.findAllTopics());
+
 		request.setAttribute("page", page);
 		request.setAttribute("lecturers", lecturers);
-		request.setAttribute("statuses", CourseStatusEnum.values());
+		List<String> statuses = Stream.of(CourseStatusEnum.values())
+                .map(Enum::name)
+                .collect(Collectors.toList());
+		request.setAttribute("statuses", statuses);
 		return Constants.PAGE__HOME;
 	}
 

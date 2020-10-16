@@ -78,9 +78,9 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 	@Override
 	public Course findById(int id) throws SQLException {
 		List<Course> list = findByField(daoFactory.getConnection(), SQL_FIND_COURSE_BY_ID, 1, id);
-		if (!list.isEmpty())
-			return list.get(0);
-		return null;
+		if (list.isEmpty())
+			throw new SQLException();
+		return list.get(0);
 	}
 
 	@Override

@@ -1,8 +1,5 @@
 package com.epam.project.command.impl.get;
 
-import java.sql.SQLException;
-import java.util.Locale;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,16 +12,17 @@ import com.epam.project.dao.DatabaseEnum;
 import com.epam.project.dto.CourseDto;
 import com.epam.project.entity.RoleEnum;
 import com.epam.project.entity.User;
+import com.epam.project.exceptions.DBException;
 import com.epam.project.exceptions.DatabaseNotSupportedException;
-import com.epam.project.i18n.Localization;
-import com.epam.project.i18n.LocalizationFactory;
+import com.epam.project.exceptions.ValidatingRequestException;
 import com.epam.project.service.ICourseService;
 import com.epam.project.service.IUserService;
 import com.epam.project.service.ServiceFactory;
 import com.epam.project.util.Page;
 
 /**
- * ICommand implementation for getting a page to edit a lecturer (appoint / dismiss courses)
+ * ICommand implementation for getting a page to edit a lecturer (appoint /
+ * dismiss courses)
  *
  */
 public class EditLecturerPageCommand implements ICommand {
@@ -48,44 +46,22 @@ public class EditLecturerPageCommand implements ICommand {
 	}
 
 	@Override
-	public String execute(HttpServletRequest request, HttpServletResponse response) {
-		User user = (User) request.getSession().getAttribute("user");
-		Localization localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
+	public String execute(HttpServletRequest request, HttpServletResponse response)
+			throws DBException, ValidatingRequestException {
+
 		int userId = 0;
 		try {
 			userId = Integer.parseInt(request.getParameter("id"));
 		} catch (NumberFormatException e) {
-			log.debug("Cannot parse id");
-			request.setAttribute("error", localization.getResourcesParam("error.badid"));
-			return Constants.PAGE__ERROR;
+			throw new ValidatingRequestException("error.badid", e);
 		}
-		try {
-			user = userService.findUserById(userId);
-		} catch (SQLException e) {
-			log.error("Finding user error", e);
-			request.setAttribute("error", localization.getResourcesParam("dberror.finduser"));
-			return Constants.PAGE__ERROR;
-		}
-		if (user == null) {
-			log.debug("Cannot find user");
-			request.setAttribute("error", localization.getResourcesParam("error.usernotfound"));
-			return Constants.PAGE__ERROR;
-		}
-		if (user.getRole() != RoleEnum.LECTURER) {
-			log.debug("Requested user not a lecturer");
-			request.setAttribute("error", localization.getResourcesParam("error.notlecturer"));
-			return Constants.PAGE__ERROR;
-		}
+		User user = userService.findUserById(userId);
+		if (user.getRole() != RoleEnum.LECTURER)
+			throw new ValidatingRequestException("error.notlecturer");
 
 		Page<CourseDto> page = new Page<>(request,
 				(limit, offset) -> courseService.findAllCoursesDtoFromTo(limit, offset),
 				() -> courseService.getCoursesCount());
-
-		if (page.getList() == null) {
-			log.error("Page cannot be formed");
-			request.setAttribute("error", localization.getResourcesParam("error.badid"));
-			return Constants.PAGE__ERROR;
-		}
 
 		request.setAttribute("page", page);
 		return Constants.PAGE__EDIT_USER;
