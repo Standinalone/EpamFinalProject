@@ -7,6 +7,10 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.project.exceptions.DBException;
 
+/**
+ * A wrapper around IntSupplier interface to manage thrown DBException
+ *
+ */
 @FunctionalInterface
 public interface IGetCountSupplier extends IntSupplier{
 	Logger log = LoggerFactory.getLogger(IGetCountSupplier.class);

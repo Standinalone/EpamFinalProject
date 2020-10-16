@@ -148,8 +148,7 @@ public class LecturerPanelCommand implements ICommand {
 					localization.getResourcesParam("success.gradesupdated"));
 			break;
 		default:
-			log.error("Uknown command");
-			return Constants.PAGE__ERROR;
+			throw new ValidatingRequestException("error.badCommand");
 		}
 		return "?" + (page == null ? "" : page);
 	}

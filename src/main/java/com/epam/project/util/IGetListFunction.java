@@ -7,6 +7,14 @@ import org.slf4j.LoggerFactory;
 
 import com.epam.project.exceptions.DBException;
 
+/**
+ * A wrapper around BiFunction interface to manage thrown DBException
+ *
+ * @param <T> the type of the first argument to the function
+ * @param <U> the type of the second argument to the function
+ * @param <R> the type of the result of the function
+ */
+@FunctionalInterface
 public interface IGetListFunction<T, U, R> extends BiFunction<T, U, R>{
 	Logger log = LoggerFactory.getLogger(IGetListFunction.class);
 	@Override
