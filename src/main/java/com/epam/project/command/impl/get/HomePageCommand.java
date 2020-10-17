@@ -1,11 +1,8 @@
 package com.epam.project.command.impl.get;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -53,6 +50,7 @@ public class HomePageCommand implements ICommand {
 	 * @param userService    mocked IUserService
 	 * @param topicService   mocked ITopicService
 	 */
+	@SuppressWarnings("unused")
 	private HomePageCommand(ServiceFactory serviceFactory, ICourseService courseService, IUserService userService,
 			ITopicService topicService) {
 		super();
@@ -125,10 +123,7 @@ public class HomePageCommand implements ICommand {
 
 		request.setAttribute("page", page);
 		request.setAttribute("lecturers", lecturers);
-		List<String> statuses = Stream.of(CourseStatusEnum.values())
-                .map(Enum::name)
-                .collect(Collectors.toList());
-		request.setAttribute("statuses", statuses);
+		request.setAttribute("statuses", CourseStatusEnum.values());
 		return Constants.PAGE__HOME;
 	}
 

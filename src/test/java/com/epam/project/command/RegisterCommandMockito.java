@@ -61,3 +61,7 @@ public class RegisterCommandMockito extends BaseCommandMockito{
 		
 	}
 }
+
+
+
+

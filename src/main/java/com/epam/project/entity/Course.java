@@ -17,7 +17,14 @@ public class Course implements Serializable{
 	private CourseStatusEnum status;
 	private int topicId;
 	private int lecturerId;
+	private String idempotencyId;
 	
+	public String getIdempotencyId() {
+		return idempotencyId;
+	}
+	public void setIdempotencyId(String idempotencyId) {
+		this.idempotencyId = idempotencyId;
+	}
 	public int getTopicId() {
 		return topicId;
 	}

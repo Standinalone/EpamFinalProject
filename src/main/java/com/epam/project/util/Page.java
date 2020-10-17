@@ -19,6 +19,7 @@ import com.epam.project.exceptions.DBException;
 public class Page<T> {
 	private List<T> list = null;
 
+	@SuppressWarnings("unchecked")
 	private <R> void createList(String indexName, String startIndex, String totalPages, HttpServletRequest request,
 			BiFunction<Integer, Integer, R> getListFunc, IntSupplier getCountFunc) throws DBException {
 

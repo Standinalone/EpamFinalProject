@@ -3,8 +3,6 @@ package com.epam.project.command.impl.get;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -97,10 +95,7 @@ public class ManageCoursesPageCommand implements ICommand {
 		request.setAttribute("topics", topicService.findAllTopics());
 
 		request.setAttribute("lecturers", lecturers);
-		List<String> statuses = Stream.of(CourseStatusEnum.values())
-                .map(Enum::name)
-                .collect(Collectors.toList());
-		request.setAttribute("statuses", statuses);
+		request.setAttribute("statuses", CourseStatusEnum.values());
 		request.setAttribute("page", page);
 
 		return Constants.PAGE__MANAGE_COURSES;

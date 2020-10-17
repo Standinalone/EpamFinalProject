@@ -26,7 +26,7 @@ import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import static org.mockito.ArgumentMatchers.*;
 
-public class UtilTest {
+public class UtilMockito {
 	@Before
 	public void setup() {
 		MockitoAnnotations.initMocks(this);

@@ -57,6 +57,7 @@ public class RegisterCommand implements ICommand {
 	 * @param userService    mocked IUserService
 	 * @param tokenService   mocked ITokenService
 	 */
+	@SuppressWarnings("unused")
 	private RegisterCommand(ServiceFactory serviceFactory, IUserService userService, ITokenService tokenService) {
 		super();
 		this.serviceFactory = serviceFactory;

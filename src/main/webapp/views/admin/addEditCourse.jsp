@@ -11,7 +11,8 @@
 	var="successMessage" scope="page" />
 <!-- Header -->
 <%@include file='/WEB-INF/jspf/header.jspf'%>
-<script src="${pageContext.servletContext.contextPath}/duration.js"></script>
+<script src="${pageContext.servletContext.contextPath}/js/duration.js"></script>
+<script src="${pageContext.servletContext.contextPath}/js/addCookie.js"></script>
 
 <!-- Body -->
 <fmt:bundle basename="tables">

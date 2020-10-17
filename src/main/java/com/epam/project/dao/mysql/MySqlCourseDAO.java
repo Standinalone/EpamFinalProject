@@ -118,7 +118,7 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 		String appendix = (conditions.length() == 0 ? "" : " WHERE " + conditions);
 		return getCount(daoFactory.getConnection(), SQL_GET_COUNT + appendix);
 	}
-
+	
 	@Override
 	protected Course mapToEntity(ResultSet rs) throws SQLException {
 		Course course = new Course();
@@ -143,4 +143,5 @@ public class MySqlCourseDAO extends GenericDAO<Course> implements ICourseDAO {
 		ps.setInt(5, course.getTopicId());
 		ps.setInt(6, course.getLecturerId());
 	}
+
 }

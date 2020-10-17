@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -56,8 +57,11 @@ public class AddEditCourseCommand implements ICommand {
 		}
 	}
 
+
+	
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
+		
 		localization = LocalizationFactory.getLocalization((Locale) request.getSession().getAttribute("locale"));
 		String page = request.getParameter("page");
 
@@ -79,6 +83,12 @@ public class AddEditCourseCommand implements ICommand {
 		if (courseId != null && !courseId.isEmpty()) {
 			courseService.updateCourse(course);
 		} else {
+			Cookie[] cookies = request.getCookies();
+			for (Cookie cookie : cookies) {
+				if ("uid".equals(cookie.getName())) {
+					course.setIdempotencyId(cookie.getValue());
+				}
+			}
 			courseService.addCourse(course);
 		}
 		request.getSession().setAttribute("successMessage", localization.getResourcesParam("success.updated"));

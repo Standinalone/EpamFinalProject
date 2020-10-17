@@ -58,7 +58,7 @@ public class FrontController extends HttpServlet {
 		}
 	}
 
-	private String handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	private String handleRequest(HttpServletRequest request, HttpServletResponse response) {
 		Locale locale = (Locale) request.getSession().getAttribute("locale");
 		Localization localization = LocalizationFactory.getLocalization(locale);
 		ICommand command = CommandFactory.getCommand(request);
@@ -66,7 +66,7 @@ public class FrontController extends HttpServlet {
 			return command.execute(request, response);
 		} catch (DBException e) {
 			e.printStackTrace();
-			log.error("DBException ({}): {}", e.getClass().getSimpleName(), localization.getResourcesParam(e.getMessage()));
+			log.error("DBException ({}): {}", e.getClass().getSimpleName(), e);
 			request.getSession().setAttribute("error", "DBException: " + localization.getResourcesParam(e.getMessage()));
 			
 		} catch (ValidatingRequestException e) {
@@ -74,7 +74,12 @@ public class FrontController extends HttpServlet {
 			log.error("ValidatingRequestException: {}", localization.getResourcesParam(e.getMessage()));
 			request.getSession().setAttribute("error", "ValidatingRequestException: " + localization.getResourcesParam(e.getMessage()));
 		}
-		response.sendRedirect(request.getRequestURL().append(Constants.COMMAND__ERROR).toString());
+		try {
+			response.sendRedirect(request.getRequestURL().append(Constants.COMMAND__ERROR).toString());
+		} catch (IOException e) {
+			log.error("Exception in doPost {}", e.getMessage());
+			e.printStackTrace();
+		}
 		log.trace("Redirecting to {}", Constants.COMMAND__ERROR);
 		return null;
 	}

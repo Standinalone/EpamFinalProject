@@ -1,7 +1,10 @@
 package com.epam.project.service.impl;
 
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -157,12 +160,26 @@ public class MySqlCourseService implements ICourseService {
 			daoFactory.endTransaction();
 		}
 	}
-
+	private Set<String> idempotencyList = new HashSet<>();
+	private boolean checkIdempotencyId(String id) {
+		if (idempotencyList.contains(id))
+			return false;
+		if (idempotencyList.size() > 200) {
+			idempotencyList = new HashSet<>();
+		}
+		return true;
+	}
 	@Override
 	public void addCourse(Course course) throws DBCourseException {
+		if (course.getIdempotencyId() == null)
+			throw new DBCourseException("dberror.course.add");
 		try {
 			daoFactory.beginTransation();
+			//courseDao.findByIdempotencyId(course.getIdempotencyId());
+			if (!checkIdempotencyId(course.getIdempotencyId()))
+				throw new DBCourseException("dberror.course.exists");
 			courseDao.add(course);
+			idempotencyList.add(course.getIdempotencyId());
 			daoFactory.getConnection().commit();
 		} catch (SQLException e) {
 			daoFactory.rollback();

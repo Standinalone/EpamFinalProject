@@ -42,5 +42,4 @@ public class HomePageMockito extends BaseCommandMockito {
 		}
 		assertEquals(null, forward);
 	}
-
 }

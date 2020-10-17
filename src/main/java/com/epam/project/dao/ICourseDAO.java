@@ -78,4 +78,5 @@ public interface ICourseDAO {
 	 * @throws SQLException
 	 */
 	int getCountWithParameters(String conditions) throws SQLException;
+
 }

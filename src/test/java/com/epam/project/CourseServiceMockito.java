@@ -91,17 +91,7 @@ public class CourseServiceMockito {
 		doReturn("FINISHED").when(rs).getString("statuses.name");
 	}
 
-	@Test
-	public void test1() throws SQLException {
-		doThrow(new SQLException()).when(daoFactory).beginTransation();
-//		doReturn(connection).when(daoFactory).getConnection();
-		try {
-			courseService.addCourse(course);
-			System.out.println("added");
-		} catch (DBException e) {
-			System.out.println(e.getMessage() + " " + e.getClass().getSimpleName());
-		}
-	}
+
 
 	@Test
 	public void test() throws SQLException, DBCourseException {
