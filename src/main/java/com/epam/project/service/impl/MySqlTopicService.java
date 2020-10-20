@@ -45,13 +45,12 @@ public class MySqlTopicService implements ITopicService{
 	@Override
 	public Topic findTopicById(int topicId) throws DBTopicException {
 		try {
-			daoFactory.beginTransation();
+			daoFactory.open();
 			return topicDao.findById(topicId);
 		} catch (SQLException e) {
-			daoFactory.rollback();
 			throw new DBTopicException("dberror.topic.get", e);
 		} finally {
-			daoFactory.endTransaction();
+			daoFactory.close();
 		}
 	}
 

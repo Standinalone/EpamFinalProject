@@ -45,6 +45,7 @@ public class MySqlTokenService implements ITokenService {
 		try {
 			daoFactory.beginTransation();
 			tokenDao.add(token);
+			daoFactory.getConnection().commit();
 		} catch (SQLException e) {
 			daoFactory.rollback();
 			throw new DBTokenException("dberror.token.add", e);

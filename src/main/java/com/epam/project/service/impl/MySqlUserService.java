@@ -113,6 +113,7 @@ public class MySqlUserService implements IUserService {
 			for (String id : courseIds) {
 				userDao.addToManyToMany(Integer.parseInt(id), userId);
 			}
+			daoFactory.getConnection().commit();
 		} catch (SQLException | NumberFormatException e) {
 			daoFactory.rollback();
 			throw new DBUserException("dberror.user.enroll", e);
@@ -151,6 +152,7 @@ public class MySqlUserService implements IUserService {
 			user.setPassword(hashedPwd(user.getPassword()));
 			daoFactory.beginTransation();
 			userDao.add(user);
+			daoFactory.getConnection().commit();
 		} catch (SQLException | NoSuchAlgorithmException e) {
 			daoFactory.rollback();
 			throw new DBUserException("dberror.user.add", e);
@@ -176,6 +178,7 @@ public class MySqlUserService implements IUserService {
 		try {
 			daoFactory.beginTransation();
 			userDao.update(user);
+			daoFactory.getConnection().commit();
 		} catch (SQLException e) {
 			daoFactory.rollback();
 			throw new DBUserException("dberror.user.update", e);
@@ -217,6 +220,7 @@ public class MySqlUserService implements IUserService {
 				user.setBlocked(true);
 				userDao.update(user);
 			}
+			daoFactory.getConnection().commit();
 		} catch (SQLException e) {
 			daoFactory.rollback();
 			throw new DBUserException("dberror.user.block", e);
@@ -235,6 +239,7 @@ public class MySqlUserService implements IUserService {
 				user.setBlocked(false);
 				userDao.update(user);
 			}
+			daoFactory.getConnection().commit();
 		} catch (SQLException e) {
 			daoFactory.rollback();
 			throw new DBUserException("dberror.user.unblock", e);
@@ -248,6 +253,7 @@ public class MySqlUserService implements IUserService {
 		try {
 			daoFactory.beginTransation();
 			userDao.delete(userId);
+			daoFactory.getConnection().commit();
 		} catch (SQLException e) {
 			daoFactory.rollback();
 			throw new DBUserException("dberror.user.delete", e);
@@ -311,6 +317,7 @@ public class MySqlUserService implements IUserService {
 			for (String userId : userIds) {
 				userDao.deleteUserFromCourse(Integer.parseInt(userId), courseId);
 			}
+			daoFactory.getConnection().commit();
 		} catch (SQLException e) {
 			daoFactory.rollback();
 			throw new DBUserException("dberror.user.decline", e);
@@ -326,6 +333,7 @@ public class MySqlUserService implements IUserService {
 			for (String userId : userIds) {
 				userDao.registerInCourse(Integer.parseInt(userId), courseId, registered);
 			}
+			daoFactory.getConnection().commit();
 		} catch (SQLException e) {
 			daoFactory.rollback();
 			throw new DBUserException("dberror.user.register", e);
@@ -341,6 +349,7 @@ public class MySqlUserService implements IUserService {
 			for (Map.Entry<Integer, Integer> entry : userGrade.entrySet()) {
 				userDao.updateGradeForUser(courseId, entry.getKey(), entry.getValue());
 			}
+			daoFactory.getConnection().commit();
 		} catch (SQLException e) {
 			daoFactory.rollback();
 			throw new DBUserException("dberror.user.grades", e);

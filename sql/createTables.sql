@@ -140,13 +140,13 @@ CREATE TABLE IF NOT EXISTS `epam`.`Courses_has_Users` (
   CONSTRAINT `fk_Courses_has_Users_Courses`
     FOREIGN KEY (`course_id`)
     REFERENCES `epam`.`Courses` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION,
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
   CONSTRAINT `fk_Courses_has_Users_Users1`
     FOREIGN KEY (`user_id`)
     REFERENCES `epam`.`Users` (`id`)
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
 ENGINE = InnoDB;
 
 

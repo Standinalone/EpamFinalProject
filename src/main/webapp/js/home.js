@@ -19,7 +19,9 @@ function changeLocation(event){
 	var url = new URL(location)
 	console.log(event.target.id)
 	console.log(event.target.name)
+	console.log( url.toString())
 	url.searchParams.set(event.target.name, event.target.value)
+	url.searchParams.set('pagenum', 1)
 	location = url.toString()
 }
 

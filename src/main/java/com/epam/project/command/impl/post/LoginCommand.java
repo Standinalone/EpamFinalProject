@@ -53,9 +53,6 @@ public class LoginCommand implements ICommand {
 			user = userService.findUserByLogin(username);
 		} catch (DBUserException e) {
 			log.error(e.getMessage());
-			errors.add(localization.getResourcesParam(e.getMessage()));
-		}
-		if (user == null) {
 			errors.add(localization.getResourcesParam("login.error"));
 			return errors;
 		}
@@ -65,11 +62,9 @@ public class LoginCommand implements ICommand {
 		}
 		if (user.isBlocked()) {
 			errors.add(localization.getResourcesParam("login.blocked"));
-			return errors;
 		}
 		if (!user.isEnabled()) {
 			errors.add(localization.getResourcesParam("login.enabled"));
-			return errors;
 		}
 		request.getSession().setAttribute("user", user);
 		return errors;

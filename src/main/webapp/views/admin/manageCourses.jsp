@@ -7,7 +7,8 @@
 	scope="page" />
 <!-- Header -->
 <%@include file='/WEB-INF/jspf/header.jspf'%>
-<script src="${pageContext.servletContext.contextPath}/home.js"></script>
+<script src="${pageContext.servletContext.contextPath}/js/home.js"></script>
+<script src="${pageContext.servletContext.contextPath}/js/deleteListener.js"></script>
 <style>
 table th {
   cursor: pointer;
@@ -107,7 +108,7 @@ table th {
 											<form
 												action="?command=DELETE_COURSE&id=${ course.course.id }"
 												method="post">
-												<a onclick="this.parentNode.submit();"><svg width="1em"
+												<a class = "btn-delete"><svg width="1em"
 														height="1em" viewBox="0 0 16 16" class="bi bi-x"
 														fill="currentColor" xmlns="http://www.w3.org/2000/svg">
   <path fill-rule="evenodd"

@@ -84,8 +84,7 @@ public class RegisterCommand implements ICommand {
 		try {
 			existingUser = userService.findUserByLogin(user.getLogin());
 		} catch (DBUserException e) {
-			log.error("Finding user error", e);
-			errors.add(localization.getResourcesParam("dberror.finduser"));
+			log.info("User not found");
 		}
 		if (existingUser != null) {
 			errors.add(localization.getResourcesParam("register.userExists"));

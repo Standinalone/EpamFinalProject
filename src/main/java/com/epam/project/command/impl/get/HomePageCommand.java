@@ -87,6 +87,7 @@ public class HomePageCommand implements ICommand {
 	@Override
 	public String execute(HttpServletRequest request, HttpServletResponse response) throws DBException {
 
+		log.error("message1");
 		int topicId = 0, lecturerId = 0, statusId = 0;
 		try {
 			lecturerId = Integer.parseInt(request.getParameter("lecturer"));
@@ -103,6 +104,7 @@ public class HomePageCommand implements ICommand {
 		} catch (IllegalArgumentException | NullPointerException e) {
 			log.trace("Wrong format for status");
 		}
+		log.error("message2");
 		Map<String, Integer> map = new HashMap<>();
 		map.put("lecturer_id", lecturerId);
 		map.put("topic_id", topicId);
