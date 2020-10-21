@@ -21,7 +21,7 @@
 							<label for="username" class="text-info"><fmt:message
 									key="register.username" />:</label><br> <input type="text"
 								name="username" id="username" class="form-control" value="user#"
-								pattern="\w{4,20}" title="Username should contain from 4 to 10 characters">
+								pattern="(?u)\w{4,20}" title="Username should contain from 4 to 10 characters">
 						</div>
 						<div class="form-group">
 							<label for="password" class="text-info"><fmt:message
@@ -42,19 +42,19 @@
 							<label for="name" class="text-info"><fmt:message
 									key="register.name" />:</label><br> <input type="text"
 								name="name" id="name" class="form-control"  value="User"
-								pattern="\w{4,20}" title="Name should contain from 4 to 10 characters">
+								pattern="(?u)\w{4,20}" title="Name should contain from 4 to 10 characters">
 						</div>
 						<div class="form-group">
 							<label for="surname" class="text-info"><fmt:message
 									key="register.surname" />:</label><br> <input type="text"
 								name="surname" id="surname" class="form-control" value="Userov"
-								pattern="\w{4,20}" title="Surname should contain from 4 to 10 characters">
+								pattern="(?u)\w{4,20}" title="Surname should contain from 4 to 10 characters">
 						</div>
 						<div class="form-group">
 							<label for="patronym" class="text-info"><fmt:message
 									key="register.patronym" />:</label><br> <input type="text"
 								name="patronym" id="patronym" class="form-control" value="Userovych"
-								pattern="\w{4,20}" title="Patronym should contain from 4 to 10 characters">
+								pattern="(?u)\w{4,20}" title="Patronym should contain from 4 to 10 characters">
 						</div>
 						<div class="form-group">
 							<label for="email" class="text-info"><fmt:message

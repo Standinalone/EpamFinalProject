@@ -18,7 +18,7 @@ public class CourseDto implements Serializable {
 	private long duration;
 	
 	/**
-	 * Fields for determining whether a user is in course
+	 * Field for determining whether a user is in course
 	 */
 	private boolean inCourse;
 
